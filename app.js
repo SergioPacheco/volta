@@ -1318,10 +1318,7 @@
       matches = matches.filter(({ index }) => isFavorite(index));
     }
     if (state.currentContinent) {
-      matches = matches.filter(({ city }) => {
-        const info = COUNTRY_INFO[city.country];
-        return info && info[1] === state.currentContinent;
-      });
+      matches = matches.filter(({ city }) => city.region === state.currentContinent);
     }
     
     elements.resultCount.textContent = `${matches.length} ${matches.length === 1 ? "destino" : "destinos"}`;
