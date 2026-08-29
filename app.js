@@ -859,7 +859,7 @@
     elements.filterButtons.forEach(btn => {
       btn.classList.toggle("is-active", btn.dataset.filter === filter);
     });
-    renderGrid();
+    renderGrid(elements.search.value);
   }
 
   /**
@@ -868,7 +868,7 @@
    */
   function setContinent(continent) {
     state.currentContinent = continent;
-    renderGrid();
+    renderGrid(elements.search.value);
   }
 
   // -----------------------------------------------------------------------------
@@ -1862,7 +1862,11 @@
       btn.addEventListener("click", () => setFilter(btn.dataset.filter));
     });
     
-    elements.filterContinent.addEventListener("change", (e) => setContinent(e.target.value));
+    if (elements.filterContinent) {
+      elements.filterContinent.addEventListener("change", (e) => setContinent(e.target.value));
+    } else {
+      console.warn("[VOLTA] Elemento filter-continent não encontrado");
+    }
     
     // Autoplay
     elements.autoplayBtn.addEventListener("click", toggleAutoplay);
