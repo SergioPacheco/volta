@@ -321,8 +321,6 @@
     filterContinent: $("#filter-continent"),
     statsModal: $("#stats-modal"),
     audioModal: $("#audio-modal"),
-    shareModal: $("#share-modal"),
-    shareCityName: $("#share-city-name"),
     pipBtn: $("#pip-button"),
     shareBtn: $("#share-button"),
     statsBtn: $("#stats-button"),
@@ -348,8 +346,7 @@
     closeAboutButtons: document.querySelectorAll("[data-close-about]"),
     closeStatsButtons: document.querySelectorAll("[data-close-stats]"),
     closeAudioButtons: document.querySelectorAll("[data-close-audio]"),
-    closeShareButtons: document.querySelectorAll("[data-close-share]"),
-    shareButtons: document.querySelectorAll("[data-share]"),
+    shareFanButtons: document.querySelectorAll(".share-fan-item"),
     filterButtons: document.querySelectorAll("[data-filter]"),
     mixerSliders: document.querySelectorAll(".mixer-item input"),
   };
@@ -1056,13 +1053,43 @@
   // -----------------------------------------------------------------------------
   
   /**
-   * Abre modal de compartilhamento
+   * Alterna visibilidade do menu leque de share
    */
-  function openShareModal() {
-    const city = currentCity();
-    const countryName = COUNTRY_INFO[city.country]?.[0] || city.country;
-    elements.shareCityName.textContent = `${city.name}, ${countryName}`;
-    openLayer(elements.shareModal);
+  function toggleShareFan() {
+    const fan = $("#share-fan");
+    const btn = elements.shareBtn;
+    const isOpen = fan.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", isOpen);
+    
+    // Fecha ao clicar fora
+    if (isOpen) {
+      setTimeout(() => {
+        document.addEventListener("click", closeShareFanOnClickOutside);
+      }, 10);
+    }
+  }
+  
+  /**
+   * Fecha o leque ao clicar fora
+   */
+  function closeShareFanOnClickOutside(e) {
+    const fan = $("#share-fan");
+    const wrapper = e.target.closest(".share-fan-wrapper");
+    if (!wrapper && fan.classList.contains("is-open")) {
+      fan.classList.remove("is-open");
+      elements.shareBtn.setAttribute("aria-expanded", "false");
+      document.removeEventListener("click", closeShareFanOnClickOutside);
+    }
+  }
+  
+  /**
+   * Fecha o leque de share
+   */
+  function closeShareFan() {
+    const fan = $("#share-fan");
+    fan.classList.remove("is-open");
+    elements.shareBtn.setAttribute("aria-expanded", "false");
+    document.removeEventListener("click", closeShareFanOnClickOutside);
   }
 
   /**
@@ -1100,23 +1127,23 @@
       try {
         await navigator.clipboard.writeText(url);
         showToast(MESSAGES.linkCopied);
-        closeLayer(elements.shareModal);
       } catch (error) {
         console.warn("[VOLTA] Erro ao copiar link:", error.message);
         showToast(MESSAGES.linkCopyFailed);
       }
+      closeShareFan();
       return;
     }
     
     const shareUrl = shareUrls[platform];
     if (shareUrl) {
       window.open(shareUrl, "_blank", "width=600,height=400,menubar=no,toolbar=no");
-      closeLayer(elements.shareModal);
+      closeShareFan();
     }
   }
 
   /**
-   * Compartilha cidade atual (fallback para Web Share API ou abre modal)
+   * Compartilha cidade atual (fallback para Web Share API ou abre leque)
    */
   async function shareCity() {
     // Em mobile com Web Share API nativa, usa ela diretamente
@@ -1130,8 +1157,8 @@
         }
       }
     } else {
-      // Em desktop, abre modal com opções de redes sociais
-      openShareModal();
+      // Em desktop, abre leque com opções de redes sociais
+      toggleShareFan();
     }
   }
 
@@ -1858,11 +1885,8 @@
     // Compartilhar
     elements.shareBtn.addEventListener("click", shareCity);
     
-    elements.closeShareButtons.forEach(btn => {
-      btn.addEventListener("click", () => closeLayer(elements.shareModal));
-    });
-    
-    elements.shareButtons.forEach(btn => {
+    // Botões do leque de share
+    elements.shareFanButtons.forEach(btn => {
       btn.addEventListener("click", () => shareToSocial(btn.dataset.share));
     });
     
@@ -1915,7 +1939,7 @@
           closeLayer(elements.about);
           closeLayer(elements.statsModal);
           closeLayer(elements.audioModal);
-          closeLayer(elements.shareModal);
+          closeShareFan();
           break;
         case "r":
         case "R":
