@@ -2,7 +2,10 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta
       name="description"
       content="VOLTA — atravesse cidades do mundo em passeios imersivos com rádio local."
@@ -204,10 +207,19 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14h3l3 3V7L7 10H4v4zM14 9c2 2 2 4 0 6"></path></svg>
       </button>
 
-      <div class="hint">
+      <!-- Hint desktop (teclado) -->
+      <div class="hint hint-desktop">
         <button type="button" id="hint-prev" aria-label="Cidade anterior" title="Cidade anterior (←)"><kbd>←</kbd></button>
         <button type="button" id="hint-next" aria-label="Próxima cidade" title="Próxima cidade (→)"><kbd>→</kbd></button>
         <span>para viajar</span>
+      </div>
+      
+      <!-- Hint mobile (swipe) -->
+      <div class="hint hint-mobile">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18"/>
+        </svg>
+        <span>deslize para viajar</span>
       </div>
 
       <section class="city-drawer" id="city-drawer" aria-hidden="true" aria-labelledby="drawer-title">

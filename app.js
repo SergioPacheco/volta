@@ -1968,6 +1968,112 @@
         // Ignora mensagens que não são JSON válido
       }
     });
+    
+    // Touch/Swipe gestures para mobile
+    setupTouchGestures();
+  }
+  
+  // -----------------------------------------------------------------------------
+  // Touch Gestures para Mobile
+  // -----------------------------------------------------------------------------
+  
+  /**
+   * Configura gestos de toque para navegação mobile
+   */
+  function setupTouchGestures() {
+    const touchState = {
+      startX: 0,
+      startY: 0,
+      startTime: 0,
+      isScrolling: null,
+    };
+    
+    const SWIPE_THRESHOLD = 50; // pixels mínimos para considerar swipe
+    const SWIPE_TIME_LIMIT = 300; // ms máximo para swipe
+    const VELOCITY_THRESHOLD = 0.3; // pixels/ms
+    
+    // Área principal para swipe (exclui player e drawer)
+    const swipeArea = elements.app;
+    
+    swipeArea.addEventListener("touchstart", (e) => {
+      // Ignora se tocar em controles interativos
+      if (e.target.closest(".player-card, .drawer, .about-modal, button, input, a")) {
+        return;
+      }
+      
+      const touch = e.touches[0];
+      touchState.startX = touch.clientX;
+      touchState.startY = touch.clientY;
+      touchState.startTime = Date.now();
+      touchState.isScrolling = null;
+    }, { passive: true });
+    
+    swipeArea.addEventListener("touchmove", (e) => {
+      if (touchState.startX === 0) return;
+      
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchState.startX;
+      const deltaY = touch.clientY - touchState.startY;
+      
+      // Determina se é scroll vertical ou swipe horizontal
+      if (touchState.isScrolling === null) {
+        touchState.isScrolling = Math.abs(deltaY) > Math.abs(deltaX);
+      }
+    }, { passive: true });
+    
+    swipeArea.addEventListener("touchend", (e) => {
+      if (touchState.startX === 0 || touchState.isScrolling) {
+        touchState.startX = 0;
+        return;
+      }
+      
+      // Ignora se tocar em controles interativos
+      if (e.target.closest(".player-card, .drawer, .about-modal, button, input, a")) {
+        touchState.startX = 0;
+        return;
+      }
+      
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - touchState.startX;
+      const deltaTime = Date.now() - touchState.startTime;
+      const velocity = Math.abs(deltaX) / deltaTime;
+      
+      // Verifica se é um swipe válido
+      if (Math.abs(deltaX) >= SWIPE_THRESHOLD && 
+          deltaTime <= SWIPE_TIME_LIMIT && 
+          velocity >= VELOCITY_THRESHOLD) {
+        
+        // Swipe para esquerda = próxima cidade
+        // Swipe para direita = cidade anterior
+        if (deltaX < 0) {
+          selectCity(state.cityIndex + 1);
+        } else {
+          selectCity(state.cityIndex - 1);
+        }
+      }
+      
+      touchState.startX = 0;
+      touchState.isScrolling = null;
+    }, { passive: true });
+    
+    // Double tap para play/pause rádio
+    let lastTap = 0;
+    swipeArea.addEventListener("touchend", (e) => {
+      // Ignora se tocar em controles
+      if (e.target.closest(".player-card, .drawer, .about-modal, button, input, a")) {
+        return;
+      }
+      
+      const now = Date.now();
+      const DOUBLE_TAP_DELAY = 300;
+      
+      if (now - lastTap < DOUBLE_TAP_DELAY) {
+        toggleRadio();
+        lastTap = 0;
+      } else {
+        lastTap = now;
+      }
+    }, { passive: true });
   }
 
   // -----------------------------------------------------------------------------
