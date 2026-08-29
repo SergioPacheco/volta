@@ -746,13 +746,13 @@
    * @param {number} [index] - Índice da cidade
    */
   function toggleFavorite(index = state.cityIndex) {
-    const cityKey = cities[index].city;
+    const cityKey = cities[index].rawName;
     if (state.favorites.has(cityKey)) {
       state.favorites.delete(cityKey);
-      showToast(MESSAGES.favoriteRemoved(cities[index].city));
+      showToast(MESSAGES.favoriteRemoved(cities[index].name));
     } else {
       state.favorites.add(cityKey);
-      showToast(MESSAGES.favoriteAdded(cities[index].city));
+      showToast(MESSAGES.favoriteAdded(cities[index].name));
     }
     saveFavorites();
     updateFavoriteButton();
@@ -764,7 +764,7 @@
    * Atualiza botão de favorito
    */
   function updateFavoriteButton() {
-    const isFav = state.favorites.has(cities[state.cityIndex].city);
+    const isFav = state.favorites.has(cities[state.cityIndex].rawName);
     elements.favoriteBtn.classList.toggle("is-active", isFav);
     elements.favoriteBtn.setAttribute("aria-label", isFav ? "Remover dos favoritos" : "Adicionar aos favoritos");
   }
@@ -775,7 +775,7 @@
    * @returns {boolean}
    */
   function isFavorite(index) {
-    return state.favorites.has(cities[index].city);
+    return state.favorites.has(cities[index].rawName);
   }
 
   // -----------------------------------------------------------------------------
