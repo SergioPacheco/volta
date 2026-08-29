@@ -518,6 +518,7 @@
    * Atualiza o relógio com o horário local da cidade
    */
   function updateClock() {
+    if (!elements.topTime) return;
     try {
       elements.topTime.textContent = new Intl.DateTimeFormat("pt-BR", {
         timeZone: currentCity().timeZone,
@@ -1379,7 +1380,9 @@
     elements.cityName.textContent = city.name;
     elements.cityNote.textContent = city.note;
     elements.cityIndex.textContent = pad(state.cityIndex + 1);
-    elements.topLocation.textContent = `${city.name}, ${city.country}`;
+    if (elements.topLocation) {
+      elements.topLocation.textContent = `${city.name}, ${city.country}`;
+    }
     document.title = `${city.name} — VOLTA`;
     
     updateModeControls();
@@ -1706,16 +1709,20 @@
    */
   function setupEventListeners() {
     // Botão iniciar
-    elements.start.addEventListener("click", () => {
-      elements.welcome.classList.add("is-hidden");
-      elements.radio.play()
-        .then(() => setPlayingState(true))
-        .catch((error) => {
-          console.warn("[VOLTA] Autoplay bloqueado:", error.message);
-          setPlayingState(false);
-        });
-      videoCommand("playVideo");
-    });
+    if (elements.start) {
+      elements.start.addEventListener("click", () => {
+        elements.welcome.classList.add("is-hidden");
+        elements.radio.play()
+          .then(() => setPlayingState(true))
+          .catch((error) => {
+            console.warn("[VOLTA] Autoplay bloqueado:", error.message);
+            setPlayingState(false);
+          });
+        videoCommand("playVideo");
+      });
+    } else {
+      console.error("[VOLTA] Botão start não encontrado!");
+    }
     
     // Navegação de cidades
     $("#cities-button").addEventListener("click", () => {
