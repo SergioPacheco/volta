@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="VOLTA — atravesse cidades do mundo em passeios imersivos com rádio local."
+    />
+    <meta name="theme-color" content="#111411" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="VOLTA — cidades em movimento" />
+    <meta property="og:description" content="Passeios imersivos por 179 cidades do mundo com rádio local. Ruas reais, sem passagem, sem pressa." />
+    <meta property="og:image" content="assets/hero-saopaulo.webp" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="VOLTA — cidades em movimento" />
+    <meta name="twitter:description" content="Passeios imersivos por 179 cidades do mundo com rádio local." />
+    <meta name="twitter:image" content="assets/hero-saopaulo.webp" />
+
+    <title>VOLTA — cidades em movimento</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23111411'/%3E%3Cpath d='M14 36c9-15 22-15 36-6M16 46c11-10 22-10 33-4' fill='none' stroke='%23d7ff43' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://www.youtube-nocookie.com" />
+    <link rel="preconnect" href="https://i.ytimg.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
+      as="style"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a href="#city-name" class="skip-link">Pular para conteúdo principal</a>
+    <main class="app" id="app">
+      <div class="media-layer" aria-hidden="true">
+        <div class="poster" id="poster"></div>
+        <iframe
+          id="city-video"
+          class="city-video"
+          title="Passeio pela cidade"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+        <div class="color-wash" id="color-wash"></div>
+        <div class="vignette"></div>
+        <div class="grain"></div>
+      </div>
+
+      <header class="topbar">
+        <button class="brand" id="about-button" type="button" aria-label="Sobre o VOLTA">
+          <svg viewBox="0 0 34 34" aria-hidden="true">
+            <circle cx="17" cy="17" r="14"></circle>
+            <path d="M8 18.5c4.5-7 10.5-7 18-3M9 24c5-5 10.5-5 16-2"></path>
+          </svg>
+          <span>VOLTA</span>
+        </button>
+
+        <div class="journey-state" aria-live="polite">
+          <span class="live-dot"></span>
+          <span id="top-location">São Paulo, Brasil</span>
+          <span class="top-time" id="top-time">16:42</span>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-button" id="pip-button" type="button" aria-label="Picture-in-Picture" title="Picture-in-Picture (P)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><rect x="11" y="10" width="9" height="6" rx="1"/></svg>
+          </button>
+          <button class="icon-button" id="share-button" type="button" aria-label="Compartilhar cidade" title="Compartilhar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+          </button>
+          <button class="icon-button" id="stats-button" type="button" aria-label="Estatísticas" title="Suas estatísticas">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </button>
+          <button class="icon-button" id="theme-button" type="button" aria-label="Trocar tema" title="Trocar tema visual">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button class="icon-button" id="fullscreen-button" type="button" aria-label="Tela cheia">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path></svg>
+          </button>
+          <button class="menu-button" id="cities-button" type="button">
+            <span>Explorar cidades</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="city-intro" aria-labelledby="city-name">
+        <div class="city-count"><span id="city-index">01</span><i></i><span id="city-total">08</span></div>
+        <p class="eyebrow" id="city-region">América do Sul · Agora</p>
+        <h1 id="city-name">São<br />Paulo</h1>
+        <p class="city-note" id="city-note">Concreto, luz e o pulso contínuo da maior cidade do hemisfério sul.</p>
+        <div class="city-actions">
+          <button class="favorite-btn" id="favorite-btn" type="button" aria-label="Adicionar aos favoritos" title="Favoritar (F)">
+            <svg class="heart-empty" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+            <svg class="heart-full" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          </button>
+          <button class="source-link" id="source-link" type="button">
+            Ver fonte do passeio
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"></path></svg>
+          </button>
+        </div>
+        <!-- Info da cidade -->
+        <div class="city-info" id="city-info">
+          <span class="info-item" id="info-timezone"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><b>--:--</b></span>
+          <span class="info-item" id="info-population"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><b>--</b></span>
+        </div>
+      </section>
+
+      <aside class="rail" aria-label="Navegação entre cidades">
+        <button class="rail-arrow" id="previous-city" type="button" aria-label="Cidade anterior">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <div class="rail-track" id="rail-track"></div>
+        <button class="rail-arrow" id="next-city" type="button" aria-label="Próxima cidade">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </button>
+      </aside>
+
+      <section class="player-card" aria-label="Reprodutor de rádio">
+        <!-- Botão de minimizar -->
+        <button class="player-minimize" id="player-minimize" type="button" aria-label="Minimizar rádio" title="Minimizar rádio (H)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </button>
+        
+        <!-- Controles superiores integrados -->
+        <div class="stereo-top-bar">
+          <div class="mode-control" aria-label="Tipo de passeio">
+            <button class="is-active" type="button" data-mode="drive" title="Passeio de carro">DRIVE</button>
+            <button type="button" data-mode="bike" title="Passeio de bicicleta">BIKE</button>
+            <button type="button" data-mode="walk" title="Caminhada">WALK</button>
+          </div>
+          <div class="top-bar-right">
+            <button class="mini-btn" id="autoplay-btn" type="button" aria-pressed="false" title="Autoplay (A)">
+              <svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            </button>
+            <button class="mini-btn" id="pomodoro-btn" type="button" aria-pressed="false" title="Pomodoro 25min">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </button>
+            <button class="mini-btn" id="street-sound" type="button" aria-pressed="false" title="Som da rua">
+              <svg viewBox="0 0 24 24"><path d="M4 14h3l3 3V7L7 10H4v4zM14 9c2 2 2 4 0 6M17 6c4 4 4 8 0 12"/></svg>
+            </button>
+            <div class="speed-control" aria-label="Velocidade">
+              <button type="button" data-speed="0.75" title="0.75×">¾</button>
+              <button class="is-active" type="button" data-speed="1" title="1×">1</button>
+              <button type="button" data-speed="1.5" title="1.5×">1½</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Seção principal: volume + deck -->
+        <div class="player-card-main">
+          <!-- Botão de Volume Tridimensional -->
+          <div class="volume-knob-section">
+            <div class="volume-knob" id="volume-knob" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64" tabindex="0"></div>
+            <span class="knob-label">Vol</span>
+            <input id="volume" type="range" min="0" max="100" value="64" aria-label="Volume do rádio" style="display:none" />
+          </div>
+
+          <!-- Deck Principal -->
+          <div class="stereo-deck">
+          <!-- Tela LCD -->
+          <div class="lcd-screen">
+            <div class="lcd-text">
+              <div class="lcd-frequency" id="station-name">Rádio Antena 1<small> FM</small></div>
+              <div class="lcd-meta" id="lcd-meta">CH-01 · LOCAL</div>
+            </div>
+            <div class="lcd-icons">
+              <div class="lcd-equalizer is-playing" id="equalizer" aria-hidden="true">
+                <i></i><i></i><i></i><i></i>
+              </div>
+              <span class="lcd-led is-active" id="stereo-led">ST</span>
+              <span class="lcd-led" id="rds-led">RDS</span>
+            </div>
+          </div>
+
+          <!-- Botões físicos -->
+          <div class="stereo-buttons">
+            <button class="stereo-btn" id="radio-previous" type="button" aria-label="Rádio anterior" title="Rádio anterior">◄◄</button>
+            <button class="stereo-btn" id="play-button" type="button" aria-label="Play/Pause" title="Play / Pause">
+              <span class="pause-text">❚❚</span>
+              <span class="play-text" style="display:none">▶</span>
+            </button>
+            <button class="stereo-btn" id="radio-next" type="button" aria-label="Próxima rádio" title="Próxima rádio">►►</button>
+            <button class="stereo-btn" id="quality-btn" type="button" aria-label="Qualidade do vídeo" title="Qualidade: Auto / 720p / 1080p">HD</button>
+            <button class="stereo-btn" id="mixer-btn" type="button" aria-label="Efeitos de áudio" title="Mixer de sons ambiente">FX</button>
+            <button class="stereo-btn" id="random-btn" type="button" aria-label="Cidade aleatória" title="Cidade aleatória (R)">RDM</button>
+          </div>
+        </div>
+        </div>
+      </section>
+
+      <!-- Botão flutuante para restaurar o player -->
+      <button class="player-restore" id="player-restore" type="button" aria-label="Mostrar rádio" title="Mostrar rádio (H)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14h3l3 3V7L7 10H4v4zM14 9c2 2 2 4 0 6"></path></svg>
+      </button>
+
+      <div class="hint">
+        <button type="button" id="hint-prev" aria-label="Cidade anterior" title="Cidade anterior (←)"><kbd>←</kbd></button>
+        <button type="button" id="hint-next" aria-label="Próxima cidade" title="Próxima cidade (→)"><kbd>→</kbd></button>
+        <span>para viajar</span>
+      </div>
+
+      <section class="city-drawer" id="city-drawer" aria-hidden="true" aria-labelledby="drawer-title">
+        <div class="drawer-backdrop" data-close-drawer></div>
+        <div class="drawer-panel">
+          <div class="drawer-header">
+            <div>
+              <span class="drawer-kicker">Escolha o próximo destino</span>
+              <h2 id="drawer-title">O mundo pela janela.</h2>
+            </div>
+            <button class="drawer-close" type="button" data-close-drawer aria-label="Fechar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+            </button>
+          </div>
+          <label class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+            <input id="city-search" type="search" placeholder="Buscar cidade ou país" autocomplete="off" />
+            <span id="result-count">8 destinos</span>
+          </label>
+          <div class="filter-bar">
+            <button class="filter-btn is-active" type="button" data-filter="all">Todas</button>
+            <button class="filter-btn" type="button" data-filter="favorites">
+              <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+              Favoritas
+            </button>
+            <select class="filter-select" id="filter-continent">
+              <option value="">Continente</option>
+              <option value="América do Sul">América do Sul</option>
+              <option value="América do Norte">América do Norte</option>
+              <option value="América Central">América Central</option>
+              <option value="Europa">Europa</option>
+              <option value="Ásia">Ásia</option>
+              <option value="África">África</option>
+              <option value="Oceania">Oceania</option>
+              <option value="Caribe">Caribe</option>
+            </select>
+          </div>
+          <div class="city-grid" id="city-grid"></div>
+          <div class="drawer-footer">
+            <span>Vídeos de criadores independentes no YouTube</span>
+            <span>Rádios transmitidas ao vivo</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-modal" id="about-modal" aria-hidden="true" aria-labelledby="about-title">
+        <div class="about-backdrop" data-close-about></div>
+        <div class="about-card">
+          <button type="button" class="drawer-close" data-close-about aria-label="Fechar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+          <span class="drawer-kicker">Sobre o projeto</span>
+          <h2 id="about-title">Sem passagem.<br />Sem pressa.</h2>
+          <p>VOLTA é uma janela para ruas distantes. Escolha uma cidade, ligue o rádio e deixe o caminho acontecer.</p>
+          <p class="about-small">Experiência estática inspirada no formato de passeios urbanos virtuais. Nenhum dado pessoal é coletado.</p>
+        </div>
+      </section>
+
+      <!-- Modal de Compartilhamento -->
+      <section class="about-modal" id="share-modal" aria-hidden="true" aria-labelledby="share-title">
+        <div class="about-backdrop" data-close-share></div>
+        <div class="about-card share-card">
+          <button type="button" class="drawer-close" data-close-share aria-label="Fechar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+          <span class="drawer-kicker">Compartilhar</span>
+          <h2 id="share-title">Compartilhe esta cidade</h2>
+          <p class="share-city-name" id="share-city-name">São Paulo, Brasil</p>
+          <div class="share-grid">
+            <button type="button" class="share-btn share-whatsapp" data-share="whatsapp" title="WhatsApp">
+              <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              <span>WhatsApp</span>
+            </button>
+            <button type="button" class="share-btn share-twitter" data-share="twitter" title="X (Twitter)">
+              <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span>X</span>
+            </button>
+            <button type="button" class="share-btn share-facebook" data-share="facebook" title="Facebook">
+              <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <span>Facebook</span>
+            </button>
+            <button type="button" class="share-btn share-telegram" data-share="telegram" title="Telegram">
+              <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              <span>Telegram</span>
+            </button>
+            <button type="button" class="share-btn share-linkedin" data-share="linkedin" title="LinkedIn">
+              <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <span>LinkedIn</span>
+            </button>
+            <button type="button" class="share-btn share-copy" data-share="copy" title="Copiar link">
+              <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>Copiar link</span>
+            </button>
+          </div>
+          <p class="about-small">Compartilhe o VOLTA com seus amigos!</p>
+        </div>
+      </section>
+
+      <!-- Modal de Estatísticas -->
+      <section class="about-modal" id="stats-modal" aria-hidden="true" aria-labelledby="stats-title">
+        <div class="about-backdrop" data-close-stats></div>
+        <div class="about-card stats-card">
+          <button type="button" class="drawer-close" data-close-stats aria-label="Fechar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+          <span class="drawer-kicker">Suas estatísticas</span>
+          <h2 id="stats-title">Sua jornada</h2>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-value" id="stat-cities">0</span>
+              <span class="stat-label">cidades visitadas</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-favorites">0</span>
+              <span class="stat-label">favoritas</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-time">0h 0m</span>
+              <span class="stat-label">tempo de viagem</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-sessions">0</span>
+              <span class="stat-label">sessões</span>
+            </div>
+          </div>
+          <p class="about-small">Estatísticas armazenadas localmente no seu navegador.</p>
+        </div>
+      </section>
+
+      <!-- Modal de Efeitos de Áudio -->
+      <section class="about-modal" id="audio-modal" aria-hidden="true" aria-labelledby="audio-title">
+        <div class="about-backdrop" data-close-audio></div>
+        <div class="about-card audio-card">
+          <button type="button" class="drawer-close" data-close-audio aria-label="Fechar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+          <span class="drawer-kicker">Ambiente sonoro</span>
+          <h2 id="audio-title">Sons extras</h2>
+          <div class="audio-mixer">
+            <div class="mixer-item">
+              <label for="fx-rain">🌧️ Chuva</label>
+              <input type="range" id="fx-rain" min="0" max="100" value="0" />
+              <span class="mixer-value">0%</span>
+            </div>
+            <div class="mixer-item">
+              <label for="fx-wind">💨 Vento</label>
+              <input type="range" id="fx-wind" min="0" max="100" value="0" />
+              <span class="mixer-value">0%</span>
+            </div>
+            <div class="mixer-item">
+              <label for="fx-cafe">☕ Café</label>
+              <input type="range" id="fx-cafe" min="0" max="100" value="0" />
+              <span class="mixer-value">0%</span>
+            </div>
+            <div class="mixer-item">
+              <label for="fx-birds">🐦 Pássaros</label>
+              <input type="range" id="fx-birds" min="0" max="100" value="0" />
+              <span class="mixer-value">0%</span>
+            </div>
+          </div>
+          <button class="mixer-reset" type="button" id="mixer-reset">Resetar todos</button>
+        </div>
+      </section>
+
+      <!-- Painel Pomodoro flutuante -->
+      <div class="pomodoro-panel" id="pomodoro-panel">
+        <span class="pomodoro-time" id="pomodoro-time">25:00</span>
+        <span class="pomodoro-label">foco</span>
+      </div>
+
+      <!-- Painel Autoplay flutuante -->
+      <div class="autoplay-panel" id="autoplay-panel">
+        <span class="autoplay-time" id="autoplay-time">3:00</span>
+        <span class="autoplay-label">próxima cidade</span>
+      </div>
+
+      <section class="welcome" id="welcome" aria-labelledby="welcome-title">
+        <div class="welcome-image"></div>
+        <div class="welcome-shade"></div>
+        <div class="welcome-brand">VOLTA <span>cidades em movimento</span></div>
+        <div class="welcome-copy">
+          <span class="welcome-number">23°33′S · 46°38′W</span>
+          <h2 id="welcome-title">O mundo está<br />logo ali.</h2>
+          <p>Ruas reais, rádios locais e um lugar na janela. Coloque os fones e viaje sem sair daí.</p>
+          <button id="start-button" type="button">
+            <span>Começar a viagem</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </button>
+        </div>
+        <div class="welcome-foot"><span id="welcome-city-count">179 cidades</span><span>Som recomendado</span><span>Dedicado à Selma</span></div>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <audio id="radio-player" preload="none"></audio>
+      <!-- Efeitos de áudio ambiente -->
+      <audio id="fx-rain-audio" loop preload="none" src="https://cdn.pixabay.com/audio/2022/05/16/audio_1333dfb394.mp3"></audio>
+      <audio id="fx-wind-audio" loop preload="none" src="https://cdn.pixabay.com/audio/2022/10/30/audio_f3d6899824.mp3"></audio>
+      <audio id="fx-cafe-audio" loop preload="none" src="https://cdn.pixabay.com/audio/2024/02/28/audio_5f29186a0c.mp3"></audio>
+      <audio id="fx-birds-audio" loop preload="none" src="https://cdn.pixabay.com/audio/2022/03/10/audio_4dedf5bf94.mp3"></audio>
+    </main>
+
+    <script src="cities-data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
