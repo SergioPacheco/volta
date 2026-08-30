@@ -321,8 +321,6 @@
     filterContinent: $("#filter-continent"),
     statsModal: $("#stats-modal"),
     audioModal: $("#audio-modal"),
-    shareModal: $("#share-modal"),
-    shareCityName: $("#share-city-name"),
     pipBtn: $("#pip-button"),
     shareBtn: $("#share-button"),
     statsBtn: $("#stats-button"),
@@ -348,8 +346,7 @@
     closeAboutButtons: document.querySelectorAll("[data-close-about]"),
     closeStatsButtons: document.querySelectorAll("[data-close-stats]"),
     closeAudioButtons: document.querySelectorAll("[data-close-audio]"),
-    closeShareButtons: document.querySelectorAll("[data-close-share]"),
-    shareButtons: document.querySelectorAll("[data-share]"),
+    shareFanButtons: document.querySelectorAll(".share-fan-item"),
     filterButtons: document.querySelectorAll("[data-filter]"),
     mixerSliders: document.querySelectorAll(".mixer-item input"),
   };
@@ -521,6 +518,7 @@
    * Atualiza o relógio com o horário local da cidade
    */
   function updateClock() {
+    if (!elements.topTime) return;
     try {
       elements.topTime.textContent = new Intl.DateTimeFormat("pt-BR", {
         timeZone: currentCity().timeZone,
@@ -749,13 +747,13 @@
    * @param {number} [index] - Índice da cidade
    */
   function toggleFavorite(index = state.cityIndex) {
-    const cityKey = cities[index].city;
+    const cityKey = cities[index].rawName;
     if (state.favorites.has(cityKey)) {
       state.favorites.delete(cityKey);
-      showToast(MESSAGES.favoriteRemoved(cities[index].city));
+      showToast(MESSAGES.favoriteRemoved(cities[index].name));
     } else {
       state.favorites.add(cityKey);
-      showToast(MESSAGES.favoriteAdded(cities[index].city));
+      showToast(MESSAGES.favoriteAdded(cities[index].name));
     }
     saveFavorites();
     updateFavoriteButton();
@@ -767,7 +765,7 @@
    * Atualiza botão de favorito
    */
   function updateFavoriteButton() {
-    const isFav = state.favorites.has(cities[state.cityIndex].city);
+    const isFav = state.favorites.has(cities[state.cityIndex].rawName);
     elements.favoriteBtn.classList.toggle("is-active", isFav);
     elements.favoriteBtn.setAttribute("aria-label", isFav ? "Remover dos favoritos" : "Adicionar aos favoritos");
   }
@@ -778,7 +776,7 @@
    * @returns {boolean}
    */
   function isFavorite(index) {
-    return state.favorites.has(cities[index].city);
+    return state.favorites.has(cities[index].rawName);
   }
 
   // -----------------------------------------------------------------------------
@@ -862,7 +860,7 @@
     elements.filterButtons.forEach(btn => {
       btn.classList.toggle("is-active", btn.dataset.filter === filter);
     });
-    renderGrid();
+    renderGrid(elements.search.value);
   }
 
   /**
@@ -871,7 +869,7 @@
    */
   function setContinent(continent) {
     state.currentContinent = continent;
-    renderGrid();
+    renderGrid(elements.search.value);
   }
 
   // -----------------------------------------------------------------------------
@@ -1056,13 +1054,43 @@
   // -----------------------------------------------------------------------------
   
   /**
-   * Abre modal de compartilhamento
+   * Alterna visibilidade do menu leque de share
    */
-  function openShareModal() {
-    const city = currentCity();
-    const countryName = COUNTRY_INFO[city.country]?.[0] || city.country;
-    elements.shareCityName.textContent = `${city.name}, ${countryName}`;
-    openLayer(elements.shareModal);
+  function toggleShareFan() {
+    const fan = $("#share-fan");
+    const btn = elements.shareBtn;
+    const isOpen = fan.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", isOpen);
+    
+    // Fecha ao clicar fora
+    if (isOpen) {
+      setTimeout(() => {
+        document.addEventListener("click", closeShareFanOnClickOutside);
+      }, 10);
+    }
+  }
+  
+  /**
+   * Fecha o leque ao clicar fora
+   */
+  function closeShareFanOnClickOutside(e) {
+    const fan = $("#share-fan");
+    const wrapper = e.target.closest(".share-fan-wrapper");
+    if (!wrapper && fan.classList.contains("is-open")) {
+      fan.classList.remove("is-open");
+      elements.shareBtn.setAttribute("aria-expanded", "false");
+      document.removeEventListener("click", closeShareFanOnClickOutside);
+    }
+  }
+  
+  /**
+   * Fecha o leque de share
+   */
+  function closeShareFan() {
+    const fan = $("#share-fan");
+    fan.classList.remove("is-open");
+    elements.shareBtn.setAttribute("aria-expanded", "false");
+    document.removeEventListener("click", closeShareFanOnClickOutside);
   }
 
   /**
@@ -1100,23 +1128,23 @@
       try {
         await navigator.clipboard.writeText(url);
         showToast(MESSAGES.linkCopied);
-        closeLayer(elements.shareModal);
       } catch (error) {
         console.warn("[VOLTA] Erro ao copiar link:", error.message);
         showToast(MESSAGES.linkCopyFailed);
       }
+      closeShareFan();
       return;
     }
     
     const shareUrl = shareUrls[platform];
     if (shareUrl) {
       window.open(shareUrl, "_blank", "width=600,height=400,menubar=no,toolbar=no");
-      closeLayer(elements.shareModal);
+      closeShareFan();
     }
   }
 
   /**
-   * Compartilha cidade atual (fallback para Web Share API ou abre modal)
+   * Compartilha cidade atual (fallback para Web Share API ou abre leque)
    */
   async function shareCity() {
     // Em mobile com Web Share API nativa, usa ela diretamente
@@ -1130,8 +1158,8 @@
         }
       }
     } else {
-      // Em desktop, abre modal com opções de redes sociais
-      openShareModal();
+      // Em desktop, abre leque com opções de redes sociais
+      toggleShareFan();
     }
   }
 
@@ -1291,10 +1319,7 @@
       matches = matches.filter(({ index }) => isFavorite(index));
     }
     if (state.currentContinent) {
-      matches = matches.filter(({ city }) => {
-        const info = COUNTRY_INFO[city.country];
-        return info && info[1] === state.currentContinent;
-      });
+      matches = matches.filter(({ city }) => city.region === state.currentContinent);
     }
     
     elements.resultCount.textContent = `${matches.length} ${matches.length === 1 ? "destino" : "destinos"}`;
@@ -1355,7 +1380,9 @@
     elements.cityName.textContent = city.name;
     elements.cityNote.textContent = city.note;
     elements.cityIndex.textContent = pad(state.cityIndex + 1);
-    elements.topLocation.textContent = `${city.name}, ${city.country}`;
+    if (elements.topLocation) {
+      elements.topLocation.textContent = `${city.name}, ${city.country}`;
+    }
     document.title = `${city.name} — VOLTA`;
     
     updateModeControls();
@@ -1682,16 +1709,20 @@
    */
   function setupEventListeners() {
     // Botão iniciar
-    elements.start.addEventListener("click", () => {
-      elements.welcome.classList.add("is-hidden");
-      elements.radio.play()
-        .then(() => setPlayingState(true))
-        .catch((error) => {
-          console.warn("[VOLTA] Autoplay bloqueado:", error.message);
-          setPlayingState(false);
-        });
-      videoCommand("playVideo");
-    });
+    if (elements.start) {
+      elements.start.addEventListener("click", () => {
+        elements.welcome.classList.add("is-hidden");
+        elements.radio.play()
+          .then(() => setPlayingState(true))
+          .catch((error) => {
+            console.warn("[VOLTA] Autoplay bloqueado:", error.message);
+            setPlayingState(false);
+          });
+        videoCommand("playVideo");
+      });
+    } else {
+      console.error("[VOLTA] Botão start não encontrado!");
+    }
     
     // Navegação de cidades
     $("#cities-button").addEventListener("click", () => {
@@ -1838,7 +1869,11 @@
       btn.addEventListener("click", () => setFilter(btn.dataset.filter));
     });
     
-    elements.filterContinent.addEventListener("change", (e) => setContinent(e.target.value));
+    if (elements.filterContinent) {
+      elements.filterContinent.addEventListener("change", (e) => setContinent(e.target.value));
+    } else {
+      console.warn("[VOLTA] Elemento filter-continent não encontrado");
+    }
     
     // Autoplay
     elements.autoplayBtn.addEventListener("click", toggleAutoplay);
@@ -1858,11 +1893,8 @@
     // Compartilhar
     elements.shareBtn.addEventListener("click", shareCity);
     
-    elements.closeShareButtons.forEach(btn => {
-      btn.addEventListener("click", () => closeLayer(elements.shareModal));
-    });
-    
-    elements.shareButtons.forEach(btn => {
+    // Botões do leque de share
+    elements.shareFanButtons.forEach(btn => {
       btn.addEventListener("click", () => shareToSocial(btn.dataset.share));
     });
     
@@ -1915,7 +1947,7 @@
           closeLayer(elements.about);
           closeLayer(elements.statsModal);
           closeLayer(elements.audioModal);
-          closeLayer(elements.shareModal);
+          closeShareFan();
           break;
         case "r":
         case "R":
@@ -1968,6 +2000,112 @@
         // Ignora mensagens que não são JSON válido
       }
     });
+    
+    // Touch/Swipe gestures para mobile
+    setupTouchGestures();
+  }
+  
+  // -----------------------------------------------------------------------------
+  // Touch Gestures para Mobile
+  // -----------------------------------------------------------------------------
+  
+  /**
+   * Configura gestos de toque para navegação mobile
+   */
+  function setupTouchGestures() {
+    const touchState = {
+      startX: 0,
+      startY: 0,
+      startTime: 0,
+      isScrolling: null,
+    };
+    
+    const SWIPE_THRESHOLD = 50; // pixels mínimos para considerar swipe
+    const SWIPE_TIME_LIMIT = 300; // ms máximo para swipe
+    const VELOCITY_THRESHOLD = 0.3; // pixels/ms
+    
+    // Área principal para swipe (exclui player e drawer)
+    const swipeArea = elements.app;
+    
+    swipeArea.addEventListener("touchstart", (e) => {
+      // Ignora se tocar em controles interativos
+      if (e.target.closest(".player-card, .drawer, .about-modal, button, input, a")) {
+        return;
+      }
+      
+      const touch = e.touches[0];
+      touchState.startX = touch.clientX;
+      touchState.startY = touch.clientY;
+      touchState.startTime = Date.now();
+      touchState.isScrolling = null;
+    }, { passive: true });
+    
+    swipeArea.addEventListener("touchmove", (e) => {
+      if (touchState.startX === 0) return;
+      
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchState.startX;
+      const deltaY = touch.clientY - touchState.startY;
+      
+      // Determina se é scroll vertical ou swipe horizontal
+      if (touchState.isScrolling === null) {
+        touchState.isScrolling = Math.abs(deltaY) > Math.abs(deltaX);
+      }
+    }, { passive: true });
+    
+    swipeArea.addEventListener("touchend", (e) => {
+      if (touchState.startX === 0 || touchState.isScrolling) {
+        touchState.startX = 0;
+        return;
+      }
+      
+      // Ignora se tocar em controles interativos
+      if (e.target.closest(".player-card, .drawer, .about-modal, button, input, a")) {
+        touchState.startX = 0;
+        return;
+      }
+      
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - touchState.startX;
+      const deltaTime = Date.now() - touchState.startTime;
+      const velocity = Math.abs(deltaX) / deltaTime;
+      
+      // Verifica se é um swipe válido
+      if (Math.abs(deltaX) >= SWIPE_THRESHOLD && 
+          deltaTime <= SWIPE_TIME_LIMIT && 
+          velocity >= VELOCITY_THRESHOLD) {
+        
+        // Swipe para esquerda = próxima cidade
+        // Swipe para direita = cidade anterior
+        if (deltaX < 0) {
+          selectCity(state.cityIndex + 1);
+        } else {
+          selectCity(state.cityIndex - 1);
+        }
+      }
+      
+      touchState.startX = 0;
+      touchState.isScrolling = null;
+    }, { passive: true });
+    
+    // Double tap para play/pause rádio
+    let lastTap = 0;
+    swipeArea.addEventListener("touchend", (e) => {
+      // Ignora se tocar em controles
+      if (e.target.closest(".player-card, .drawer, .about-modal, button, input, a")) {
+        return;
+      }
+      
+      const now = Date.now();
+      const DOUBLE_TAP_DELAY = 300;
+      
+      if (now - lastTap < DOUBLE_TAP_DELAY) {
+        toggleRadio();
+        lastTap = 0;
+      } else {
+        lastTap = now;
+      }
+    }, { passive: true });
   }
 
   // -----------------------------------------------------------------------------
