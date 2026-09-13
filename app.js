@@ -293,7 +293,11 @@
           typeof ride === "string" ? { id: ride, start: 0 } : ride
         )
       },
-      radios: [...(window.RADIO_CATALOG?.[item.name] || []), ...item.radios]
+      radios: [
+        ...(window.RADIO_CATALOG?.[item.name] || []),
+        ...(window.RADIO_EXTRA_CATALOG?.[item.name] || []),
+        ...item.radios
+      ]
         .filter((radio, index, radios) => radios.findIndex((candidate) => candidate.url === radio.url) === index)
         .slice(0, 5)
         .map((radio) => ({ ...radio, mark: stationMark(radio.name) }))

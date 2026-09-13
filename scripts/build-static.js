@@ -284,7 +284,7 @@ function main() {
   mkdirSync(join(OUTPUT_DIR, "assets"), { recursive: true });
   mkdirSync(join(OUTPUT_DIR, "city"), { recursive: true });
 
-  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "drone-videos.js", "radio-catalog.js"]) {
+  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js"]) {
     cpSync(resolve(ROOT_DIR, file), join(OUTPUT_DIR, file));
   }
   cpSync(resolve(ROOT_DIR, "assets"), join(OUTPUT_DIR, "assets"), { recursive: true });
