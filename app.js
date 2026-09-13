@@ -226,6 +226,12 @@
       .replace(/^-+|-+$/g, "");
   }
 
+  const BASE_PATH = String(window.YOUCITY_BASE_PATH || "").replace(/\/+$/, "");
+
+  function sitePath(path) {
+    return `${BASE_PATH}${path}`;
+  }
+
   /**
    * Sanitiza entrada de URL para prevenir XSS
    * @param {string} value - Valor a sanitizar
@@ -273,6 +279,7 @@
     const [country, region, countryTimeZone] = COUNTRY_INFO[item.country] || [item.country, "World", "UTC"];
     return {
       ...item,
+      id: citySlug(item.name),
       rawName: item.name,
       rawCountry: item.country,
       name: CITY_NAMES[item.name] || item.name,
@@ -304,6 +311,11 @@
     cityName: $("#city-name"),
     cityRegion: $("#city-region"),
     cityNote: $("#city-note"),
+    travelPlanner: $("#travel-planner"),
+    travelPrimary: $("#travel-primary"),
+    travelSecondary: $("#travel-secondary"),
+    travelDisclosure: $("#travel-disclosure"),
+    travelPreviewBadge: $("#travel-preview-badge"),
     cityIndex: $("#city-index"),
     cityTotal: $("#city-total"),
     topLocation: $("#top-location"),
@@ -322,6 +334,8 @@
     search: $("#city-search"),
     resultCount: $("#result-count"),
     about: $("#about-modal"),
+    travelDrawer: $("#travel-drawer"),
+    travelButton: $("#travel-button"),
     mapModal: $("#map-modal"),
     mapContainer: $("#world-map"),
     mapResultCount: $("#map-result-count"),
@@ -354,6 +368,7 @@
     modeButtons: document.querySelectorAll("[data-mode]"),
     speedButtons: document.querySelectorAll("[data-speed]"),
     closeDrawerButtons: document.querySelectorAll("[data-close-drawer]"),
+    closeTravelButtons: document.querySelectorAll("[data-close-travel]"),
     closeAboutButtons: document.querySelectorAll("[data-close-about]"),
     closeMapButtons: document.querySelectorAll("[data-close-map]"),
     closeStatsButtons: document.querySelectorAll("[data-close-stats]"),
@@ -453,18 +468,141 @@
     return url.toString();
   }
 
-  function travelRecommendationMarkup(city) {
-    const recommendations = window.YOUCITY_TRAVEL_RECOMMENDATIONS?.byCity?.[city.rawName];
-    if (!recommendations) return "";
+  const TRAVEL_CATEGORIES = {
+    experiences: { label: "Things to do", icon: "🎟", description: "Tours & experiences" },
+    hotels: { label: "Stay", icon: "🛏", description: "Hotels and stays" },
+    cars: { label: "Get around", icon: "🚗", description: "Car rentals" },
+    esim: { label: "Stay connected", icon: "📱", description: "eSIM and internet" },
+    insurance: { label: "Travel protected", icon: "🛡", description: "Travel insurance" },
+    flights: { label: "Flights", icon: "✈", description: "Compare flights" }
+  };
 
-    const labels = { hotels: "Hotels", flights: "Flights", carRental: "Car rental" };
-    const sections = Object.entries(labels).map(([category, label]) => {
-      const entries = Array.isArray(recommendations[category]) ? recommendations[category] : [];
+  const PRIMARY_TRAVEL_CATEGORIES = ["experiences", "hotels", "cars", "esim"];
+  const SECONDARY_TRAVEL_CATEGORIES = ["insurance", "flights"];
+
+  function travelConfig() {
+    return window.YOUCITY_TRAVEL || window.YOUCITY_TRAVEL_RECOMMENDATIONS || {};
+  }
+
+  function travelProvider(providerId) {
+    return travelConfig().providers?.[providerId] || {};
+  }
+
+  function travelCityOverrides(city) {
+    const config = travelConfig();
+    return config.byCity?.[city.id]
+      || config.byCity?.[city.rawName]
+      || config.byCity?.[city.name]
+      || {};
+  }
+
+  function resolveTravelOffers(city) {
+    const config = travelConfig();
+    const countryOverrides = config.byCountry?.[city.rawCountry] || config.byCountry?.[city.country] || {};
+    const cityOverrides = travelCityOverrides(city);
+    const defaults = config.defaults?.categories || {};
+    const offers = {};
+
+    Object.keys(TRAVEL_CATEGORIES).forEach((category) => {
+      let entries = defaults[category];
+      if (Array.isArray(countryOverrides[category])) entries = countryOverrides[category];
+      if (Array.isArray(cityOverrides[category])) entries = cityOverrides[category];
+
+      offers[category] = (Array.isArray(entries) ? entries : [])
+        .map((entry) => ({ ...entry, category }))
+        .filter((entry) => {
+          const provider = travelProvider(entry.provider);
+          return entry.active !== false && provider.active !== false;
+        })
+        .sort((a, b) => Number(a.priority || 99) - Number(b.priority || 99));
+    });
+
+    return offers;
+  }
+
+  function safeTravelUrl(value) {
+    if (!value) return "";
+    try {
+      const url = new URL(value, window.location.origin);
+      if (url.origin === window.location.origin && url.pathname.startsWith("/go/")) return url.toString();
+      return url.protocol === "https:" ? url.toString() : "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function travelProviderLabel(entry) {
+    return entry.providerLabel || travelProvider(entry.provider).label || entry.provider;
+  }
+
+  function travelOfferMarkup(entry, city, options = {}) {
+    const providerLabel = travelProviderLabel(entry);
+    const label = entry.label || "Explore options";
+    const metadata = `data-travel-provider="${escapeHtml(entry.provider)}" data-travel-category="${escapeHtml(entry.category)}" data-travel-campaign="${escapeHtml(entry.campaign || "")}" data-travel-placement="${escapeHtml(entry.placement || "")}" data-travel-city="${escapeHtml(city.id)}"`;
+    const placeholder = Boolean(travelConfig().demo) && (entry.placeholder || travelProvider(entry.provider).placeholder);
+    const className = `travel-offer-action${placeholder ? " is-placeholder" : ""}`;
+
+    if (placeholder) {
+      return `<button type="button" class="${className}" ${metadata} data-travel-placeholder="true"><span>${escapeHtml(label)}</span><small>${escapeHtml(providerLabel)} · preview</small></button>`;
+    }
+
+    const href = safeTravelUrl(entry.url);
+    if (!href) return "";
+    const compact = options.compact ? " is-compact" : "";
+    return `<a class="${className}${compact}" href="${escapeHtml(href)}" target="_blank" rel="sponsored noopener noreferrer" ${metadata}><span>${escapeHtml(label)}</span><small>${escapeHtml(providerLabel)}</small><b aria-hidden="true">↗</b></a>`;
+  }
+
+  function travelCategoryMarkup(category, entries, city, options = {}) {
+    const categoryInfo = TRAVEL_CATEGORIES[category];
+    if (!categoryInfo || !entries.length) return "";
+    const actions = entries.map((entry) => travelOfferMarkup(entry, city, options)).filter(Boolean).join("");
+    if (!actions) return "";
+    const extraClass = options.secondary ? " is-secondary" : "";
+    return `<article class="travel-category${extraClass}" data-travel-category-card="${escapeHtml(category)}"><div class="travel-category-heading"><span class="travel-category-icon" aria-hidden="true">${categoryInfo.icon}</span><div><strong>${escapeHtml(categoryInfo.label)}</strong><small>${escapeHtml(categoryInfo.description)}</small></div></div><div class="travel-category-actions">${actions}</div></article>`;
+  }
+
+  function renderTravelPlanner(city) {
+    if (!elements.travelPlanner || !elements.travelPrimary || !elements.travelSecondary) return;
+    const offers = resolveTravelOffers(city);
+    const primary = PRIMARY_TRAVEL_CATEGORIES.map((category) => travelCategoryMarkup(category, offers[category], city)).filter(Boolean).join("");
+    const secondary = SECONDARY_TRAVEL_CATEGORIES.map((category) => travelCategoryMarkup(category, offers[category], city, { secondary: true, compact: true })).filter(Boolean).join("");
+
+    elements.travelPrimary.innerHTML = primary;
+    elements.travelSecondary.innerHTML = secondary ? `<div class="travel-secondary-heading">More travel options</div>${secondary}` : "";
+    elements.travelDisclosure.textContent = travelConfig().disclosure?.short || "Travel options may include affiliate links.";
+    elements.travelPlanner.classList.toggle("is-demo", Boolean(travelConfig().demo));
+    elements.travelPreviewBadge.hidden = !travelConfig().demo;
+  }
+
+  function trackTravelClick(target) {
+    if (!target || target.dataset.travelPlaceholder === "true") return;
+    const payload = {
+      event: "affiliate_click",
+      city: target.dataset.travelCity,
+      provider: target.dataset.travelProvider,
+      category: target.dataset.travelCategory,
+      placement: target.dataset.travelPlacement,
+      campaign: target.dataset.travelCampaign,
+      mode: state.currentMode
+    };
+    try {
+      window.YOUCITY_ANALYTICS?.track?.(payload);
+    } catch (error) {
+      console.warn("[YouCity] Travel click tracking failed:", error.message);
+    }
+  }
+
+  function travelRecommendationMarkup(city) {
+    const offers = resolveTravelOffers(city);
+    const categories = [...PRIMARY_TRAVEL_CATEGORIES, ...SECONDARY_TRAVEL_CATEGORIES];
+    const sections = categories.map((category) => {
+      const entries = offers[category] || [];
       if (!entries.length) return "";
-      return `<div class="map-travel-group"><strong>${label}</strong><ul>${entries.map((entry) => `<li><a href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer sponsored">${escapeHtml(entry.name || "Explore options")} ↗</a></li>`).join("")}</ul></div>`;
+      const links = entries.map((entry) => travelOfferMarkup(entry, city, { compact: true })).filter(Boolean).join("");
+      return links ? `<div class="map-travel-group"><strong>${escapeHtml(TRAVEL_CATEGORIES[category].label)}</strong>${links}</div>` : "";
     }).join("");
 
-    return sections ? `<div class="map-travel"><span>Travel options</span>${sections}</div>` : "";
+    return sections ? `<div class="map-travel"><span>Travel options preview</span>${sections}</div>` : "";
   }
 
   function mapPopup(city, index) {
@@ -1308,7 +1446,7 @@
   function getShareData() {
     const city = currentCity();
     const countryName = COUNTRY_INFO[city.country]?.[0] || city.country;
-    const url = `${window.location.origin}/city/${citySlug(city.rawName || city.name)}`;
+    const url = `${window.location.origin}${sitePath(`/city/${citySlug(city.rawName || city.name)}`)}`;
     const text = `🌍 Exploring ${city.name}, ${countryName} on YouCity — an immersive urban ride with local radio`;
     const title = `YouCity — ${city.name}`;
     return { url, text, title };
@@ -1378,7 +1516,10 @@
   function loadCityFromURL() {
     try {
       const params = new URLSearchParams(window.location.search);
-      const cityPath = window.location.pathname.match(/^\/city\/([^/]+)\/?$/i)?.[1];
+      const pathWithoutBase = BASE_PATH && window.location.pathname.startsWith(BASE_PATH)
+        ? window.location.pathname.slice(BASE_PATH.length) || "/"
+        : window.location.pathname;
+      const cityPath = pathWithoutBase.match(/^\/city\/([^/]+)(?:\.html)?\/?$/i)?.[1];
       const cityName = params.get("city");
 
       if (cityPath) {
@@ -1555,6 +1696,7 @@
     // Novas funcionalidades
     updateFavoriteButton();
     updateCityInfo();
+    renderTravelPlanner(city);
     trackVisit(state.cityIndex);
     
     // Salva preferência
@@ -1822,6 +1964,7 @@
     // Preview mode para QA
     const previewMode = new URLSearchParams(window.location.search).get("preview");
     if (previewMode === "drawer") openLayer(elements.drawer);
+    if (previewMode === "travel") openLayer(elements.travelDrawer);
     
     // Salva estatísticas ao fechar a página
     window.addEventListener("beforeunload", saveStats);
@@ -1860,9 +2003,22 @@
     
     $("#about-button").addEventListener("click", () => openLayer(elements.about));
 
+    elements.travelButton.addEventListener("click", () => openLayer(elements.travelDrawer));
+
     elements.mapButton.addEventListener("click", () => {
       openLayer(elements.mapModal);
       initializeWorldMap();
+    });
+
+    elements.travelPlanner.addEventListener("click", (event) => {
+      const offer = event.target.closest("[data-travel-provider]");
+      if (!offer) return;
+      if (offer.dataset.travelPlaceholder === "true") {
+        event.preventDefault();
+        showToast("Affiliate link preview — add the approved provider URL to travel-config.js");
+        return;
+      }
+      trackTravelClick(offer);
     });
 
     elements.closeMapButtons.forEach((button) => {
@@ -1871,6 +2027,16 @@
 
     elements.mapContainer.addEventListener("click", (event) => {
       const playButton = event.target.closest("[data-map-play]");
+      const offer = event.target.closest("[data-travel-provider]");
+      if (offer) {
+        if (offer.dataset.travelPlaceholder === "true") {
+          event.preventDefault();
+          showToast("Affiliate link preview — add the approved provider URL to travel-config.js");
+        } else {
+          trackTravelClick(offer);
+        }
+        return;
+      }
       if (!playButton) return;
 
       event.preventDefault();
@@ -1894,6 +2060,10 @@
     
     elements.closeDrawerButtons.forEach((button) => {
       button.addEventListener("click", () => closeLayer(elements.drawer));
+    });
+
+    elements.closeTravelButtons.forEach((button) => {
+      button.addEventListener("click", () => closeLayer(elements.travelDrawer));
     });
     
     elements.closeAboutButtons.forEach((button) => {
@@ -2078,6 +2248,7 @@
           break;
         case "Escape":
           closeLayer(elements.drawer);
+          closeLayer(elements.travelDrawer);
           closeLayer(elements.about);
           closeLayer(elements.mapModal);
           closeLayer(elements.statsModal);

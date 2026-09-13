@@ -13,8 +13,11 @@ const ROOT_DIR = resolve(__dirname, "..");
 const OUTPUT_DIR = resolve(ROOT_DIR, "dist");
 const DEFAULT_SITE_URL = "https://youcity.pages.dev";
 const SITE_URL = String(process.env.SEO_SITE_URL || DEFAULT_SITE_URL).replace(/\/+$/, "");
+const BASE_PATH = String(process.env.SEO_BASE_PATH || "").trim().replace(/^\/+|\/+$/g, "");
+const SITE_PATH = BASE_PATH ? `/${BASE_PATH}` : "";
+const CITY_SUFFIX = String(process.env.SEO_CITY_SUFFIX || "");
 const SITE_NAME = "YouCity";
-const SOCIAL_IMAGE = `${SITE_URL}/assets/hero-saopaulo.webp`;
+const SOCIAL_IMAGE = `${SITE_URL}${SITE_PATH}/assets/hero-saopaulo.webp`;
 const SOCIAL_ALT = "YouCity — immersive city rides around the world";
 
 function escapeHtml(value) {
@@ -60,6 +63,14 @@ function displayCityName(city) {
   return { "Sao Paulo": "São Paulo" }[city.name] || city.name;
 }
 
+function sitePath(path) {
+  return `${SITE_PATH}${path}`;
+}
+
+function cityPath(city) {
+  return sitePath(`/city/${slugify(city.name)}${CITY_SUFFIX}`);
+}
+
 function cityNote(city) {
   const name = displayCityName(city);
   return `Explore ${name}, ${countryName(city.country)} through real streets, local radio, and immersive Drive, Bike, Walk, and Drone rides.`;
@@ -77,7 +88,7 @@ function cityModes(city) {
 function citySeo(city) {
   const name = displayCityName(city);
   const country = countryName(city.country);
-  const path = `/city/${slugify(city.name)}`;
+  const path = cityPath(city);
   const canonical = `${SITE_URL}${path}`;
   const description = cityNote(city);
   return {
@@ -91,13 +102,13 @@ function citySeo(city) {
         name: `${name} — YouCity`,
         description,
         url: canonical,
-        isPartOf: { "@type": "WebSite", name: SITE_NAME, url: `${SITE_URL}/` }
+        isPartOf: { "@type": "WebSite", name: SITE_NAME, url: `${SITE_URL}${sitePath("/")}` }
       },
       {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
+          { "@type": "ListItem", position: 1, name: SITE_NAME, item: `${SITE_URL}${sitePath("/")}` },
           { "@type": "ListItem", position: 2, name, item: canonical }
         ]
       }
@@ -114,20 +125,20 @@ function homeSeo(catalog) {
   return {
     title: "YouCity — cities in motion",
     description,
-    canonical: `${SITE_URL}/`,
+    canonical: `${SITE_URL}${sitePath("/")}`,
     jsonLd: [
       {
         "@context": "https://schema.org",
         "@type": "Organization",
         name: SITE_NAME,
-        url: `${SITE_URL}/`,
-        logo: `${SITE_URL}/assets/favicon.svg`
+        url: `${SITE_URL}${sitePath("/")}`,
+        logo: `${SITE_URL}${sitePath("/assets/favicon.svg")}`
       },
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: SITE_NAME,
-        url: `${SITE_URL}/`,
+        url: `${SITE_URL}${sitePath("/")}`,
         description
       }
     ],
@@ -159,6 +170,16 @@ function replaceJsonLd(html, jsonLd) {
   const tag = `<script type="application/ld+json" data-seo-jsonld>${jsonForHtml(jsonLd)}</script>`;
   const pattern = /<script\b[^>]*type=["']application\/ld\+json["'][^>]*data-seo-jsonld[^>]*>[\s\S]*?<\/script>/i;
   return pattern.test(html) ? html.replace(pattern, tag) : html.replace("</head>", `    ${tag}\n  </head>`);
+}
+
+function rewriteInternalPaths(html) {
+  if (!SITE_PATH) return html;
+  return html.replace(/\b(href|src)=(['"])\/(?!\/)/g, `$1=$2${SITE_PATH}/`);
+}
+
+function injectRuntimeBasePath(html) {
+  const script = `<script>window.YOUCITY_BASE_PATH = ${jsonForHtml(SITE_PATH)};</script>`;
+  return html.replace("</head>", `    ${script}\n  </head>`);
 }
 
 function replaceElementText(html, tagName, id, value) {
@@ -207,31 +228,38 @@ function xmlEscape(value) {
 
 function buildSitemap(catalog) {
   const urls = [
-    `${SITE_URL}/`,
-    ...catalog.map((city) => `${SITE_URL}/city/${slugify(city.name)}`)
+    `${SITE_URL}${sitePath("/")}`,
+    ...catalog.map((city) => `${SITE_URL}${cityPath(city)}`)
   ];
   const entries = urls.map((url) => `  <url>\n    <loc>${xmlEscape(url)}</loc>\n  </url>`).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`;
 }
 
 function buildRobots() {
-  return `User-agent: *\nAllow: /\n\n# Query-string variants are client-side state; city pages use stable paths.\nDisallow: /*?city=\nDisallow: /*?preview=\nDisallow: /*?*\n\nSitemap: ${SITE_URL}/sitemap.xml\n`;
+  return `User-agent: *\nAllow: /\n\n# Query-string variants are client-side state; city pages use stable paths.\nDisallow: /*?city=\nDisallow: /*?preview=\nDisallow: /*?*\n\nSitemap: ${SITE_URL}${sitePath("/sitemap.xml")}\n`;
 }
 
 function buildNotFound() {
-  return `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — YouCity</title><meta name="robots" content="noindex,follow"><link rel="stylesheet" href="/styles.css"></head><body><main class="seo-fallback"><h1>Page not found</h1><p>The city page you requested does not exist.</p><p><a href="/">Return to YouCity</a></p></main></body></html>\n`;
+  return `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — YouCity</title><meta name="robots" content="noindex,follow"><link rel="stylesheet" href="${sitePath("/styles.css")}"></head><body><main class="seo-fallback"><h1>Page not found</h1><p>The city page you requested does not exist.</p><p><a href="${sitePath("/")}">Return to YouCity</a></p></main></body></html>\n`;
 }
 
 function cityFallback(seo, catalog) {
   const links = catalog.map((city) => {
     const name = displayCityName(city);
-    return `<li><a href="/city/${slugify(city.name)}">${escapeHtml(name)}</a></li>`;
+    return `<li><a href="${cityPath(city)}">${escapeHtml(name)}</a></li>`;
   }).join("");
-  return `<section class="seo-fallback"><h2>${escapeHtml(seo.name)}, ${escapeHtml(seo.country)}</h2><p>${escapeHtml(cityNote({ name: seo.name, country: seo.country }))}</p><p>Available modes: ${escapeHtml(seo.modes.join(", "))}.</p><p><a href="/">Explore all cities</a></p><h2>More destinations</h2><ul>${links}</ul></section>`;
+  const planner = [
+    ["Things to do", "Viator"],
+    ["Stay", "Booking.com · Expedia · Travelpayouts"],
+    ["Get around", "DiscoverCars"],
+    ["Stay connected", "Airalo"],
+    ["More travel options", "Heymondo · Travelpayouts flights"]
+  ].map(([label, providers]) => `<li><strong>${label}</strong> — ${providers} <em>(preview)</em></li>`).join("");
+  return `<section class="seo-fallback"><h2>${escapeHtml(seo.name)}, ${escapeHtml(seo.country)}</h2><p>${escapeHtml(cityNote({ name: seo.name, country: seo.country }))}</p><p>Available modes: ${escapeHtml(seo.modes.join(", "))}.</p><h2>Plan your trip to ${escapeHtml(seo.name)}</h2><ul>${planner}</ul><p>Travel options preview. Affiliate links will be added after provider approval.</p><p><a href="${sitePath("/")}">Explore all cities</a></p><h2>More destinations</h2><ul>${links}</ul></section>`;
 }
 
 function homeFallback(catalog) {
-  const links = catalog.map((city) => `<li><a href="/city/${slugify(city.name)}">${escapeHtml(displayCityName(city))}, ${escapeHtml(countryName(city.country))}</a></li>`).join("");
+  const links = catalog.map((city) => `<li><a href="${cityPath(city)}">${escapeHtml(displayCityName(city))}, ${escapeHtml(countryName(city.country))}</a></li>`).join("");
   return `<section class="seo-fallback"><h2>Explore ${catalog.length} cities around the world</h2><p>YouCity is an interactive collection of immersive Drive, Bike, Walk, and Drone rides with local radio.</p><ul>${links}</ul></section>`;
 }
 
@@ -252,7 +280,7 @@ function main() {
     if (existsSync(resolve(ROOT_DIR, file))) cpSync(resolve(ROOT_DIR, file), join(OUTPUT_DIR, file));
   }
 
-  const baseHtml = readFileSync(resolve(ROOT_DIR, "index.html"), "utf8");
+  const baseHtml = injectRuntimeBasePath(rewriteInternalPaths(readFileSync(resolve(ROOT_DIR, "index.html"), "utf8")));
   writeFileSync(join(OUTPUT_DIR, "index.html"), renderPage(baseHtml, homeSeo(catalog), homeFallback(catalog)));
 
   catalog.forEach((city, index) => {
@@ -269,6 +297,7 @@ function main() {
   writeFileSync(join(OUTPUT_DIR, "robots.txt"), buildRobots());
   writeFileSync(join(OUTPUT_DIR, "sitemap.xml"), buildSitemap(catalog));
   writeFileSync(join(OUTPUT_DIR, "404.html"), buildNotFound());
+  writeFileSync(join(OUTPUT_DIR, ".nojekyll"), "");
   console.log(`Built ${catalog.length + 1} SEO pages in ${OUTPUT_DIR} using ${SITE_URL}`);
 }
 

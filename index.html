@@ -135,6 +135,10 @@
           <button class="icon-button" id="fullscreen-button" type="button" aria-label="Fullscreen">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path></svg>
           </button>
+          <button class="menu-button travel-menu-button" id="travel-button" type="button" aria-label="Plan your trip" title="Plan your trip">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12v13H6zM9 7V5a3 3 0 0 1 6 0v2M9 12h6M12 9v6"></path></svg>
+            <span>Plan your trip</span>
+          </button>
           <button class="menu-button" id="cities-button" type="button">
             <span>Explore cities</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
@@ -307,6 +311,29 @@
             <span>Videos by independent YouTube creators</span>
             <span>Live radio streams</span>
           </div>
+        </div>
+      </section>
+
+      <section class="travel-drawer" id="travel-drawer" aria-hidden="true" aria-labelledby="travel-planner-title">
+        <div class="drawer-backdrop" data-close-travel></div>
+        <div class="drawer-panel travel-panel">
+          <section class="travel-planner" id="travel-planner" aria-labelledby="travel-planner-title">
+            <div class="travel-planner-header">
+              <div>
+                <span class="travel-planner-kicker">Plan your trip</span>
+                <h2 id="travel-planner-title">Travel options</h2>
+              </div>
+              <div class="travel-planner-actions">
+                <span class="travel-preview-badge" id="travel-preview-badge">Preview</span>
+                <button class="drawer-close" type="button" data-close-travel aria-label="Close travel planner">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+                </button>
+              </div>
+            </div>
+            <div class="travel-primary" id="travel-primary"></div>
+            <div class="travel-secondary" id="travel-secondary"></div>
+            <p class="travel-disclosure" id="travel-disclosure"></p>
+          </section>
         </div>
       </section>
 
