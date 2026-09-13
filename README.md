@@ -22,6 +22,12 @@ node scripts/seo-check.js
 python3 -m http.server 4174 --directory dist
 ```
 
+Validate the audited Drone catalog before publishing:
+
+```bash
+node scripts/validate-drone-catalog.js
+```
+
 Open `http://localhost:4174`. The generated city file is available at
 `http://localhost:4174/city/sao-paulo.html`; Cloudflare Pages also serves it at
 the extensionless URL `/city/sao-paulo` after deployment.

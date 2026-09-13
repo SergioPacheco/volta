@@ -45,7 +45,17 @@ function slugify(value) {
 function loadCatalog() {
   const context = { window: {} };
   runInNewContext(readFileSync(resolve(ROOT_DIR, "cities-data.js"), "utf8"), context);
-  return context.window.CITY_CATALOG || [];
+  runInNewContext(readFileSync(resolve(ROOT_DIR, "drone-videos.js"), "utf8"), context);
+  const droneCatalog = context.window.DRONE_CATALOG || {};
+  return (context.window.CITY_CATALOG || []).map((city) => ({
+    ...city,
+    videos: {
+      ...city.videos,
+      drone: (droneCatalog[city.name] || []).map((ride) =>
+        typeof ride === "string" ? { id: ride, start: 0 } : ride
+      )
+    }
+  }));
 }
 
 function countryName(country) {
@@ -73,7 +83,9 @@ function cityPath(city) {
 
 function cityNote(city) {
   const name = displayCityName(city);
-  return `Explore ${name}, ${countryName(city.country)} through real streets, local radio, and immersive Drive, Bike, Walk, and Drone rides.`;
+  const modes = cityModes(city);
+  const modeText = modes.length ? modes.join(", ") : "city";
+  return `Explore ${name}, ${countryName(city.country)} through real streets, local radio, and immersive ${modeText} rides.`;
 }
 
 function cityModes(city) {
@@ -81,7 +93,7 @@ function cityModes(city) {
     city.videos?.drive?.length ? "Drive" : null,
     city.videos?.bike?.length ? "Bike" : null,
     city.videos?.walk?.length ? "Walk" : null,
-    "Drone"
+    city.videos?.drone?.length ? "Drone" : null
   ].filter(Boolean);
 }
 
@@ -193,7 +205,7 @@ function replaceStaticCity(html, seo, index, total) {
   output = replaceElementText(output, "span", "city-total", String(total));
   output = replaceElementText(output, "p", "city-region", `${escapeHtml(seo.country)} · Now`);
   output = replaceElementText(output, "h1", "city-name", escapeHtml(seo.name));
-  output = replaceElementText(output, "p", "city-note", escapeHtml(cityNote({ name: seo.name, country: seo.country })));
+  output = replaceElementText(output, "p", "city-note", escapeHtml(seo.description));
   return output;
 }
 
@@ -255,7 +267,7 @@ function cityFallback(seo, catalog) {
     ["Stay connected", "Airalo"],
     ["More travel options", "Heymondo · Travelpayouts flights"]
   ].map(([label, providers]) => `<li><strong>${label}</strong> — ${providers} <em>(preview)</em></li>`).join("");
-  return `<section class="seo-fallback"><h2>${escapeHtml(seo.name)}, ${escapeHtml(seo.country)}</h2><p>${escapeHtml(cityNote({ name: seo.name, country: seo.country }))}</p><p>Available modes: ${escapeHtml(seo.modes.join(", "))}.</p><h2>Plan your trip to ${escapeHtml(seo.name)}</h2><ul>${planner}</ul><p>Travel options preview. Affiliate links will be added after provider approval.</p><p><a href="${sitePath("/")}">Explore all cities</a></p><h2>More destinations</h2><ul>${links}</ul></section>`;
+  return `<section class="seo-fallback"><h2>${escapeHtml(seo.name)}, ${escapeHtml(seo.country)}</h2><p>${escapeHtml(seo.description)}</p><p>Available modes: ${escapeHtml(seo.modes.join(", "))}.</p><h2>Plan your trip to ${escapeHtml(seo.name)}</h2><ul>${planner}</ul><p>Travel options preview. Affiliate links will be added after provider approval.</p><p><a href="${sitePath("/")}">Explore all cities</a></p><h2>More destinations</h2><ul>${links}</ul></section>`;
 }
 
 function homeFallback(catalog) {

@@ -289,7 +289,9 @@
       note: CITY_NOTES[item.name] || `Real streets, local radio, and the rhythm of ${CITY_NAMES[item.name] || item.name} through the window.`,
       videos: {
         ...item.videos,
-        [CONFIG.modes.DRONE]: (window.DRONE_CATALOG?.[item.name] || []).map((id) => ({ id, start: 0 }))
+        [CONFIG.modes.DRONE]: (window.DRONE_CATALOG?.[item.name] || []).map((ride) =>
+          typeof ride === "string" ? { id: ride, start: 0 } : ride
+        )
       },
       radios: [...(window.RADIO_CATALOG?.[item.name] || []), ...item.radios]
         .filter((radio, index, radios) => radios.findIndex((candidate) => candidate.url === radio.url) === index)
