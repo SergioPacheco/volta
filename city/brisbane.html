@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="Explore Brisbane, Australia through real streets, local radio, and immersive Drive, Bike, Walk, and Drone rides." />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#111411" />
+    <meta name="application-name" content="YouCity" />
+    <link rel="canonical" href="https://sergiopacheco.github.io/youcity/city/brisbane.html" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Brisbane — YouCity" />
+    <meta property="og:description" content="Explore Brisbane, Australia through real streets, local radio, and immersive Drive, Bike, Walk, and Drone rides." />
+    <meta property="og:url" content="https://sergiopacheco.github.io/youcity/city/brisbane.html" />
+    <meta property="og:site_name" content="YouCity" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://sergiopacheco.github.io/youcity/assets/hero-saopaulo.webp" />
+    <meta property="og:image:type" content="image/webp" />
+    <meta property="og:image:width" content="1672" />
+    <meta property="og:image:height" content="941" />
+    <meta property="og:image:alt" content="YouCity — immersive city rides around the world" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Brisbane — YouCity" />
+    <meta name="twitter:description" content="Explore Brisbane, Australia through real streets, local radio, and immersive Drive, Bike, Walk, and Drone rides." />
+    <meta name="twitter:image" content="https://sergiopacheco.github.io/youcity/assets/hero-saopaulo.webp" />
+    <meta name="twitter:image:alt" content="YouCity — immersive city rides around the world" />
+
+    <title>Brisbane — YouCity</title>
+    <link rel="icon" type="image/svg+xml" href="/youcity/assets/favicon.svg" />
+    <link rel="preload" as="image" type="image/webp" href="/youcity/assets/hero-saopaulo.webp" />
+    <link rel="preconnect" href="https://www.youtube-nocookie.com" />
+    <link rel="preconnect" href="https://i.ytimg.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
+      as="style"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap"
+      rel="stylesheet"
+    />
+    <script type="application/ld+json" data-seo-jsonld>[{"@context":"https://schema.org","@type":"WebPage","name":"Brisbane — YouCity","description":"Explore Brisbane, Australia through real streets, local radio, and immersive Drive, Bike, Walk, and Drone rides.","url":"https://sergiopacheco.github.io/youcity/city/brisbane.html","isPartOf":{"@type":"WebSite","name":"YouCity","url":"https://sergiopacheco.github.io/youcity/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"YouCity","item":"https://sergiopacheco.github.io/youcity/"},{"@type":"ListItem","position":2,"name":"Brisbane","item":"https://sergiopacheco.github.io/youcity/city/brisbane.html"}]}]</script>
+    <link rel="stylesheet" href="/youcity/styles.css" />
+      <script>window.YOUCITY_BASE_PATH = "/youcity";</script>
+  </head>
+  <body>
+    <a href="#city-name" class="skip-link">Skip to main content</a>
+    <main class="app" id="app">
+      <div class="media-layer" aria-hidden="true">
+        <div class="poster" id="poster"></div>
+        <iframe
+          id="city-video"
+          class="city-video"
+          title="City ride"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+        <div class="color-wash" id="color-wash"></div>
+        <div class="vignette"></div>
+        <div class="grain"></div>
+      </div>
+
+      <header class="topbar">
+        <button class="brand" id="about-button" type="button" aria-label="About YouCity">
+          <svg viewBox="0 0 34 34" aria-hidden="true">
+            <circle cx="17" cy="17" r="14"></circle>
+            <path d="M9 10l8 8 8-8M17 18v7M11 25h12"></path>
+          </svg>
+          <span>YouCity</span>
+        </button>
+
+        <div class="top-actions">
+          <button class="icon-button" id="pip-button" type="button" aria-label="Picture-in-Picture" title="Picture-in-Picture (P)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><rect x="11" y="10" width="9" height="6" rx="1"/></svg>
+          </button>
+          <div class="share-fan-wrapper">
+          <button class="icon-button" id="share-button" type="button" aria-label="Share city" title="Share" aria-expanded="false" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+            </button>
+            <div class="share-fan" id="share-fan" role="menu" aria-label="Sharing options">
+              <button class="share-fan-item" data-share="whatsapp" role="menuitem" title="WhatsApp" style="--i: 0">
+                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              </button>
+              <button class="share-fan-item" data-share="twitter" role="menuitem" title="X (Twitter)" style="--i: 1">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </button>
+              <button class="share-fan-item" data-share="facebook" role="menuitem" title="Facebook" style="--i: 2">
+                <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </button>
+              <button class="share-fan-item" data-share="telegram" role="menuitem" title="Telegram" style="--i: 3">
+                <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              </button>
+              <button class="share-fan-item" data-share="linkedin" role="menuitem" title="LinkedIn" style="--i: 4">
+                <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </button>
+              <button class="share-fan-item" data-share="copy" role="menuitem" title="Copy link" style="--i: 5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              </button>
+            </div>
+          </div>
+          <button class="icon-button" id="map-button" type="button" aria-label="Open world map" title="World map (M)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.2 2.4 3.3 5.4 3.3 9s-1.1 6.6-3.3 9c-2.2-2.4-3.3-5.4-3.3-9S9.8 5.4 12 3zM5.2 6.5c2 .9 4.3 1.3 6.8 1.3s4.8-.4 6.8-1.3M5.2 17.5c2-.9 4.3-1.3 6.8-1.3s4.8.4 6.8 1.3"></path></svg>
+          </button>
+          <button class="icon-button" id="stats-button" type="button" aria-label="Statistics" title="Your statistics">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </button>
+          <button class="icon-button" id="theme-button" type="button" aria-label="Change theme" title="Change visual theme">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button class="icon-button" id="fullscreen-button" type="button" aria-label="Fullscreen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path></svg>
+          </button>
+          <button class="menu-button travel-menu-button" id="travel-button" type="button" aria-label="Plan your trip" title="Plan your trip">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12v13H6zM9 7V5a3 3 0 0 1 6 0v2M9 12h6M12 9v6"></path></svg>
+            <span>Plan your trip</span>
+          </button>
+          <button class="menu-button" id="cities-button" type="button">
+            <span>Explore cities</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="city-intro" aria-labelledby="city-name">
+        <div class="city-count"><span id="city-index">036</span><i></i><span id="city-total">179</span></div>
+        <p class="eyebrow" id="city-region">Australia · Now</p>
+        <h1 id="city-name">Brisbane</h1>
+        <p class="city-note" id="city-note">Explore Brisbane, Australia through real streets, local radio, and immersive Drive, Bike, Walk, and Drone rides.</p>
+        <div class="city-actions">
+          <button class="favorite-btn" id="favorite-btn" type="button" aria-label="Add to favorites" title="Favorite (F)">
+            <svg class="heart-empty" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+            <svg class="heart-full" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          </button>
+          <button class="source-link" id="source-link" type="button">
+            View ride source
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"></path></svg>
+          </button>
+        </div>
+        <!-- City information -->
+        <div class="city-info" id="city-info">
+          <span class="info-item" id="info-timezone"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><b>--:--</b></span>
+          <span class="info-item" id="info-population"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><b>--</b></span>
+        </div>
+      </section>
+
+      <aside class="rail" aria-label="City navigation">
+        <button class="rail-arrow" id="previous-city" type="button" aria-label="Previous city">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <div class="rail-track" id="rail-track"></div>
+        <button class="rail-arrow" id="next-city" type="button" aria-label="Next city">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </button>
+      </aside>
+
+      <section class="player-card" aria-label="Radio player">
+        <!-- Minimize button -->
+        <button class="player-minimize" id="player-minimize" type="button" aria-label="Minimize radio" title="Minimize radio (H)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </button>
+        
+        <!-- Integrated top controls -->
+        <div class="stereo-top-bar">
+          <div class="mode-control" aria-label="Ride type">
+            <button class="is-active" type="button" data-mode="drive" title="Drive ride">DRIVE</button>
+            <button type="button" data-mode="bike" title="Bike ride">BIKE</button>
+            <button type="button" data-mode="walk" title="Walking tour">WALK</button>
+            <button type="button" data-mode="drone" title="Drone footage">DRONE</button>
+          </div>
+          <div class="top-bar-right">
+            <button class="mini-btn" id="autoplay-btn" type="button" aria-pressed="false" title="Autoplay (A)">
+              <svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            </button>
+            <button class="mini-btn" id="pomodoro-btn" type="button" aria-pressed="false" title="Pomodoro 25min">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </button>
+            <button class="mini-btn" id="street-sound" type="button" aria-pressed="false" title="Street sound">
+              <svg viewBox="0 0 24 24"><path d="M4 14h3l3 3V7L7 10H4v4zM14 9c2 2 2 4 0 6M17 6c4 4 4 8 0 12"/></svg>
+            </button>
+            <div class="speed-control" aria-label="Speed">
+              <button type="button" data-speed="0.75" title="0.75×">¾</button>
+              <button class="is-active" type="button" data-speed="1" title="1×">1</button>
+              <button type="button" data-speed="1.5" title="1.5×">1½</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Main section: volume + deck -->
+        <div class="player-card-main">
+          <!-- 3D volume knob -->
+          <div class="volume-knob-section">
+            <div class="volume-knob" id="volume-knob" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64" tabindex="0"></div>
+            <span class="knob-label">Vol</span>
+            <input id="volume" type="range" min="0" max="100" value="64" aria-label="Radio volume" style="display:none" />
+          </div>
+
+          <!-- Main deck -->
+          <div class="stereo-deck">
+          <!-- LCD screen -->
+          <div class="lcd-screen">
+            <div class="lcd-text">
+              <div class="lcd-frequency" id="station-name">Antena 1 Radio<small> FM</small></div>
+              <div class="lcd-meta" id="lcd-meta">CH-01 · LOCAL</div>
+            </div>
+            <div class="lcd-icons">
+              <div class="lcd-equalizer is-playing" id="equalizer" aria-hidden="true">
+                <i></i><i></i><i></i><i></i>
+              </div>
+              <span class="lcd-led is-active" id="stereo-led">ST</span>
+              <span class="lcd-led" id="rds-led">RDS</span>
+            </div>
+          </div>
+
+          <!-- Physical buttons -->
+          <div class="stereo-buttons">
+            <button class="stereo-btn" id="radio-previous" type="button" aria-label="Previous radio" title="Previous radio">◄◄</button>
+            <button class="stereo-btn" id="play-button" type="button" aria-label="Play/Pause" title="Play / Pause">
+              <span class="pause-text">❚❚</span>
+              <span class="play-text" style="display:none">▶</span>
+            </button>
+            <button class="stereo-btn" id="radio-next" type="button" aria-label="Next radio" title="Next radio">►►</button>
+            <button class="stereo-btn" id="quality-btn" type="button" aria-label="Video quality" title="Quality: Auto / 720p / 1080p">HD</button>
+            <button class="stereo-btn" id="random-btn" type="button" aria-label="Random city" title="Random city (R)">RDM</button>
+          </div>
+        </div>
+        </div>
+      </section>
+
+      <!-- Floating button to restore the player -->
+      <button class="player-restore" id="player-restore" type="button" aria-label="Show radio" title="Show radio (H)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14h3l3 3V7L7 10H4v4zM14 9c2 2 2 4 0 6"></path></svg>
+      </button>
+
+      <!-- Desktop hint (keyboard) -->
+      <div class="hint hint-desktop">
+        <button type="button" id="hint-prev" aria-label="Previous city" title="Previous city (←)"><kbd>←</kbd></button>
+        <button type="button" id="hint-next" aria-label="Next city" title="Next city (→)"><kbd>→</kbd></button>
+        <span>to travel</span>
+      </div>
+      
+      <!-- Mobile hint (swipe) -->
+      <div class="hint hint-mobile">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18"/>
+        </svg>
+        <span>swipe to travel</span>
+      </div>
+
+      <section class="city-drawer" id="city-drawer" aria-hidden="true" aria-labelledby="drawer-title">
+        <div class="drawer-backdrop" data-close-drawer></div>
+        <div class="drawer-panel">
+          <div class="drawer-header">
+            <div>
+              <span class="drawer-kicker">Choose your next destination</span>
+              <h2 id="drawer-title">The world through the window.</h2>
+            </div>
+            <button class="drawer-close" type="button" data-close-drawer aria-label="Close">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+            </button>
+          </div>
+          <label class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+            <input id="city-search" type="search" placeholder="Search city or country" autocomplete="off" />
+            <span id="result-count">8 destinations</span>
+          </label>
+          <div class="filter-bar">
+            <button class="filter-btn is-active" type="button" data-filter="all">All</button>
+            <button class="filter-btn" type="button" data-filter="favorites">
+              <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+              Favorites
+            </button>
+            <select class="filter-select" id="filter-continent">
+              <option value="">Continent</option>
+              <option value="South America">South America</option>
+              <option value="North America">North America</option>
+              <option value="Central America">Central America</option>
+              <option value="Europe">Europe</option>
+              <option value="Asia">Asia</option>
+              <option value="Africa">Africa</option>
+              <option value="Oceania">Oceania</option>
+              <option value="Caribbean">Caribbean</option>
+            </select>
+          </div>
+          <div class="city-grid" id="city-grid"></div>
+          <div class="drawer-footer">
+            <span>Videos by independent YouTube creators</span>
+            <span>Live radio streams</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="travel-drawer" id="travel-drawer" aria-hidden="true" aria-labelledby="travel-planner-title">
+        <div class="drawer-backdrop" data-close-travel></div>
+        <div class="drawer-panel travel-panel">
+          <section class="travel-planner" id="travel-planner" aria-labelledby="travel-planner-title">
+            <div class="travel-planner-header">
+              <div>
+                <span class="travel-planner-kicker">Plan your trip</span>
+                <h2 id="travel-planner-title">Travel options</h2>
+              </div>
+              <div class="travel-planner-actions">
+                <span class="travel-preview-badge" id="travel-preview-badge">Preview</span>
+                <button class="drawer-close" type="button" data-close-travel aria-label="Close travel planner">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+                </button>
+              </div>
+            </div>
+            <div class="travel-primary" id="travel-primary"></div>
+            <div class="travel-secondary" id="travel-secondary"></div>
+            <p class="travel-disclosure" id="travel-disclosure"></p>
+          </section>
+        </div>
+      </section>
+
+      <section class="about-modal" id="about-modal" aria-hidden="true" aria-labelledby="about-title">
+        <div class="about-backdrop" data-close-about></div>
+        <div class="about-card">
+          <button type="button" class="drawer-close" data-close-about aria-label="Close">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+          <span class="drawer-kicker">About the project</span>
+          <h2 id="about-title">No ticket.<br />No rush.</h2>
+          <p>YouCity is a window into distant streets. Choose a city, turn on the radio, and let the road unfold.</p>
+          <p class="about-small">A static experience inspired by virtual urban tours. No personal data is collected.</p>
+        </div>
+      </section>
+
+      <!-- World map with city video links -->
+      <section class="map-modal" id="map-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="map-title">
+        <div class="map-backdrop" data-close-map></div>
+        <div class="map-card">
+          <div class="map-header">
+            <div>
+              <span class="drawer-kicker">Explore the catalog</span>
+              <h2 id="map-title">The world through the window.</h2>
+            </div>
+            <button class="drawer-close" type="button" data-close-map aria-label="Close world map">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+            </button>
+          </div>
+          <div class="map-toolbar">
+            <span id="map-result-count">179 cities</span>
+            <span>OpenStreetMap · click a marker to see videos</span>
+          </div>
+          <div class="world-map" id="world-map" role="application" aria-label="Interactive map of YouCity destinations"></div>
+          <details class="map-directory">
+            <summary>Browse destinations without the map</summary>
+            <div class="map-directory-list" id="map-directory" aria-label="YouCity destinations and videos"></div>
+          </details>
+          <p class="map-footnote">Video links open on YouTube. Select a mode in a popup to play it inside YouCity.</p>
+        </div>
+      </section>
+
+
+      <!-- Statistics modal -->
+      <section class="about-modal" id="stats-modal" aria-hidden="true" aria-labelledby="stats-title">
+        <div class="about-backdrop" data-close-stats></div>
+        <div class="about-card stats-card">
+          <button type="button" class="drawer-close" data-close-stats aria-label="Close">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+          <span class="drawer-kicker">Your statistics</span>
+          <h2 id="stats-title">Your journey</h2>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-value" id="stat-cities">0</span>
+              <span class="stat-label">cities visited</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-favorites">0</span>
+              <span class="stat-label">favorites</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-time">0h 0m</span>
+              <span class="stat-label">travel time</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-sessions">0</span>
+              <span class="stat-label">sessions</span>
+            </div>
+          </div>
+          <p class="about-small">Statistics are stored locally in your browser.</p>
+        </div>
+      </section>
+
+      <!-- Painel Pomodoro flutuante -->
+      <div class="pomodoro-panel" id="pomodoro-panel">
+        <span class="pomodoro-time" id="pomodoro-time">25:00</span>
+        <span class="pomodoro-label">focus</span>
+      </div>
+
+      <!-- Painel Autoplay flutuante -->
+      <div class="autoplay-panel" id="autoplay-panel">
+        <span class="autoplay-time" id="autoplay-time">3:00</span>
+        <span class="autoplay-label">next city</span>
+      </div>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <audio id="radio-player" preload="none"></audio>
+    </main>
+
+    <noscript data-seo-fallback><section class="seo-fallback"><h2>Brisbane, Australia</h2><p>Explore Brisbane, Australia through real streets, local radio, and immersive Drive, Bike, Walk, and Drone rides.</p><p>Available modes: Drive, Bike, Walk, Drone.</p><h2>Plan your trip to Brisbane</h2><ul><li><strong>Things to do</strong> — Viator <em>(preview)</em></li><li><strong>Stay</strong> — Booking.com · Expedia · Travelpayouts <em>(preview)</em></li><li><strong>Get around</strong> — DiscoverCars <em>(preview)</em></li><li><strong>Stay connected</strong> — Airalo <em>(preview)</em></li><li><strong>More travel options</strong> — Heymondo · Travelpayouts flights <em>(preview)</em></li></ul><p>Travel options preview. Affiliate links will be added after provider approval.</p><p><a href="/youcity/">Explore all cities</a></p><h2>More destinations</h2><ul><li><a href="/youcity/city/sao-paulo.html">São Paulo</a></li><li><a href="/youcity/city/abu-dhabi.html">Abu Dhabi</a></li><li><a href="/youcity/city/acapulco.html">Acapulco</a></li><li><a href="/youcity/city/ahmedabad.html">Ahmedabad</a></li><li><a href="/youcity/city/albuquerque.html">Albuquerque</a></li><li><a href="/youcity/city/amritsar.html">Amritsar</a></li><li><a href="/youcity/city/amsterdam.html">Amsterdam</a></li><li><a href="/youcity/city/anchorage.html">Anchorage</a></li><li><a href="/youcity/city/angeles-city.html">Angeles City</a></li><li><a href="/youcity/city/ankara.html">Ankara</a></li><li><a href="/youcity/city/antalya.html">Antalya</a></li><li><a href="/youcity/city/asheville.html">Asheville</a></li><li><a href="/youcity/city/aspen.html">Aspen</a></li><li><a href="/youcity/city/athens.html">Athens</a></li><li><a href="/youcity/city/atlanta.html">Atlanta</a></li><li><a href="/youcity/city/atlantic-city.html">Atlantic City</a></li><li><a href="/youcity/city/auckland.html">Auckland</a></li><li><a href="/youcity/city/austin.html">Austin</a></li><li><a href="/youcity/city/bacolod.html">Bacolod</a></li><li><a href="/youcity/city/baguio.html">Baguio</a></li><li><a href="/youcity/city/baltimore.html">Baltimore</a></li><li><a href="/youcity/city/bangalore.html">Bangalore</a></li><li><a href="/youcity/city/barcelona.html">Barcelona</a></li><li><a href="/youcity/city/basel.html">Basel</a></li><li><a href="/youcity/city/beijing.html">Beijing</a></li><li><a href="/youcity/city/belem.html">Belém</a></li><li><a href="/youcity/city/belfast.html">Belfast</a></li><li><a href="/youcity/city/belo-horizonte.html">Belo Horizonte</a></li><li><a href="/youcity/city/berlin.html">Berlin</a></li><li><a href="/youcity/city/beverly-hills.html">Beverly Hills</a></li><li><a href="/youcity/city/bhopal.html">Bhopal</a></li><li><a href="/youcity/city/bhubaneswar.html">Bhubaneswar</a></li><li><a href="/youcity/city/bordeaux.html">Bordeaux</a></li><li><a href="/youcity/city/boston.html">Boston</a></li><li><a href="/youcity/city/brasilia.html">Brasilia</a></li><li><a href="/youcity/city/brisbane.html">Brisbane</a></li><li><a href="/youcity/city/bristol.html">Bristol</a></li><li><a href="/youcity/city/bronx.html">Bronx</a></li><li><a href="/youcity/city/brooklyn.html">Brooklyn</a></li><li><a href="/youcity/city/budapest.html">Budapest</a></li><li><a href="/youcity/city/buenos-aires.html">Buenos Aires</a></li><li><a href="/youcity/city/cairo.html">Cairo</a></li><li><a href="/youcity/city/campinas.html">Campinas</a></li><li><a href="/youcity/city/cancun.html">Cancun</a></li><li><a href="/youcity/city/cape-town.html">Cape Town</a></li><li><a href="/youcity/city/cebu-city.html">Cebu City</a></li><li><a href="/youcity/city/chandigarh.html">Chandigarh</a></li><li><a href="/youcity/city/charleston.html">Charleston</a></li><li><a href="/youcity/city/chennai.html">Chennai</a></li><li><a href="/youcity/city/chicago.html">Chicago</a></li><li><a href="/youcity/city/cincinnati.html">Cincinnati</a></li><li><a href="/youcity/city/cleveland.html">Cleveland</a></li><li><a href="/youcity/city/columbus.html">Columbus</a></li><li><a href="/youcity/city/curitiba.html">Curitiba</a></li><li><a href="/youcity/city/dakar.html">Dakar</a></li><li><a href="/youcity/city/dallas.html">Dallas</a></li><li><a href="/youcity/city/davos.html">Davos</a></li><li><a href="/youcity/city/delhi.html">Delhi</a></li><li><a href="/youcity/city/denver.html">Denver</a></li><li><a href="/youcity/city/detroit.html">Detroit</a></li><li><a href="/youcity/city/dubai.html">Dubai</a></li><li><a href="/youcity/city/dublin.html">Dublin</a></li><li><a href="/youcity/city/dunedin.html">Dunedin</a></li><li><a href="/youcity/city/edinburgh.html">Edinburgh</a></li><li><a href="/youcity/city/faisalabad.html">Faisalabad</a></li><li><a href="/youcity/city/fortaleza.html">Fortaleza</a></li><li><a href="/youcity/city/frankfurt.html">Frankfurt</a></li><li><a href="/youcity/city/general-santos-city.html">General Santos City</a></li><li><a href="/youcity/city/geneva.html">Geneva</a></li><li><a href="/youcity/city/goa.html">Goa</a></li><li><a href="/youcity/city/gold-coast.html">Gold Coast</a></li><li><a href="/youcity/city/guadalajara.html">Guadalajara</a></li><li><a href="/youcity/city/guatemala.html">Guatemala</a></li><li><a href="/youcity/city/guwahati.html">Guwahati</a></li><li><a href="/youcity/city/hamburg.html">Hamburg</a></li><li><a href="/youcity/city/havana.html">Havana</a></li><li><a href="/youcity/city/hawaii.html">Hawaii</a></li><li><a href="/youcity/city/hollywood.html">Hollywood</a></li><li><a href="/youcity/city/houston.html">Houston</a></li><li><a href="/youcity/city/hyderabad.html">Hyderabad</a></li><li><a href="/youcity/city/ibiza.html">Ibiza</a></li><li><a href="/youcity/city/indianapolis.html">Indianapolis</a></li><li><a href="/youcity/city/innsbruck.html">Innsbruck</a></li><li><a href="/youcity/city/islamabad.html">Islamabad</a></li><li><a href="/youcity/city/istanbul.html">Istanbul</a></li><li><a href="/youcity/city/izmir.html">Izmir</a></li><li><a href="/youcity/city/jacksonville.html">Jacksonville</a></li><li><a href="/youcity/city/jaipur.html">Jaipur</a></li><li><a href="/youcity/city/jakarta.html">Jakarta</a></li><li><a href="/youcity/city/joao-pessoa.html">João Pessoa</a></li><li><a href="/youcity/city/johannesburg.html">Johannesburg</a></li><li><a href="/youcity/city/karachi.html">Karachi</a></li><li><a href="/youcity/city/kochi.html">Kochi</a></li><li><a href="/youcity/city/kolkata.html">Kolkata</a></li><li><a href="/youcity/city/kuala-lumpur.html">Kuala Lumpur</a></li><li><a href="/youcity/city/kyiv.html">Kyiv</a></li><li><a href="/youcity/city/la-romana.html">La Romana</a></li><li><a href="/youcity/city/lahore.html">Lahore</a></li><li><a href="/youcity/city/las-vegas.html">Las Vegas</a></li><li><a href="/youcity/city/lauterbrunnen.html">Lauterbrunnen</a></li><li><a href="/youcity/city/lisbon.html">Lisbon</a></li><li><a href="/youcity/city/liverpool.html">Liverpool</a></li><li><a href="/youcity/city/ljubljana.html">Ljubljana</a></li><li><a href="/youcity/city/london.html">London</a></li><li><a href="/youcity/city/los-angeles.html">Los Angeles</a></li><li><a href="/youcity/city/lyon.html">Lyon</a></li><li><a href="/youcity/city/madrid.html">Madrid</a></li><li><a href="/youcity/city/makati.html">Makati</a></li><li><a href="/youcity/city/manila.html">Manila</a></li><li><a href="/youcity/city/melbourne.html">Melbourne</a></li><li><a href="/youcity/city/metro-manila.html">Metro Manila</a></li><li><a href="/youcity/city/mexico-city.html">Mexico City</a></li><li><a href="/youcity/city/miami.html">Miami</a></li><li><a href="/youcity/city/milan.html">Milan</a></li><li><a href="/youcity/city/minneapolis.html">Minneapolis</a></li><li><a href="/youcity/city/monaco.html">Monaco</a></li><li><a href="/youcity/city/monterrey.html">Monterrey</a></li><li><a href="/youcity/city/montevideo.html">Montevideo</a></li><li><a href="/youcity/city/moscow.html">Moscow</a></li><li><a href="/youcity/city/mumbai.html">Mumbai</a></li><li><a href="/youcity/city/munich.html">Munich</a></li><li><a href="/youcity/city/narita.html">Narita</a></li><li><a href="/youcity/city/nashville.html">Nashville</a></li><li><a href="/youcity/city/new-orleans.html">New Orleans</a></li><li><a href="/youcity/city/new-taipei-city.html">New Taipei City</a></li><li><a href="/youcity/city/new-york-city.html">New York City</a></li><li><a href="/youcity/city/niagara-falls.html">Niagara Falls</a></li><li><a href="/youcity/city/nice.html">Nice</a></li><li><a href="/youcity/city/nizhny-novgorod.html">Nizhny Novgorod</a></li><li><a href="/youcity/city/novosibirsk.html">Novosibirsk</a></li><li><a href="/youcity/city/orlando.html">Orlando</a></li><li><a href="/youcity/city/oslo.html">Oslo</a></li><li><a href="/youcity/city/palm-beach.html">Palm Beach</a></li><li><a href="/youcity/city/paris.html">Paris</a></li><li><a href="/youcity/city/philadelphia.html">Philadelphia</a></li><li><a href="/youcity/city/phoenix.html">Phoenix</a></li><li><a href="/youcity/city/pittsburgh.html">Pittsburgh</a></li><li><a href="/youcity/city/porto-alegre.html">Porto Alegre</a></li><li><a href="/youcity/city/prague.html">Prague</a></li><li><a href="/youcity/city/presidente-prudente.html">Presidente Prudente</a></li><li><a href="/youcity/city/puebla.html">Puebla</a></li><li><a href="/youcity/city/pune.html">Pune</a></li><li><a href="/youcity/city/qatar.html">Qatar</a></li><li><a href="/youcity/city/queretaro.html">Querétaro</a></li><li><a href="/youcity/city/recife.html">Recife</a></li><li><a href="/youcity/city/rio-de-janeiro.html">Rio De Janeiro</a></li><li><a href="/youcity/city/rome.html">Rome</a></li><li><a href="/youcity/city/salvador.html">Salvador</a></li><li><a href="/youcity/city/samarkand.html">Samarkand</a></li><li><a href="/youcity/city/san-diego.html">San Diego</a></li><li><a href="/youcity/city/san-fernando-pampanga.html">San Fernando, Pampanga</a></li><li><a href="/youcity/city/san-francisco.html">San Francisco</a></li><li><a href="/youcity/city/sanliurfa.html">Sanliurfa</a></li><li><a href="/youcity/city/santiago-de-los-caballeros.html">Santiago de los Caballeros</a></li><li><a href="/youcity/city/santo-domingo.html">Santo Domingo</a></li><li><a href="/youcity/city/seattle.html">Seattle</a></li><li><a href="/youcity/city/seoul.html">Seoul</a></li><li><a href="/youcity/city/singapore.html">Singapore</a></li><li><a href="/youcity/city/sofia.html">Sofia</a></li><li><a href="/youcity/city/st-petersburg.html">St. Petersburg</a></li><li><a href="/youcity/city/stockholm.html">Stockholm</a></li><li><a href="/youcity/city/stuttgart.html">Stuttgart</a></li><li><a href="/youcity/city/sydney.html">Sydney</a></li><li><a href="/youcity/city/taipei.html">Taipei</a></li><li><a href="/youcity/city/tampa.html">Tampa</a></li><li><a href="/youcity/city/tashkent.html">Tashkent</a></li><li><a href="/youcity/city/tehran.html">Tehran</a></li><li><a href="/youcity/city/tel-aviv.html">Tel Aviv</a></li><li><a href="/youcity/city/thessaloniki.html">Thessaloniki</a></li><li><a href="/youcity/city/tokyo.html">Tokyo</a></li><li><a href="/youcity/city/toronto.html">Toronto</a></li><li><a href="/youcity/city/trabzon.html">Trabzon</a></li><li><a href="/youcity/city/vancouver.html">Vancouver</a></li><li><a href="/youcity/city/vienna.html">Vienna</a></li><li><a href="/youcity/city/warsaw.html">Warsaw</a></li><li><a href="/youcity/city/washington-dc.html">Washington DC</a></li><li><a href="/youcity/city/wuhan.html">Wuhan</a></li><li><a href="/youcity/city/yekaterinburg.html">Yekaterinburg</a></li><li><a href="/youcity/city/zurich.html">Zurich</a></li></ul></section></noscript>
+
+    <script src="/youcity/cities-data.js"></script>
+    <script src="/youcity/map-catalog.js"></script>
+    <script src="/youcity/map-config.js"></script>
+    <script src="/youcity/travel-config.js"></script>
+    <script src="/youcity/drone-videos.js"></script>
+    <script src="/youcity/radio-catalog.js"></script>
+    <script src="/youcity/app.js"></script>
+  </body>
+</html>

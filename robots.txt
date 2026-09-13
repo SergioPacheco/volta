@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Query-string variants are client-side state; city pages use stable paths.
+Disallow: /*?city=
+Disallow: /*?preview=
+Disallow: /*?*
+
+Sitemap: https://sergiopacheco.github.io/youcity/sitemap.xml
