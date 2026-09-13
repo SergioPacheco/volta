@@ -5,11 +5,11 @@
   --acid: #d7ff43;
   --line: rgba(255, 255, 255, 0.22);
   --glass: rgba(14, 17, 15, 0.58);
-  /* Opacidades de texto para contraste WCAG AA */
+  /* Text opacity values for WCAG AA contrast */
   --text-muted: rgba(255, 255, 255, 0.68);
   --text-subtle: rgba(255, 255, 255, 0.52);
   --text-faint: rgba(255, 255, 255, 0.42);
-  /* Safe areas para notch/home indicator */
+  /* Safe areas for notch/home indicator */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
@@ -22,7 +22,7 @@
 
 html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #0d110f; }
 
-/* Skip link para acessibilidade */
+/* Accessibility skip link */
 .skip-link {
   position: absolute;
   top: -100%;
@@ -70,7 +70,7 @@ button:focus-visible, input:focus-visible {
 .top-actions { display: flex; justify-self: end; align-items: center; gap: 10px; }
 .icon-button, .menu-button { border: 1px solid var(--line); background: rgba(9,12,10,.28); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); cursor: pointer; position: relative; z-index: 1; }
 .icon-button { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
-.icon-button svg, .menu-button svg, .source-link svg, .rail-arrow svg, .transport svg, .volume-control svg, .ambient-button svg, .drawer-close svg, .search-box svg, #start-button svg { width: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.icon-button svg, .menu-button svg, .source-link svg, .rail-arrow svg, .transport svg, .volume-control svg, .ambient-button svg, .drawer-close svg, .search-box svg { width: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 #share-button svg circle { fill: currentColor; stroke: none; }
 #share-button svg path { stroke-width: 2; }
 
@@ -150,18 +150,18 @@ button:focus-visible, input:focus-visible {
 .player-card::before { content: ''; position: absolute; inset: 0; border: 1px solid rgba(255,255,255,0.04); pointer-events: none; border-radius: 4px; }
 .player-card.is-hidden { transform: translateY(calc(100% + 60px)); opacity: 0; pointer-events: none; }
 
-/* Botão de minimizar no player */
+/* Player minimize button */
 .player-minimize { position: absolute; top: -32px; right: 0; z-index: 5; width: 26px; height: 26px; padding: 0; border: 1px solid rgba(255,255,255,.15); border-radius: 4px; background: rgba(0,0,0,.55); color: rgba(255,255,255,.5); cursor: pointer; display: grid; place-items: center; transition: background 0.15s, color 0.15s, border-color 0.15s; }
 .player-minimize:hover { background: rgba(0,0,0,.5); color: var(--lcd-green); border-color: var(--lcd-green); }
 .player-minimize svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* Botão flutuante para restaurar player */
+/* Floating button to restore player */
 .player-restore { position: absolute; z-index: 4; right: clamp(76px, 8vw, 132px); bottom: 20px; width: 54px; height: 54px; padding: 0; border: 2px solid rgba(255,255,255,.15); border-radius: 50%; background: linear-gradient(180deg, #1f2124 0%, #121315 100%); color: var(--lcd-green); cursor: pointer; display: grid; place-items: center; box-shadow: 0 6px 20px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.08); opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none; transition: opacity 0.3s, transform 0.3s cubic-bezier(.4,0,.2,1), border-color 0.15s, background 0.15s; }
 .player-restore.is-visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 .player-restore:hover { border-color: var(--lcd-green); background: linear-gradient(180deg, #252830 0%, #151618 100%); }
 .player-restore svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-/* Barra superior integrada com controles */
+/* Top bar with integrated controls */
 .stereo-top-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; border-bottom: 2px solid #0a0a0b; background: linear-gradient(180deg, #232528 0%, #1a1c1e 100%); border-radius: 4px 4px 0 0; }
 .stereo-top-bar .mode-control { height: 30px; border: 1px solid rgba(255,255,255,.12); border-radius: 4px; background: rgba(0,0,0,.3); padding: 3px; display: flex; align-items: center; flex-shrink: 0; }
 .stereo-top-bar .mode-control button { height: 24px; padding: 0 10px; border: 0; border-radius: 3px; background: transparent; color: rgba(255,255,255,.5); cursor: pointer; font: 700 8px "DM Mono", monospace; letter-spacing: .05em; text-transform: uppercase; transition: background 0.15s, color 0.15s; }
@@ -179,10 +179,10 @@ button:focus-visible, input:focus-visible {
 .stereo-top-bar .speed-control button:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
 .stereo-top-bar .speed-control button.is-active { background: rgba(255,255,255,.18); color: var(--lcd-green); }
 
-/* Seção principal do rádio */
+/* Main radio section */
 .player-card-main { display: flex; align-items: center; padding: 12px 14px; gap: 14px; }
 
-/* Botão giratório de volume 3D */
+/* 3D volume knob */
 .volume-knob-section { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
 .volume-knob { width: 52px; height: 52px; background: repeating-conic-gradient(from 0deg, #333 0deg 10deg, #222 10deg 20deg); border-radius: 50%; border: 3px solid #0a0a0b; box-shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 3px 3px rgba(255,255,255,0.12), inset 0 -3px 3px rgba(0,0,0,0.4); position: relative; cursor: pointer; transition: transform 0.1s; }
 .volume-knob:hover { transform: scale(1.03); }
@@ -192,7 +192,7 @@ button:focus-visible, input:focus-visible {
 /* Deck principal */
 .stereo-deck { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 
-/* Tela LCD verde estilo retrô */
+/* Retro green LCD screen */
 :root { --lcd-green: #00ff66; --lcd-bg: #040c06; }
 .lcd-screen { background-color: var(--lcd-bg); border: 3px solid #17181c; border-radius: 4px; height: 62px; box-shadow: inset 0 3px 8px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.04); padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; }
 .lcd-screen::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px); pointer-events: none; }
@@ -204,7 +204,7 @@ button:focus-visible, input:focus-visible {
 .lcd-led { font: 700 8px "DM Mono", monospace; color: var(--lcd-green); opacity: 0.25; }
 .lcd-led.is-active { opacity: 1; text-shadow: 0 0 5px var(--lcd-green); }
 
-/* Botões físicos do rádio */
+/* Physical radio buttons */
 .stereo-buttons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 .stereo-btn { background: linear-gradient(180deg, #2c3036 0%, #1e2024 100%); border: 1px solid #111; border-bottom: 2px solid #0b0c0d; color: #8a909a; font: 700 9px "DM Mono", monospace; padding: 7px 0; border-radius: 3px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.5); transition: all 0.05s ease; text-transform: uppercase; letter-spacing: 0.3px; }
 .stereo-btn:active { border-bottom-width: 1px; transform: translateY(1px); background: #18191c; color: var(--lcd-green); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); }
@@ -225,7 +225,7 @@ button:focus-visible, input:focus-visible {
 .hint button:hover kbd { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.4); color: #fff; }
 .hint button:active kbd { background: rgba(255,255,255,.2); transform: translateY(1px); }
 .hint span { margin-left: 6px; }
-/* Hint mobile - escondido por padrão, visível apenas em touch */
+/* Mobile hint - hidden by default, visible on touch devices */
 .hint-mobile { display: none; gap: 8px; bottom: calc(54px + var(--safe-bottom)); }
 .hint-mobile svg { opacity: 0.5; }
 @media (hover: none) and (pointer: coarse) {
@@ -272,20 +272,64 @@ button:focus-visible, input:focus-visible {
 .about-card a { color: var(--lcd-green); text-decoration: none; }
 .about-card a:hover { text-decoration: underline; }
 
-.welcome { position: fixed; z-index: 50; inset: 0; overflow: hidden; background: #111; color: #fff; transition: opacity .8s, visibility .8s; }
-.welcome.is-hidden { visibility: hidden; opacity: 0; pointer-events: none; }
-.welcome-image, .welcome-shade { position: absolute; inset: 0; }
-.welcome-image { background: url("assets/hero-saopaulo.webp") center/cover; animation: drift 14s ease-out both; }
-.welcome-shade { background: linear-gradient(90deg, rgba(8,12,9,.84), rgba(8,12,9,.34) 58%, rgba(8,12,9,.42)), linear-gradient(180deg, rgba(8,10,8,.35), transparent 50%, rgba(8,10,8,.42)); }
-.welcome-brand { position: absolute; top: 42px; left: 52px; font-size: 18px; font-weight: 700; letter-spacing: .18em; }
-.welcome-brand span { margin-left: 12px; padding-left: 15px; border-left: 1px solid rgba(255,255,255,.36); color: rgba(255,255,255,.55); font: 400 8px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .1em; }
-.welcome-copy { position: absolute; top: 50%; left: clamp(38px, 10vw, 160px); width: min(580px, calc(100% - 76px)); transform: translateY(-45%); }
-.welcome-number { color: var(--acid); font: 500 9px "DM Mono", monospace; letter-spacing: .12em; }
-.welcome-copy h2 { margin: 18px 0 20px; font: 300 clamp(78px, 10vw, 154px)/.75 "Newsreader", serif; letter-spacing: -.065em; }
-.welcome-copy p { max-width: 430px; margin: 30px 0; color: rgba(255,255,255,.7); font-size: 14px; line-height: 1.7; }
-#start-button { display: flex; align-items: center; justify-content: space-between; width: 242px; height: 54px; padding: 0 20px; border: 0; border-radius: 2px; background: var(--acid); color: #000; cursor: pointer; font-size: 13px; font-weight: 800; letter-spacing: 0.02em; transition: width .3s, background .3s; }
-#start-button:hover { width: 258px; background: #e4ff79; }
-.welcome-foot { position: absolute; right: 50px; bottom: 38px; left: 50px; display: flex; justify-content: space-between; padding-top: 15px; border-top: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.48); font: 400 8px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .1em; }
+/* World map */
+.map-modal { position: fixed; z-index: 35; inset: 0; visibility: hidden; pointer-events: none; }
+.map-modal.is-open { visibility: visible; pointer-events: auto; }
+.map-backdrop { position: absolute; inset: 0; background: rgba(4,6,5,.78); opacity: 0; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); transition: opacity .35s; }
+.map-modal.is-open .map-backdrop { opacity: 1; }
+.map-card { position: absolute; inset: 28px 4vw; display: flex; flex-direction: column; overflow: hidden; padding: 34px 38px 22px; background: linear-gradient(180deg, #101411 0%, #080a09 100%); color: #e8e6e1; border: 1px solid rgba(255,255,255,.13); border-radius: 10px; opacity: 0; transform: translateY(18px) scale(.985); transition: opacity .35s, transform .35s; }
+.map-modal.is-open .map-card { opacity: 1; transform: translateY(0) scale(1); }
+.map-header { display: flex; align-items: start; justify-content: space-between; gap: 28px; flex: 0 0 auto; }
+.map-header h2 { margin: 8px 0 18px; font: 300 clamp(36px, 4vw, 58px)/.95 "Newsreader", serif; letter-spacing: -.04em; }
+.map-toolbar { display: flex; justify-content: space-between; gap: 20px; padding: 10px 0; color: rgba(255,255,255,.52); border-top: 1px solid rgba(255,255,255,.12); font: 400 9px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .05em; }
+.map-toolbar span:first-child { color: var(--lcd-green); }
+.world-map { position: relative; flex: 1 1 auto; min-height: 360px; overflow: hidden; background: #d7e1df; border: 1px solid rgba(255,255,255,.14); border-radius: 5px; }
+.world-map .leaflet-container { width: 100%; height: 100%; min-height: 360px; background: #d7e1df; font-family: "DM Mono", monospace; }
+.world-map .leaflet-control-zoom a { color: #111411; }
+.world-map .leaflet-control-attribution { font-size: 9px; }
+.map-footnote { flex: 0 0 auto; margin: 12px 0 0; color: rgba(255,255,255,.42); font: 400 9px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .04em; }
+.map-unavailable { display: grid; height: 100%; min-height: 360px; place-items: center; margin: 0; padding: 24px; color: #20251f; font: 500 12px "DM Mono", monospace; text-align: center; }
+.map-popup { min-width: 230px; color: #182018; font-family: "Manrope", sans-serif; }
+.map-popup-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 9px; border-bottom: 1px solid #dfe4dd; }
+.map-popup-title strong { font: 600 18px/1 "Newsreader", serif; }
+.map-popup-title span { color: #69736a; font: 500 9px "DM Mono", monospace; text-transform: uppercase; }
+.map-popup-videos { max-height: 260px; overflow-y: auto; padding-top: 8px; }
+.map-video-group { padding: 7px 0; border-bottom: 1px solid #edf0ec; }
+.map-video-group:last-child { border-bottom: 0; }
+.map-video-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.map-video-heading strong { font: 600 10px "DM Mono", monospace; letter-spacing: .06em; text-transform: uppercase; }
+.map-video-heading button { padding: 4px 6px; border: 0; border-radius: 3px; background: #182018; color: #d7ff43; cursor: pointer; font: 600 8px "DM Mono", monospace; text-transform: uppercase; }
+.map-video-heading button:hover { background: #31412d; }
+.map-video-group ul { display: flex; flex-wrap: wrap; gap: 3px 8px; margin: 5px 0 0; padding: 0; list-style: none; }
+.map-video-group a { color: #436346; font-size: 10px; text-decoration: none; }
+.map-video-group a:hover { color: #152216; text-decoration: underline; }
+.map-popup-videos > p { margin: 8px 0; color: #69736a; font-size: 11px; }
+.map-directory { flex: 0 0 auto; margin-top: 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 4px; background: rgba(0,0,0,.18); }
+.map-directory summary { padding: 10px 12px; color: rgba(255,255,255,.72); cursor: pointer; font: 500 9px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .06em; }
+.map-directory summary::marker { color: var(--lcd-green); }
+.map-directory-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; max-height: 220px; overflow-y: auto; padding: 0 10px 10px; }
+.map-directory-item { min-width: 0; padding: 9px; border-top: 1px solid rgba(255,255,255,.1); }
+.map-directory-item h3 { display: flex; flex-direction: column; gap: 3px; margin: 0 0 7px; }
+.map-directory-item h3 button { width: fit-content; padding: 0; border: 0; background: transparent; color: #fff; cursor: pointer; font: 500 14px "Newsreader", serif; text-align: left; }
+.map-directory-item h3 button:hover { color: var(--lcd-green); }
+.map-directory-item h3 span { color: rgba(255,255,255,.42); font: 400 8px "DM Mono", monospace; text-transform: uppercase; }
+.map-directory-mode { display: flex; align-items: baseline; gap: 5px; margin-top: 5px; color: rgba(255,255,255,.48); font: 400 8px "DM Mono", monospace; }
+.map-directory-mode strong { color: var(--lcd-green); font-size: 8px; }
+.map-directory-mode button { padding: 1px 4px; border: 1px solid rgba(215,255,67,.35); border-radius: 2px; background: transparent; color: var(--lcd-green); cursor: pointer; font: inherit; text-transform: uppercase; }
+.map-directory-mode span { display: flex; flex-wrap: wrap; gap: 0 6px; }
+.map-directory-mode a { color: rgba(255,255,255,.62); text-decoration: none; }
+.map-directory-mode a:hover { color: #fff; text-decoration: underline; }
+.map-travel { margin-top: 8px; padding-top: 8px; border-top: 1px solid #dfe4dd; }
+.map-travel > span { display: block; margin-bottom: 5px; color: #69736a; font: 600 9px "DM Mono", monospace; text-transform: uppercase; }
+.map-travel-group { display: inline-flex; gap: 5px; margin: 0 8px 5px 0; font-size: 10px; }
+.map-travel-group strong { color: #436346; }
+.map-travel-group ul { display: flex; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.map-travel-group a { color: #436346; }
+
+.catalog-error { display: grid; place-items: center; align-content: center; gap: 18px; min-height: 100%; padding: 32px; color: #fff; text-align: center; }
+.catalog-error h1 { margin: 0; font: 300 64px/1 "Newsreader", serif; }
+.catalog-error p { max-width: 400px; margin: 0; color: var(--text-muted); line-height: 1.7; }
+.catalog-error button { padding: 14px 28px; border: 0; border-radius: 4px; background: var(--acid); color: var(--ink); cursor: pointer; font-weight: 600; }
 .toast { position: fixed; z-index: 80; left: 50%; bottom: 26px; padding: 11px 16px; border: 1px solid rgba(255,255,255,.18); border-radius: 5px; background: rgba(12,15,13,.88); color: #fff; opacity: 0; pointer-events: none; transform: translate(-50%, 14px); transition: .3s; font-size: 11px; }
 .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
 
@@ -293,7 +337,7 @@ button:focus-visible, input:focus-visible {
    NOVAS FUNCIONALIDADES
    ============================================================================ */
 
-/* Botão de favorito */
+/* Favorite button */
 .city-actions { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
 .favorite-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; padding: 0; border: 1px solid rgba(255,255,255,.3); border-radius: 50%; background: rgba(0,0,0,.25); color: rgba(255,255,255,.7); cursor: pointer; transition: all .2s; }
 .favorite-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; }
@@ -303,13 +347,13 @@ button:focus-visible, input:focus-visible {
 .favorite-btn.is-active .heart-empty { display: none; }
 .favorite-btn.is-active .heart-full { display: block; }
 
-/* Info da cidade */
+/* City information */
 .city-info { display: flex; gap: 16px; margin-top: 12px; }
 .info-item { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,.6); font: 400 10px "DM Mono", monospace; }
 .info-item svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; }
 .info-item b { color: rgba(255,255,255,.85); }
 
-/* Barra de filtros no drawer */
+/* Drawer filter bar */
 .filter-bar { display: flex; align-items: center; gap: 8px; padding: 14px 0; flex-wrap: wrap; }
 .filter-btn { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 14px; border: 1px solid rgba(255,255,255,.15); border-radius: 16px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.6); cursor: pointer; font: 500 10px "DM Mono", monospace; text-transform: uppercase; transition: all .15s; }
 .filter-btn svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; }
@@ -319,7 +363,7 @@ button:focus-visible, input:focus-visible {
 .filter-select:focus { outline: none; border-color: var(--lcd-green); }
 .filter-select option { background: #1a1d1b; color: #fff; padding: 8px; }
 
-/* Card de cidade com favorito */
+/* City card with favorite */
 .city-card .card-favorite { position: absolute; top: 8px; right: 8px; z-index: 3; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: rgba(0,0,0,.6); color: rgba(255,255,255,.7); cursor: pointer; display: grid; place-items: center; opacity: 0; transition: opacity .2s, color .15s, background .15s; }
 .city-card:hover .card-favorite { opacity: 1; }
 .city-card .card-favorite svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; flex-shrink: 0; }
@@ -327,23 +371,12 @@ button:focus-visible, input:focus-visible {
 .city-card .card-favorite.is-active svg { fill: currentColor; }
 .city-card .card-favorite:hover { background: rgba(0,0,0,.8); color: #ff6b6b; }
 
-/* Modal de estatísticas */
+/* Statistics modal */
 .stats-card { text-align: center; }
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; }
 .stat-item { padding: 20px; background: rgba(255,255,255,.05); border-radius: 8px; }
 .stat-value { display: block; font: 300 36px "Newsreader", serif; color: var(--lcd-green); }
 .stat-label { display: block; margin-top: 4px; color: rgba(255,255,255,.5); font: 400 9px "DM Mono", monospace; text-transform: uppercase; }
-
-/* Modal de mixer de áudio */
-.audio-card { max-width: 400px; }
-.audio-mixer { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
-.mixer-item { display: grid; grid-template-columns: 80px 1fr 40px; align-items: center; gap: 12px; }
-.mixer-item label { font-size: 13px; }
-.mixer-item input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: rgba(255,255,255,.15); appearance: none; cursor: pointer; }
-.mixer-item input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--lcd-green); cursor: pointer; }
-.mixer-value { text-align: right; color: rgba(255,255,255,.5); font: 400 10px "DM Mono", monospace; }
-.mixer-reset { width: 100%; padding: 10px; border: 1px solid rgba(255,255,255,.2); border-radius: 4px; background: transparent; color: rgba(255,255,255,.6); cursor: pointer; font: 500 10px "DM Mono", monospace; text-transform: uppercase; transition: all .15s; }
-.mixer-reset:hover { border-color: var(--lcd-green); color: var(--lcd-green); }
 
 /* Painel Pomodoro flutuante */
 .pomodoro-panel, .autoplay-panel { position: absolute; z-index: 5; top: 110px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(0,0,0,.7); border: 1px solid rgba(255,255,255,.15); border-radius: 20px; opacity: 0; pointer-events: none; transition: opacity .3s; }
@@ -402,7 +435,7 @@ button:focus-visible, input:focus-visible {
   .source-link { display: none; }
   .rail { right: 16px; }
   .rail-arrow { display: none; }
-  /* Rádio compacto mobile */
+  /* Compact mobile radio */
   .player-card { right: 14px; bottom: 16px; left: 14px; width: auto; min-width: 0; }
   .player-restore { right: 14px; left: 14px; width: auto; border-radius: 8px; height: 44px; }
   .stereo-top-bar { padding: 6px 8px; gap: 6px; flex-wrap: wrap; }
@@ -428,15 +461,13 @@ button:focus-visible, input:focus-visible {
   .hint { display: none; }
   .drawer-panel { padding: 28px 18px 20px; }
   .drawer-header h2 { font-size: 44px; }
+  .map-card { inset: 14px; padding: 24px 18px 16px; }
+  .map-header h2 { font-size: 40px; }
+  .map-toolbar { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .map-directory-list { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 190px; }
   .city-grid { grid-template-columns: 1fr; }
   .city-card { height: 170px; }
   .drawer-footer { flex-direction: column; gap: 7px; }
-  .welcome-brand { top: 25px; left: 24px; }
-  .welcome-copy { left: 24px; width: calc(100% - 48px); }
-  .welcome-copy h2 { font-size: clamp(72px, 24vw, 112px); }
-  .welcome-copy p { font-size: 13px; }
-  .welcome-foot { right: 24px; bottom: 22px; left: 24px; }
-  .welcome-foot span:nth-child(2) { display: none; }
 }
 
 @media (max-width: 430px) {
@@ -446,17 +477,12 @@ button:focus-visible, input:focus-visible {
   .stereo-top-bar .mode-control { height: 30px; }
   .stereo-top-bar .mode-control button { height: 22px; font-size: 7px; padding: 0 8px; }
   .about-card { padding: 42px 26px 28px; }
-  .welcome-copy { top: 46%; }
-  .welcome-copy h2 { margin-top: 14px; }
-  .welcome-copy p { margin: 23px 0; }
-  .welcome-brand span { display: none; }
   .stereo-buttons { grid-template-columns: repeat(3, 1fr); }
   .stereo-btn:nth-child(4) { display: none; }
 }
 
 /* Mobile small - safe areas e ajustes finais */
 @media (max-width: 430px) and (max-height: 750px) {
-  .welcome-copy h2 { font-size: 64px; }
   .city-intro h1 { font-size: 32px; }
   .player-card { bottom: calc(12px + var(--safe-bottom)); }
 }
@@ -473,12 +499,9 @@ button:focus-visible, input:focus-visible {
   .player-card-main { padding: 8px; }
   .stereo-top-bar { display: none; }
   .stereo-buttons { display: none; }
-  .welcome-copy { top: 50%; }
-  .welcome-copy h2 { font-size: 48px; }
-  #start-button { height: 44px; width: 200px; }
 }
 
-/* Touch-friendly: aumenta áreas de toque */
+/* Touch-friendly: increase touch targets */
 @media (hover: none) and (pointer: coarse) {
   .icon-button { min-width: 44px; min-height: 44px; }
   .stereo-btn { min-height: 44px; }
@@ -487,7 +510,7 @@ button:focus-visible, input:focus-visible {
   .city-card { cursor: default; }
   .card-favorite { width: 44px; height: 44px; }
   .drawer-close { width: 44px; height: 44px; }
-  /* Indica que há swipe disponível */
+  /* Indicate that swipe navigation is available */
   .swipe-hint { display: flex; }
 }
 
@@ -507,15 +530,45 @@ button:focus-visible, input:focus-visible {
     margin-top: auto;
     max-height: 85vh;
   }
+  .map-card { inset: 0; padding: calc(20px + var(--safe-top)) 14px calc(16px + var(--safe-bottom)); border: 0; border-radius: 0; }
+  .map-header h2 { font-size: 38px; }
+  .world-map, .world-map .leaflet-container { min-height: 0; }
+  .map-directory-list { grid-template-columns: 1fr; max-height: 180px; }
 }
 
 /* PWA standalone mode */
 @media (display-mode: standalone) {
   .topbar { padding-top: var(--safe-top); height: calc(80px + var(--safe-top)); }
-  .welcome-brand { top: calc(28px + var(--safe-top)); }
   .player-card { bottom: calc(20px + var(--safe-bottom)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Accessible fallback when JavaScript is disabled. */
+.seo-fallback {
+  box-sizing: border-box;
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  width: 100%;
+  min-height: 100vh;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  overflow: auto;
+  color: #151713;
+  background: #f1ecdf;
+  font-family: Manrope, sans-serif;
+  line-height: 1.6;
+}
+
+.seo-fallback h2 { margin: 0 0 12px; }
+.seo-fallback p { max-width: 680px; }
+.seo-fallback a { color: inherit; }
+.seo-fallback ul { columns: 3; padding-left: 22px; }
+
+@media (max-width: 700px) {
+  .seo-fallback ul { columns: 1; }
 }

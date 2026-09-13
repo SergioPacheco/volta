@@ -1,16 +1,16 @@
 // =============================================================================
-// VOLTA — app.js
-// Experiência imersiva de passeios urbanos com rádio local
+// YouCity — app.js
+// Immersive urban rides with local radio
 // =============================================================================
 
 /**
- * IIFE para encapsular todo o código e evitar poluição do namespace global
+ * IIFE to encapsulate all code and avoid polluting the global namespace
  */
 (function() {
   'use strict';
 
   // -----------------------------------------------------------------------------
-  // Configuração centralizada (elimina magic numbers e strings hardcoded)
+  // Centralized configuration (avoids magic numbers and hardcoded strings)
   // -----------------------------------------------------------------------------
   const CONFIG = {
     VIDEO_READY_DELAY: 1500,
@@ -20,9 +20,9 @@
     RADIO_RETRY_DELAY: 2000,
     RADIO_MAX_RETRIES: 2,
     DEFAULT_VOLUME: 64,
-    AUTOPLAY_INTERVAL: 180_000, // 3 minutos
-    POMODORO_DURATION: 25 * 60, // 25 minutos em segundos
-    POMODORO_BREAK: 5 * 60, // 5 minutos de pausa
+    AUTOPLAY_INTERVAL: 180_000, // 3 minutes
+    POMODORO_DURATION: 25 * 60, // 25 minutes in seconds
+    POMODORO_BREAK: 5 * 60, // 5-minute break
     VOLUME_ROTATION_FACTOR: 2.4,
     VOLUME_DRAG_SENSITIVITY: 0.5,
     VOLUME_WHEEL_STEP: 5,
@@ -51,110 +51,110 @@
       DRIVE: "drive",
       BIKE: "bike",
       WALK: "walk",
+      DRONE: "drone",
     },
   };
 
-  // Mensagens centralizadas para facilitar i18n futura
+  // Centralized messages for future i18n
   const MESSAGES = {
-    nowIn: (cityName) => `Agora em ${cityName}`,
-    autoplayOn: "Autoplay ativado — troca a cada 3 minutos",
-    autoplayOff: "Autoplay desativado",
-    pomodoroStart: "Pomodoro iniciado — 25 minutos de foco",
-    pomodoroPause: "Pomodoro pausado",
-    pomodoroBreakEnd: "☕ Pausa terminou! Hora de focar.",
-    pomodoroComplete: "🎉 Pomodoro completo! Pausa de 5 minutos.",
-    streetSoundOn: "Som da rua ativado",
-    streetSoundOff: "Som da rua desativado",
-    noRadio: "Esta cidade ainda não possui rádio disponível.",
-    radioRetry: "Rádio não respondeu. Tentando próxima estação...",
-    radioUnavailable: "Nenhuma rádio disponível no momento. Tente mais tarde.",
-    noVideo: "Nenhum vídeo disponível para esta cidade.",
-    videoFallback: "Vídeo indisponível. Carregando alternativa...",
-    videoUnavailable: "Vídeo indisponível. Tente outra cidade.",
-    fullscreenUnavailable: "Tela cheia não disponível neste navegador.",
-    pipUnavailable: "PiP não disponível para vídeos do YouTube incorporados",
-    pipError: "Erro ao ativar Picture-in-Picture",
-    pipOff: "Picture-in-Picture desativado",
-    linkCopied: "Link copiado para a área de transferência!",
-    linkCopyFailed: "Não foi possível copiar o link",
-    audioReset: "Efeitos de áudio resetados",
-    favoriteAdded: (city) => `${city} adicionada aos favoritos ♥`,
-    favoriteRemoved: (city) => `${city} removida dos favoritos`,
-    randomDestination: (city) => `Destino aleatório: ${city}`,
-    rideSpeed: (speed) => `Ritmo do passeio: ${speed}`,
-    qualityAuto: "Qualidade: Automática",
-    qualitySet: (quality) => `Qualidade: ${quality}p`,
-    themeDefault: "Tema: Padrão",
-    themeSepia: "Tema: Sépia",
-    themeContrast: "Tema: Alto contraste",
-    modeSwitch: (mode, city) => `${mode} em ${city}`,
+    nowIn: (cityName) => `Now in ${cityName}`,
+    autoplayOn: "Autoplay on — switching every 3 minutes",
+    autoplayOff: "Autoplay off",
+    pomodoroStart: "Pomodoro started — 25 minutes of focus",
+    pomodoroPause: "Pomodoro paused",
+    pomodoroBreakEnd: "☕ Break over! Time to focus.",
+    pomodoroComplete: "🎉 Pomodoro complete! Take a 5-minute break.",
+    streetSoundOn: "Street sound on",
+    streetSoundOff: "Street sound off",
+    noRadio: "This city has no radio station available yet.",
+    radioRetry: "The radio did not respond. Trying the next station...",
+    radioUnavailable: "No radio station is available right now. Try again later.",
+    noVideo: "No video is available for this city.",
+    videoFallback: "Video unavailable. Loading an alternative...",
+    videoUnavailable: "Video unavailable. Try another city.",
+    fullscreenUnavailable: "Fullscreen is not available in this browser.",
+    pipUnavailable: "PiP is not available for embedded YouTube videos",
+    pipError: "Error enabling Picture-in-Picture",
+    pipOff: "Picture-in-Picture off",
+    linkCopied: "Link copied to clipboard!",
+    linkCopyFailed: "Could not copy the link",
+    favoriteAdded: (city) => `${city} added to favorites ♥`,
+    favoriteRemoved: (city) => `${city} removed from favorites`,
+    randomDestination: (city) => `Random destination: ${city}`,
+    rideSpeed: (speed) => `Ride speed: ${speed}`,
+    qualityAuto: "Quality: Auto",
+    qualitySet: (quality) => `Quality: ${quality}p`,
+    themeDefault: "Theme: Default",
+    themeSepia: "Theme: Sepia",
+    themeContrast: "Theme: High contrast",
+    modeSwitch: (mode, city) => `${mode} in ${city}`,
   };
 
   // -----------------------------------------------------------------------------
   // Dados estáticos
   // -----------------------------------------------------------------------------
   const COUNTRY_INFO = {
-    Argentina: ["Argentina", "América do Sul", "America/Argentina/Buenos_Aires"],
-    Australia: ["Austrália", "Oceania", "Australia/Sydney"],
-    Austria: ["Áustria", "Europa", "Europe/Vienna"],
-    Brazil: ["Brasil", "América do Sul", "America/Sao_Paulo"],
-    Bulgaria: ["Bulgária", "Europa", "Europe/Sofia"],
-    Canada: ["Canadá", "América do Norte", "America/Toronto"],
-    China: ["China", "Ásia", "Asia/Shanghai"],
-    Cuba: ["Cuba", "Caribe", "America/Havana"],
-    Czechia: ["Tchéquia", "Europa", "Europe/Prague"],
-    "Dominican Republic": ["República Dominicana", "Caribe", "America/Santo_Domingo"],
-    Egypt: ["Egito", "África", "Africa/Cairo"],
-    England: ["Inglaterra", "Europa", "Europe/London"],
-    France: ["França", "Europa", "Europe/Paris"],
-    Germany: ["Alemanha", "Europa", "Europe/Berlin"],
-    Greece: ["Grécia", "Europa", "Europe/Athens"],
-    Guatemala: ["Guatemala", "América Central", "America/Guatemala"],
-    Hungary: ["Hungria", "Europa", "Europe/Budapest"],
-    India: ["Índia", "Ásia", "Asia/Kolkata"],
-    Indonesia: ["Indonésia", "Ásia", "Asia/Jakarta"],
-    Iran: ["Irã", "Ásia", "Asia/Tehran"],
-    Ireland: ["Irlanda", "Europa", "Europe/Dublin"],
-    Israel: ["Israel", "Ásia", "Asia/Jerusalem"],
-    Italy: ["Itália", "Europa", "Europe/Rome"],
-    Japan: ["Japão", "Ásia", "Asia/Tokyo"],
-    Korea: ["Coreia do Sul", "Ásia", "Asia/Seoul"],
-    Malaysia: ["Malásia", "Ásia", "Asia/Kuala_Lumpur"],
-    Mexico: ["México", "América do Norte", "America/Mexico_City"],
-    Monaco: ["Mônaco", "Europa", "Europe/Monaco"],
-    Netherlands: ["Países Baixos", "Europa", "Europe/Amsterdam"],
-    "New Zealand": ["Nova Zelândia", "Oceania", "Pacific/Auckland"],
-    "Northern Ireland": ["Irlanda do Norte", "Europa", "Europe/London"],
-    Norway: ["Noruega", "Europa", "Europe/Oslo"],
-    Pakistan: ["Paquistão", "Ásia", "Asia/Karachi"],
-    Philippines: ["Filipinas", "Ásia", "Asia/Manila"],
-    Poland: ["Polônia", "Europa", "Europe/Warsaw"],
-    Portugal: ["Portugal", "Europa", "Europe/Lisbon"],
-    Qatar: ["Catar", "Ásia", "Asia/Qatar"],
-    Russia: ["Rússia", "Europa/Ásia", "Europe/Moscow"],
-    Senegal: ["Senegal", "África", "Africa/Dakar"],
-    Singapore: ["Singapura", "Ásia", "Asia/Singapore"],
-    Slovenia: ["Eslovênia", "Europa", "Europe/Ljubljana"],
-    "South Africa": ["África do Sul", "África", "Africa/Johannesburg"],
-    Spain: ["Espanha", "Europa", "Europe/Madrid"],
-    Sweden: ["Suécia", "Europa", "Europe/Stockholm"],
-    Switzerland: ["Suíça", "Europa", "Europe/Zurich"],
-    Taiwan: ["Taiwan", "Ásia", "Asia/Taipei"],
-    Turkey: ["Turquia", "Europa/Ásia", "Europe/Istanbul"],
-    UAE: ["Emirados Árabes Unidos", "Ásia", "Asia/Dubai"],
-    UK: ["Reino Unido", "Europa", "Europe/London"],
-    USA: ["Estados Unidos", "América do Norte", "America/New_York"],
-    Ukraine: ["Ucrânia", "Europa", "Europe/Kyiv"],
-    Uruguay: ["Uruguai", "América do Sul", "America/Montevideo"],
-    Uzbekistan: ["Uzbequistão", "Ásia", "Asia/Tashkent"]
+    Argentina: ["Argentina", "South America", "America/Argentina/Buenos_Aires"],
+    Australia: ["Australia", "Oceania", "Australia/Sydney"],
+    Austria: ["Austria", "Europe", "Europe/Vienna"],
+    Brazil: ["Brazil", "South America", "America/Sao_Paulo"],
+    Bulgaria: ["Bulgaria", "Europe", "Europe/Sofia"],
+    Canada: ["Canada", "North America", "America/Toronto"],
+    China: ["China", "Asia", "Asia/Shanghai"],
+    Cuba: ["Cuba", "Caribbean", "America/Havana"],
+    Czechia: ["Czechia", "Europe", "Europe/Prague"],
+    "Dominican Republic": ["Dominican Republic", "Caribbean", "America/Santo_Domingo"],
+    Egypt: ["Egypt", "Africa", "Africa/Cairo"],
+    England: ["England", "Europe", "Europe/London"],
+    France: ["France", "Europe", "Europe/Paris"],
+    Germany: ["Germany", "Europe", "Europe/Berlin"],
+    Greece: ["Greece", "Europe", "Europe/Athens"],
+    Guatemala: ["Guatemala", "Central America", "America/Guatemala"],
+    Hungary: ["Hungary", "Europe", "Europe/Budapest"],
+    India: ["India", "Asia", "Asia/Kolkata"],
+    Indonesia: ["Indonesia", "Asia", "Asia/Jakarta"],
+    Iran: ["Iran", "Asia", "Asia/Tehran"],
+    Ireland: ["Ireland", "Europe", "Europe/Dublin"],
+    Israel: ["Israel", "Asia", "Asia/Jerusalem"],
+    Italy: ["Italy", "Europe", "Europe/Rome"],
+    Japan: ["Japan", "Asia", "Asia/Tokyo"],
+    Korea: ["South Korea", "Asia", "Asia/Seoul"],
+    Malaysia: ["Malaysia", "Asia", "Asia/Kuala_Lumpur"],
+    Mexico: ["Mexico", "North America", "America/Mexico_City"],
+    Monaco: ["Monaco", "Europe", "Europe/Monaco"],
+    Netherlands: ["Netherlands", "Europe", "Europe/Amsterdam"],
+    "New Zealand": ["New Zealand", "Oceania", "Pacific/Auckland"],
+    "Northern Ireland": ["Northern Ireland", "Europe", "Europe/London"],
+    Norway: ["Norway", "Europe", "Europe/Oslo"],
+    Pakistan: ["Pakistan", "Asia", "Asia/Karachi"],
+    Philippines: ["Philippines", "Asia", "Asia/Manila"],
+    Poland: ["Poland", "Europe", "Europe/Warsaw"],
+    Portugal: ["Portugal", "Europe", "Europe/Lisbon"],
+    Qatar: ["Qatar", "Asia", "Asia/Qatar"],
+    Russia: ["Russia", "Europe/Asia", "Europe/Moscow"],
+    Senegal: ["Senegal", "Africa", "Africa/Dakar"],
+    Singapore: ["Singapore", "Asia", "Asia/Singapore"],
+    Slovenia: ["Slovenia", "Europe", "Europe/Ljubljana"],
+    "South Africa": ["South Africa", "Africa", "Africa/Johannesburg"],
+    Spain: ["Spain", "Europe", "Europe/Madrid"],
+    Sweden: ["Sweden", "Europe", "Europe/Stockholm"],
+    Switzerland: ["Switzerland", "Europe", "Europe/Zurich"],
+    Taiwan: ["Taiwan", "Asia", "Asia/Taipei"],
+    Turkey: ["Turkey", "Europe/Asia", "Europe/Istanbul"],
+    UAE: ["United Arab Emirates", "Asia", "Asia/Dubai"],
+    UK: ["United Kingdom", "Europe", "Europe/London"],
+    USA: ["United States", "North America", "America/New_York"],
+    Ukraine: ["Ukraine", "Europe", "Europe/Kyiv"],
+    Uruguay: ["Uruguay", "South America", "America/Montevideo"],
+    Uzbekistan: ["Uzbekistan", "Asia", "Asia/Tashkent"]
   };
 
   const CITY_NAMES = {
-    "Sao Paulo": "São Paulo", Tokyo: "Tóquio", "New York City": "Nova York",
-    "Rio De Janeiro": "Rio de Janeiro", London: "Londres", Seoul: "Seul", Lisbon: "Lisboa",
-    Rome: "Roma", Moscow: "Moscou", Munich: "Munique", Vienna: "Viena", Warsaw: "Varsóvia",
-    Athens: "Atenas", Beijing: "Pequim", "Mexico City": "Cidade do México", Milan: "Milão",
-    Cologne: "Colônia", Florence: "Florença", Brussels: "Bruxelas", Istanbul: "Istambul"
+    "Sao Paulo": "São Paulo", Tokyo: "Tokyo", "New York City": "New York City",
+    "Rio De Janeiro": "Rio de Janeiro", London: "London", Seoul: "Seoul", Lisbon: "Lisbon",
+    Rome: "Rome", Moscow: "Moscow", Munich: "Munich", Vienna: "Vienna", Warsaw: "Warsaw",
+    Athens: "Athens", Beijing: "Beijing", "Mexico City": "Mexico City", Milan: "Milan",
+    Cologne: "Cologne", Florence: "Florence", Brussels: "Brussels", Istanbul: "Istanbul"
   };
 
   const CITY_TIME_ZONES = {
@@ -171,20 +171,21 @@
   };
 
   const CITY_NOTES = {
-    "Sao Paulo": "Concreto, luz e o pulso contínuo da maior cidade do hemisfério sul.",
-    Tokyo: "Neon, silêncio preciso e vias que atravessam uma cidade quase futurista.",
-    Paris: "Boulevards de pedra, luz dourada e esquinas que pedem um caminho mais longo.",
-    "New York City": "Faróis, pontes e o ruído elétrico de uma cidade sempre a caminho.",
-    "Rio De Janeiro": "A cidade encontra o mar entre túneis, morros e uma luz que muda tudo.",
-    London: "Chuva fina, tijolos antigos e o ritmo calmo das ruas à margem do Tâmisa.",
-    Seoul: "A madrugada reflete no asfalto entre mercados, letreiros e avenidas largas.",
-    Lisbon: "Subidas, azulejos e o Atlântico surgindo no fim de cada rua estreita."
+    "Sao Paulo": "Concrete, light, and the constant pulse of the largest city in the Southern Hemisphere.",
+    Tokyo: "Neon, precise silence, and roads crossing a city that feels almost futuristic.",
+    Paris: "Stone boulevards, golden light, and corners that call for a longer route.",
+    "New York City": "Traffic lights, bridges, and the electric hum of a city always on the move.",
+    "Rio De Janeiro": "The city meets the sea between tunnels, hills, and a light that changes everything.",
+    London: "Fine rain, old brick, and the calm rhythm of streets along the Thames.",
+    Seoul: "Dawn reflects on the asphalt between markets, signs, and wide avenues.",
+    Lisbon: "Hills, tiled facades, and the Atlantic appearing at the end of every narrow street."
   };
 
   const MODE_LABELS = { 
     [CONFIG.modes.DRIVE]: "Drive", 
     [CONFIG.modes.BIKE]: "Bike", 
-    [CONFIG.modes.WALK]: "Walk" 
+    [CONFIG.modes.WALK]: "Walk",
+    [CONFIG.modes.DRONE]: "Drone"
   };
 
   const THEME_NAMES = {
@@ -213,7 +214,16 @@
    * @returns {string} String normalizada
    */
   function normalizeSearch(value) {
-    return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
+    return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("en-US");
+  }
+
+  /**
+   * Creates the stable URL segment used by prerendered city pages.
+   */
+  function citySlug(value) {
+    return normalizeSearch(value)
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
   }
 
   /**
@@ -238,7 +248,7 @@
     try {
       return JSON.parse(localStorage.getItem(CONFIG.storageKeys.prefs)) || {};
     } catch (error) {
-      console.warn("[VOLTA] Falha ao carregar preferências:", error.message);
+      console.warn("[YouCity] Failed to load preferences:", error.message);
       return {};
     }
   }
@@ -252,15 +262,15 @@
       const current = loadPreferences();
       localStorage.setItem(CONFIG.storageKeys.prefs, JSON.stringify({ ...current, ...prefs }));
     } catch (error) {
-      console.warn("[VOLTA] Falha ao salvar preferências (modo privado?):", error.message);
+      console.warn("[YouCity] Failed to save preferences (private mode?):", error.message);
     }
   }
 
   // -----------------------------------------------------------------------------
-  // Processamento do catálogo de cidades
+  // City catalog processing
   // -----------------------------------------------------------------------------
   const cities = (window.CITY_CATALOG || []).map((item) => {
-    const [country, region, countryTimeZone] = COUNTRY_INFO[item.country] || [item.country, "Mundo", "UTC"];
+    const [country, region, countryTimeZone] = COUNTRY_INFO[item.country] || [item.country, "World", "UTC"];
     return {
       ...item,
       rawName: item.name,
@@ -269,13 +279,20 @@
       country,
       region,
       timeZone: CITY_TIME_ZONES[item.name] || countryTimeZone,
-      note: CITY_NOTES[item.name] || `Ruas reais, rádio local e o ritmo de ${CITY_NAMES[item.name] || item.name} pela janela.`,
-      radios: item.radios.map((radio) => ({ ...radio, mark: stationMark(radio.name) }))
+      note: CITY_NOTES[item.name] || `Real streets, local radio, and the rhythm of ${CITY_NAMES[item.name] || item.name} through the window.`,
+      videos: {
+        ...item.videos,
+        [CONFIG.modes.DRONE]: (window.DRONE_CATALOG?.[item.name] || []).map((id) => ({ id, start: 0 }))
+      },
+      radios: [...(window.RADIO_CATALOG?.[item.name] || []), ...item.radios]
+        .filter((radio, index, radios) => radios.findIndex((candidate) => candidate.url === radio.url) === index)
+        .slice(0, 5)
+        .map((radio) => ({ ...radio, mark: stationMark(radio.name) }))
     };
   });
 
   // -----------------------------------------------------------------------------
-  // Seleção de elementos DOM (cacheados para performance)
+  // DOM element selection (cached for performance)
   // -----------------------------------------------------------------------------
   const $ = (selector) => document.querySelector(selector);
 
@@ -284,8 +301,6 @@
     video: $("#city-video"),
     poster: $("#poster"),
     radio: $("#radio-player"),
-    welcome: $("#welcome"),
-    start: $("#start-button"),
     cityName: $("#city-name"),
     cityRegion: $("#city-region"),
     cityNote: $("#city-note"),
@@ -307,10 +322,14 @@
     search: $("#city-search"),
     resultCount: $("#result-count"),
     about: $("#about-modal"),
+    mapModal: $("#map-modal"),
+    mapContainer: $("#world-map"),
+    mapResultCount: $("#map-result-count"),
+    mapDirectory: $("#map-directory"),
+    mapButton: $("#map-button"),
     streetSound: $("#street-sound"),
     randomBtn: $("#random-btn"),
     toast: $("#toast"),
-    welcomeCityCount: $("#welcome-city-count"),
     playerCard: document.querySelector(".player-card"),
     playerMinimize: $("#player-minimize"),
     playerRestore: $("#player-restore"),
@@ -320,7 +339,6 @@
     infoPopulation: $("#info-population"),
     filterContinent: $("#filter-continent"),
     statsModal: $("#stats-modal"),
-    audioModal: $("#audio-modal"),
     pipBtn: $("#pip-button"),
     shareBtn: $("#share-button"),
     statsBtn: $("#stats-button"),
@@ -332,23 +350,15 @@
     autoplayPanel: $("#autoplay-panel"),
     autoplayTime: $("#autoplay-time"),
     qualityBtn: $("#quality-btn"),
-    mixerBtn: $("#mixer-btn"),
-    mixerReset: $("#mixer-reset"),
-    // Áudios de efeitos
-    fxRain: $("#fx-rain-audio"),
-    fxWind: $("#fx-wind-audio"),
-    fxCafe: $("#fx-cafe-audio"),
-    fxBirds: $("#fx-birds-audio"),
     // Seletores cacheados para grupos de botões
     modeButtons: document.querySelectorAll("[data-mode]"),
     speedButtons: document.querySelectorAll("[data-speed]"),
     closeDrawerButtons: document.querySelectorAll("[data-close-drawer]"),
     closeAboutButtons: document.querySelectorAll("[data-close-about]"),
+    closeMapButtons: document.querySelectorAll("[data-close-map]"),
     closeStatsButtons: document.querySelectorAll("[data-close-stats]"),
-    closeAudioButtons: document.querySelectorAll("[data-close-audio]"),
     shareFanButtons: document.querySelectorAll(".share-fan-item"),
     filterButtons: document.querySelectorAll("[data-filter]"),
-    mixerSliders: document.querySelectorAll(".mixer-item input"),
   };
 
   // -----------------------------------------------------------------------------
@@ -358,12 +368,15 @@
     cityIndex: 0,
     radioIndex: 0,
     radioPlaying: false,
+    radioWantsPlay: false,
     streetSoundOn: false,
     currentSpeed: 1,
     currentMode: CONFIG.modes.DRIVE,
     videoReadyTimer: null,
     toastTimer: null,
     radioRetryCount: 0,
+    radioRetryTimer: null,
+    radioRequestId: 0,
     clockIntervalId: null,
     // Novas funcionalidades
     favorites: new Set(),
@@ -389,6 +402,9 @@
       startVolume: 0,
     },
   };
+
+  let worldMap = null;
+  let leafletAssetsPromise = null;
 
   // -----------------------------------------------------------------------------
   // Funções auxiliares
@@ -420,6 +436,170 @@
     const modeVideos = city.videos[state.currentMode];
     if (modeVideos?.length) return modeVideos[0];
     return city.videos[CONFIG.modes.DRIVE][0];
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function buildYoutubeWatchUrl(ride) {
+    const url = new URL(`https://www.youtube.com/watch?v=${encodeURIComponent(ride.id)}`);
+    if (Number(ride.start) > 0) url.searchParams.set("t", `${Math.floor(Number(ride.start))}s`);
+    return url.toString();
+  }
+
+  function travelRecommendationMarkup(city) {
+    const recommendations = window.YOUCITY_TRAVEL_RECOMMENDATIONS?.byCity?.[city.rawName];
+    if (!recommendations) return "";
+
+    const labels = { hotels: "Hotels", flights: "Flights", carRental: "Car rental" };
+    const sections = Object.entries(labels).map(([category, label]) => {
+      const entries = Array.isArray(recommendations[category]) ? recommendations[category] : [];
+      if (!entries.length) return "";
+      return `<div class="map-travel-group"><strong>${label}</strong><ul>${entries.map((entry) => `<li><a href="${escapeHtml(entry.url)}" target="_blank" rel="noopener noreferrer sponsored">${escapeHtml(entry.name || "Explore options")} ↗</a></li>`).join("")}</ul></div>`;
+    }).join("");
+
+    return sections ? `<div class="map-travel"><span>Travel options</span>${sections}</div>` : "";
+  }
+
+  function mapPopup(city, index) {
+    const modeSections = Object.entries(city.videos)
+      .filter(([, videos]) => videos?.length)
+      .map(([mode, videos]) => {
+        const label = MODE_LABELS[mode] || mode;
+        const links = videos.map((ride, videoIndex) => `
+          <li>
+            <a href="${escapeHtml(buildYoutubeWatchUrl(ride))}" target="_blank" rel="noopener noreferrer">Watch video ${videoIndex + 1} ↗</a>
+          </li>`).join("");
+        return `
+          <div class="map-video-group">
+            <div class="map-video-heading">
+              <strong>${escapeHtml(label)}</strong>
+              <button type="button" data-map-play data-city="${index}" data-mode="${escapeHtml(mode)}">Play in YouCity</button>
+            </div>
+            <ul>${links}</ul>
+          </div>`;
+      }).join("");
+
+    return `<div class="map-popup">
+      <div class="map-popup-title"><strong>${escapeHtml(city.name)}</strong><span>${escapeHtml(city.country)}</span></div>
+      <div class="map-popup-videos">${modeSections || "<p>No videos available.</p>"}${travelRecommendationMarkup(city)}</div>
+    </div>`;
+  }
+
+  function loadLeafletAssets() {
+    if (window.L) return Promise.resolve(window.L);
+    if (leafletAssetsPromise) return leafletAssetsPromise;
+
+    const config = window.YOUCITY_MAP_CONFIG || {};
+    const cssUrl = config.leafletCssUrl || "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    const jsUrl = config.leafletJsUrl || "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+
+    leafletAssetsPromise = new Promise((resolve, reject) => {
+      if (!document.querySelector("link[data-youcity-leaflet]") && cssUrl) {
+        const stylesheet = document.createElement("link");
+        stylesheet.rel = "stylesheet";
+        stylesheet.href = cssUrl;
+        stylesheet.dataset.youcityLeaflet = "true";
+        document.head.appendChild(stylesheet);
+      }
+
+      const existingScript = document.querySelector("script[data-youcity-leaflet]");
+      if (existingScript) {
+        existingScript.addEventListener("load", () => resolve(window.L), { once: true });
+        existingScript.addEventListener("error", () => reject(new Error("Leaflet failed to load")), { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = jsUrl;
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.dataset.youcityLeaflet = "true";
+      script.addEventListener("load", () => resolve(window.L), { once: true });
+      script.addEventListener("error", () => reject(new Error("Leaflet failed to load")), { once: true });
+      document.body.appendChild(script);
+    });
+
+    return leafletAssetsPromise;
+  }
+
+  function renderMapDirectory() {
+    if (!elements.mapDirectory) return;
+    elements.mapDirectory.innerHTML = cities.map((city, index) => {
+      const modes = Object.entries(city.videos)
+        .filter(([, videos]) => videos?.length)
+        .map(([mode, videos]) => {
+          const links = videos.map((ride, videoIndex) => `<a href="${escapeHtml(buildYoutubeWatchUrl(ride))}" target="_blank" rel="noopener noreferrer">${escapeHtml(MODE_LABELS[mode] || mode)} ${videoIndex + 1}</a>`).join("");
+          return `<div class="map-directory-mode"><strong>${escapeHtml(MODE_LABELS[mode] || mode)}</strong><button type="button" data-map-play data-city="${index}" data-mode="${escapeHtml(mode)}">Play</button><span>${links}</span></div>`;
+        }).join("");
+      return `<article class="map-directory-item"><h3><button type="button" data-map-city-select="${index}">${escapeHtml(city.name)}</button><span>${escapeHtml(city.country)}</span></h3>${modes}</article>`;
+    }).join("");
+  }
+
+  async function initializeWorldMap() {
+    if (!elements.mapContainer || worldMap) {
+      worldMap?.invalidateSize();
+      return;
+    }
+
+    elements.mapContainer.innerHTML = '<p class="map-unavailable map-loading">Loading world map…</p>';
+    let L;
+    try {
+      L = await loadLeafletAssets();
+    } catch (error) {
+      console.warn("[YouCity] Map library unavailable:", error.message);
+      elements.mapContainer.innerHTML = '<p class="map-unavailable">The map library could not be loaded. Check your connection and try again.</p>';
+      return;
+    }
+
+    if (!L) {
+      elements.mapContainer.innerHTML = '<p class="map-unavailable">The map library could not be loaded. Check your connection and try again.</p>';
+      return;
+    }
+
+    worldMap = L.map(elements.mapContainer, { worldCopyJump: true, minZoom: 2, maxZoom: 12, zoomControl: true }).setView([20, 0], 2);
+    const mapConfig = window.YOUCITY_MAP_CONFIG || {};
+    L.tileLayer(mapConfig.tileUrl || "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: mapConfig.attribution || "&copy; OpenStreetMap contributors",
+      maxZoom: mapConfig.maxZoom || 19,
+      tileSize: 256
+    }).addTo(worldMap);
+
+    const bounds = [];
+    let mappedCities = 0;
+    cities.forEach((city, index) => {
+      const coordinates = window.CITY_COORDINATES?.[city.rawName];
+      if (!Array.isArray(coordinates)) return;
+      mappedCities += 1;
+      bounds.push(coordinates);
+      L.circleMarker(coordinates, {
+        radius: 6,
+        color: "#d7ff43",
+        weight: 2,
+        fillColor: "#111411",
+        fillOpacity: 0.95,
+        bubblingMouseEvents: false
+      }).bindPopup(mapPopup(city, index), { maxWidth: 340, minWidth: 260 }).addTo(worldMap);
+    });
+
+    if (elements.mapResultCount) elements.mapResultCount.textContent = `${mappedCities} cities · ${cities.length} destinations`;
+    renderMapDirectory();
+    if (bounds.length) worldMap.fitBounds(bounds, { padding: [28, 28], maxZoom: 3 });
+    setTimeout(() => worldMap?.invalidateSize(), 50);
+  }
+
+  function playMapRide(cityIndex, mode) {
+    if (!Number.isInteger(cityIndex) || !cities[cityIndex]?.videos[mode]?.length) return;
+    closeLayer(elements.mapModal);
+    selectCity(cityIndex, { silent: true });
+    if (state.currentMode !== mode) switchMode(mode);
+    else updateVideo(currentCity());
   }
 
   // -----------------------------------------------------------------------------
@@ -458,7 +638,7 @@
       fs: "0",
       cc_load_policy: "0",
       iv_load_policy: "3",
-      hl: "pt-BR",
+      hl: "en-US",
       start: String(ride.start),
       origin: window.location.origin
     });
@@ -520,14 +700,14 @@
   function updateClock() {
     if (!elements.topTime) return;
     try {
-      elements.topTime.textContent = new Intl.DateTimeFormat("pt-BR", {
+      elements.topTime.textContent = new Intl.DateTimeFormat("en-US", {
         timeZone: currentCity().timeZone,
         hour: "2-digit",
         minute: "2-digit",
         hour12: false
       }).format(new Date());
     } catch (error) {
-      console.warn("[VOLTA] Falha ao atualizar relógio:", error.message);
+      console.warn("[YouCity] Failed to update clock:", error.message);
       elements.topTime.textContent = "--:--";
     }
   }
@@ -554,7 +734,7 @@
   }
 
   // -----------------------------------------------------------------------------
-  // Controles de modo (Drive/Bike/Walk)
+  // Ride mode controls (Drive/Bike/Walk/Drone)
   // -----------------------------------------------------------------------------
   
   /**
@@ -567,8 +747,8 @@
       button.disabled = !available;
       button.classList.toggle("is-active", mode === state.currentMode);
       button.title = available
-        ? `${MODE_LABELS[mode]} em ${currentCity().name}`
-        : "Modalidade indisponível nesta cidade";
+        ? `${MODE_LABELS[mode]} in ${currentCity().name}`
+        : "This ride type is unavailable in this city";
     });
     elements.cityRegion.textContent = `${currentCity().region} · ${MODE_LABELS[state.currentMode]}`;
   }
@@ -582,12 +762,46 @@
    * @param {number} [nextIndex=0] - Índice da estação
    * @param {boolean} [shouldPlay] - Se deve tocar automaticamente
    */
-  function setRadio(nextIndex = 0, shouldPlay = state.radioPlaying) {
+  function clearRadioRetryTimer() {
+    if (state.radioRetryTimer) {
+      clearTimeout(state.radioRetryTimer);
+      state.radioRetryTimer = null;
+    }
+  }
+
+  /**
+   * Schedules one retry for the current radio failure.
+   */
+  function scheduleRadioRetry() {
+    if (!state.radioWantsPlay || state.radioRetryTimer) return;
+
+    if (state.radioRetryCount >= CONFIG.RADIO_MAX_RETRIES) {
+      state.radioWantsPlay = false;
+      state.radioRetryCount = 0;
+      setPlayingState(false);
+      showToast(MESSAGES.radioUnavailable);
+      return;
+    }
+
+    state.radioRetryCount++;
+    showToast(MESSAGES.radioRetry);
+    state.radioRetryTimer = setTimeout(() => {
+      state.radioRetryTimer = null;
+      if (state.radioWantsPlay) setRadio(state.radioIndex + 1, true, { preserveRetries: true });
+    }, CONFIG.RADIO_RETRY_DELAY);
+  }
+
+  function setRadio(nextIndex = 0, shouldPlay = state.radioPlaying, options = {}) {
     const radios = currentCity().radios;
+
+    clearRadioRetryTimer();
+    state.radioWantsPlay = shouldPlay;
+    if (!options.preserveRetries) state.radioRetryCount = 0;
+    const requestId = ++state.radioRequestId;
     
     if (!radios.length) {
       elements.radio.removeAttribute("src");
-      elements.stationName.innerHTML = "SEM SINAL<small> --</small>";
+      elements.stationName.innerHTML = "NO SIGNAL<small> --</small>";
       elements.lcdMeta.textContent = "-- · NO SIGNAL";
       elements.play.disabled = true;
       elements.stereoLed.classList.remove("is-active");
@@ -598,7 +812,6 @@
     
     elements.play.disabled = false;
     state.radioIndex = (nextIndex + radios.length) % radios.length;
-    state.radioRetryCount = 0;
     
     const station = radios[state.radioIndex];
     elements.stationName.innerHTML = `${station.name}<small> FM</small>`;
@@ -610,7 +823,7 @@
     elements.radio.volume = Number(elements.volume.value) / 100;
     
     if (shouldPlay) {
-      playRadioWithRetry();
+      playRadioWithRetry(requestId);
     } else {
       setPlayingState(false);
     }
@@ -619,27 +832,18 @@
   /**
    * Tenta reproduzir rádio com retry automático
    */
-  function playRadioWithRetry() {
+  function playRadioWithRetry(requestId = state.radioRequestId) {
     elements.radio.play()
       .then(() => {
+        if (requestId !== state.radioRequestId) return;
         setPlayingState(true);
         state.radioRetryCount = 0;
       })
       .catch((error) => {
-        console.warn("[VOLTA] Falha ao reproduzir rádio:", error.message);
+        if (requestId !== state.radioRequestId || !state.radioWantsPlay) return;
+        console.warn("[YouCity] Failed to play radio:", error.message);
         setPlayingState(false);
-        
-        // Auto-retry: tenta próxima estação automaticamente
-        if (state.radioRetryCount < CONFIG.RADIO_MAX_RETRIES) {
-          state.radioRetryCount++;
-          showToast(MESSAGES.radioRetry);
-          setTimeout(() => {
-            setRadio(state.radioIndex + 1, true);
-          }, CONFIG.RADIO_RETRY_DELAY);
-        } else {
-          showToast(MESSAGES.radioUnavailable);
-          state.radioRetryCount = 0;
-        }
+        scheduleRadioRetry();
       });
   }
 
@@ -657,7 +861,7 @@
       playText.style.display = playing ? "none" : "inline";
     }
     
-    elements.play.setAttribute("aria-label", playing ? "Pausar rádio" : "Tocar rádio");
+    elements.play.setAttribute("aria-label", playing ? "Pause radio" : "Play radio");
     elements.equalizer.classList.toggle("is-playing", playing);
   }
 
@@ -669,10 +873,14 @@
       return showToast(MESSAGES.noRadio);
     }
     
-    if (state.radioPlaying) {
+    if (state.radioPlaying || state.radioWantsPlay) {
+      state.radioWantsPlay = false;
+      clearRadioRetryTimer();
+      state.radioRequestId++;
       elements.radio.pause();
       setPlayingState(false);
     } else {
+      state.radioWantsPlay = true;
       playRadioWithRetry();
     }
   }
@@ -695,7 +903,7 @@
     try {
       localStorage.setItem(CONFIG.storageKeys.playerHidden, state.playerHidden);
     } catch (error) {
-      console.warn("[VOLTA] Falha ao salvar estado do player:", error.message);
+      console.warn("[YouCity] Failed to save player state:", error.message);
     }
   }
 
@@ -709,7 +917,7 @@
         togglePlayer(true);
       }
     } catch (error) {
-      console.warn("[VOLTA] Falha ao restaurar estado do player:", error.message);
+      console.warn("[YouCity] Failed to restore player state:", error.message);
     }
   }
 
@@ -726,7 +934,7 @@
       const saved = localStorage.getItem(CONFIG.storageKeys.favorites);
       return saved ? new Set(JSON.parse(saved)) : new Set();
     } catch (error) {
-      console.warn("[VOLTA] Falha ao carregar favoritos:", error.message);
+      console.warn("[YouCity] Failed to load favorites:", error.message);
       return new Set();
     }
   }
@@ -738,7 +946,7 @@
     try {
       localStorage.setItem(CONFIG.storageKeys.favorites, JSON.stringify([...state.favorites]));
     } catch (error) {
-      console.warn("[VOLTA] Falha ao salvar favoritos:", error.message);
+      console.warn("[YouCity] Failed to save favorites:", error.message);
     }
   }
 
@@ -767,7 +975,7 @@
   function updateFavoriteButton() {
     const isFav = state.favorites.has(cities[state.cityIndex].rawName);
     elements.favoriteBtn.classList.toggle("is-active", isFav);
-    elements.favoriteBtn.setAttribute("aria-label", isFav ? "Remover dos favoritos" : "Adicionar aos favoritos");
+    elements.favoriteBtn.setAttribute("aria-label", isFav ? "Remove from favorites" : "Add to favorites");
   }
 
   /**
@@ -792,7 +1000,7 @@
       const saved = localStorage.getItem(CONFIG.storageKeys.stats);
       return saved ? JSON.parse(saved) : { visited: [], totalTime: 0, sessions: 0 };
     } catch (error) {
-      console.warn("[VOLTA] Falha ao carregar estatísticas:", error.message);
+      console.warn("[YouCity] Failed to load statistics:", error.message);
       return { visited: [], totalTime: 0, sessions: 0 };
     }
   }
@@ -807,7 +1015,7 @@
       stats.totalTime = state.totalTravelTime + Math.floor((Date.now() - state.sessionStartTime) / 1000);
       localStorage.setItem(CONFIG.storageKeys.stats, JSON.stringify(stats));
     } catch (error) {
-      console.warn("[VOLTA] Falha ao salvar estatísticas:", error.message);
+      console.warn("[YouCity] Failed to save statistics:", error.message);
     }
   }
 
@@ -843,7 +1051,7 @@
       stats.sessions = (stats.sessions || 0) + 1;
       localStorage.setItem(CONFIG.storageKeys.stats, JSON.stringify(stats));
     } catch (error) {
-      console.warn("[VOLTA] Falha ao incrementar sessão:", error.message);
+      console.warn("[YouCity] Failed to increment session count:", error.message);
     }
   }
 
@@ -938,13 +1146,13 @@
             state.pomodoroRemaining = CONFIG.POMODORO_DURATION;
             state.pomodoroIsBreak = false;
             showToast(MESSAGES.pomodoroBreakEnd);
-            document.querySelector(".pomodoro-label").textContent = "foco";
+            document.querySelector(".pomodoro-label").textContent = "focus";
           } else {
             state.pomodoroRemaining = CONFIG.POMODORO_BREAK;
             state.pomodoroIsBreak = true;
             selectCity(state.cityIndex + 1);
             showToast(MESSAGES.pomodoroComplete);
-            document.querySelector(".pomodoro-label").textContent = "pausa";
+            document.querySelector(".pomodoro-label").textContent = "break";
           }
         }
       }, 1000);
@@ -983,7 +1191,7 @@
     try {
       localStorage.setItem(CONFIG.storageKeys.theme, state.currentTheme);
     } catch (error) {
-      console.warn("[VOLTA] Falha ao salvar tema:", error.message);
+      console.warn("[YouCity] Failed to save theme:", error.message);
     }
     
     showToast(THEME_NAMES[state.currentTheme]);
@@ -997,7 +1205,7 @@
       state.currentTheme = localStorage.getItem(CONFIG.storageKeys.theme) || CONFIG.themes.DEFAULT;
       if (state.currentTheme) elements.app.classList.add(state.currentTheme);
     } catch (error) {
-      console.warn("[VOLTA] Falha ao carregar tema:", error.message);
+      console.warn("[YouCity] Failed to load theme:", error.message);
     }
   }
 
@@ -1044,7 +1252,7 @@
         showToast(MESSAGES.pipUnavailable);
       }
     } catch (error) {
-      console.warn("[VOLTA] Erro PiP:", error.message);
+      console.warn("[YouCity] PiP error:", error.message);
       showToast(MESSAGES.pipError);
     }
   }
@@ -1100,9 +1308,9 @@
   function getShareData() {
     const city = currentCity();
     const countryName = COUNTRY_INFO[city.country]?.[0] || city.country;
-    const url = `${window.location.origin}${window.location.pathname}?city=${encodeURIComponent(city.city)}`;
-    const text = `🌍 Viajando por ${city.name}, ${countryName} no VOLTA — experiência imersiva de passeios urbanos com rádio local`;
-    const title = `VOLTA — ${city.name}`;
+    const url = `${window.location.origin}/city/${citySlug(city.rawName || city.name)}`;
+    const text = `🌍 Exploring ${city.name}, ${countryName} on YouCity — an immersive urban ride with local radio`;
+    const title = `YouCity — ${city.name}`;
     return { url, text, title };
   }
 
@@ -1129,7 +1337,7 @@
         await navigator.clipboard.writeText(url);
         showToast(MESSAGES.linkCopied);
       } catch (error) {
-        console.warn("[VOLTA] Erro ao copiar link:", error.message);
+        console.warn("[YouCity] Could not copy link:", error.message);
         showToast(MESSAGES.linkCopyFailed);
       }
       closeShareFan();
@@ -1154,7 +1362,7 @@
         await navigator.share({ title, text, url });
       } catch (error) {
         if (error.name !== 'AbortError') {
-          console.warn("[VOLTA] Erro ao compartilhar:", error.message);
+          console.warn("[YouCity] Could not share:", error.message);
         }
       }
     } else {
@@ -1170,82 +1378,34 @@
   function loadCityFromURL() {
     try {
       const params = new URLSearchParams(window.location.search);
+      const cityPath = window.location.pathname.match(/^\/city\/([^/]+)\/?$/i)?.[1];
       const cityName = params.get("city");
+
+      if (cityPath) {
+        const requestedSlug = citySlug(decodeURIComponent(cityPath));
+        const pathIndex = cities.findIndex((city) =>
+          citySlug(city.name) === requestedSlug || citySlug(city.rawName) === requestedSlug
+        );
+        if (pathIndex !== -1) return pathIndex;
+      }
       
       // CORREÇÃO: Sanitiza entrada para prevenir XSS
       const sanitizedCityName = sanitizeInput(cityName);
       
       if (sanitizedCityName) {
-        const index = cities.findIndex(c => 
-          c.city.toLowerCase() === sanitizedCityName.toLowerCase()
+        const normalizedRequestedCity = normalizeSearch(sanitizedCityName);
+        const index = cities.findIndex((city) =>
+          [city.name, city.rawName].some((name) => normalizeSearch(name) === normalizedRequestedCity)
         );
         if (index !== -1) return index;
       }
     } catch (error) {
-      console.warn("[VOLTA] Erro ao carregar cidade da URL:", error.message);
+      console.warn("[YouCity] Could not load city from URL:", error.message);
     }
     return null;
   }
 
   // -----------------------------------------------------------------------------
-  // Mixer de áudio
-  // -----------------------------------------------------------------------------
-  const audioEffects = {
-    rain: { element: null, volume: 0 },
-    wind: { element: null, volume: 0 },
-    cafe: { element: null, volume: 0 },
-    birds: { element: null, volume: 0 },
-  };
-
-  /**
-   * Inicializa elementos de efeitos de áudio
-   */
-  function initAudioEffects() {
-    audioEffects.rain.element = elements.fxRain;
-    audioEffects.wind.element = elements.fxWind;
-    audioEffects.cafe.element = elements.fxCafe;
-    audioEffects.birds.element = elements.fxBirds;
-  }
-
-  /**
-   * Define volume de um efeito de áudio
-   * @param {string} effect - Nome do efeito
-   * @param {number} volume - Volume (0-100)
-   */
-  function setAudioEffect(effect, volume) {
-    const fx = audioEffects[effect];
-    if (!fx || !fx.element) return;
-    
-    fx.volume = volume;
-    fx.element.volume = volume / 100;
-    
-    if (volume > 0) {
-      if (fx.element.paused) {
-        fx.element.play().catch((error) => {
-          console.warn(`[VOLTA] Erro ao reproduzir efeito ${effect}:`, error.message);
-        });
-      }
-    } else {
-      fx.element.pause();
-    }
-    
-    // Atualiza o display
-    const slider = $(`#fx-${effect}`);
-    if (slider) {
-      slider.value = volume;
-      const valueDisplay = slider.nextElementSibling;
-      if (valueDisplay) valueDisplay.textContent = `${volume}%`;
-    }
-  }
-
-  /**
-   * Reseta todos os efeitos de áudio
-   */
-  function resetAudioEffects() {
-    Object.keys(audioEffects).forEach(effect => setAudioEffect(effect, 0));
-    showToast(MESSAGES.audioReset);
-  }
-
   // -----------------------------------------------------------------------------
   // Info da cidade
   // -----------------------------------------------------------------------------
@@ -1260,14 +1420,14 @@
     // Hora local
     if (info && info[2]) {
       try {
-        const time = new Date().toLocaleTimeString("pt-BR", { 
+        const time = new Date().toLocaleTimeString("en-US", {
           timeZone: info[2], 
           hour: "2-digit", 
           minute: "2-digit" 
         });
         elements.infoTimezone.querySelector("b").textContent = time;
       } catch (error) {
-        console.warn("[VOLTA] Erro ao formatar hora:", error.message);
+      console.warn("[YouCity] Could not format time:", error.message);
         elements.infoTimezone.querySelector("b").textContent = "--:--";
       }
     }
@@ -1278,7 +1438,7 @@
       "Paris": "2.1M", "Berlin": "3.6M", "Sydney": "5.3M", "Mumbai": "12.4M",
       "Beijing": "21.5M", "Moscow": "11.9M", "Cairo": "9.5M", "Lagos": "14.3M",
     };
-    const pop = populations[city.city] || `${Math.floor(Math.random() * 5 + 1)}.${Math.floor(Math.random() * 9)}M`;
+    const pop = populations[city.name] || populations[city.rawName] || `${Math.floor(Math.random() * 5 + 1)}.${Math.floor(Math.random() * 9)}M`;
     elements.infoPopulation.querySelector("b").textContent = pop;
   }
 
@@ -1298,7 +1458,7 @@
       <button class="rail-dot${index === state.cityIndex ? " is-active" : ""}" 
               type="button" 
               data-city="${index}" 
-              aria-label="Ir para ${cities[index].name}"></button>
+              aria-label="Go to ${cities[index].name}"></button>
     `).join("");
   }
 
@@ -1322,10 +1482,10 @@
       matches = matches.filter(({ city }) => city.region === state.currentContinent);
     }
     
-    elements.resultCount.textContent = `${matches.length} ${matches.length === 1 ? "destino" : "destinos"}`;
+    elements.resultCount.textContent = `${matches.length} ${matches.length === 1 ? "destination" : "destinations"}`;
     
     if (!matches.length) {
-      elements.grid.innerHTML = `<p class="empty-state">Nenhuma cidade encontrada.</p>`;
+      elements.grid.innerHTML = `<p class="empty-state">No cities found.</p>`;
       return;
     }
     
@@ -1343,7 +1503,7 @@
              tabindex="0"
              data-city="${index}">
           <img src="https://i.ytimg.com/vi/${thumbnail}/hqdefault.jpg" alt="" loading="lazy" />
-          <span class="card-favorite${isFav ? " is-active" : ""}" role="button" tabindex="0" data-favorite="${index}" aria-label="${isFav ? "Remover dos favoritos" : "Adicionar aos favoritos"}">
+          <span class="card-favorite${isFav ? " is-active" : ""}" role="button" tabindex="0" data-favorite="${index}" aria-label="${isFav ? "Remove from favorites" : "Add to favorites"}">
             <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
           </span>
           <span class="city-card-copy">
@@ -1383,7 +1543,7 @@
     if (elements.topLocation) {
       elements.topLocation.textContent = `${city.name}, ${city.country}`;
     }
-    document.title = `${city.name} — VOLTA`;
+    document.title = `${city.name} — YouCity`;
     
     updateModeControls();
     updateVideo(city);
@@ -1416,7 +1576,7 @@
 
   /**
    * Troca modo de passeio
-   * @param {string} mode - Modo (drive/bike/walk)
+   * @param {string} mode - Mode (drive/bike/walk/drone)
    */
   function switchMode(mode) {
     if (!currentCity().videos[mode]?.length || mode === state.currentMode) return;
@@ -1439,7 +1599,7 @@
    */
   function getFocusableElements(container) {
     return container.querySelectorAll(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      'button:not([disabled]), [href], summary, input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
   }
 
@@ -1476,7 +1636,7 @@
     layer.setAttribute("aria-hidden", "false");
     
     // Foca no primeiro elemento focável
-    const panel = layer.querySelector(".drawer-panel, .about-card");
+    const panel = layer.querySelector(".drawer-panel, .about-card, .map-card");
     if (panel) {
       const focusable = getFocusableElements(panel);
       if (focusable.length) {
@@ -1619,7 +1779,6 @@
     state.totalTravelTime = stats.totalTime || 0;
     incrementSession();
     loadTheme();
-    initAudioEffects();
     
     // Restaura estado
     if (prefs.volume !== undefined) {
@@ -1650,20 +1809,18 @@
     
     // Inicializa UI
     elements.cityTotal.textContent = pad(cities.length);
-    elements.welcomeCityCount.textContent = `${cities.length} cidades`;
     renderRail();
     renderGrid();
     
-    // Seleciona cidade (da URL ou restaura ou inicial)
+    // Seleciona cidade da URL ou uma cidade aleatória ao abrir o site
     const cityFromURL = loadCityFromURL();
     const initialCity = cityFromURL !== null 
       ? cityFromURL 
-      : (prefs.cityIndex !== undefined && prefs.cityIndex < cities.length ? prefs.cityIndex : 0);
+      : Math.floor(Math.random() * cities.length);
     selectCity(initialCity, { silent: true });
     
     // Preview mode para QA
     const previewMode = new URLSearchParams(window.location.search).get("preview");
-    if (previewMode) elements.welcome.classList.add("is-hidden");
     if (previewMode === "drawer") openLayer(elements.drawer);
     
     // Salva estatísticas ao fechar a página
@@ -1678,25 +1835,12 @@
    */
   function showCatalogError() {
     // UI amigável quando catálogo não carrega
-    elements.welcome.innerHTML = `
-      <div class="welcome-shade"></div>
-      <div class="welcome-copy" style="text-align: center; top: 50%; transform: translateY(-50%);">
-        <h2 style="font-size: 48px; margin-bottom: 20px;">Ops!</h2>
-        <p style="max-width: 400px; margin: 0 auto;">
-          Não foi possível carregar o catálogo de cidades. 
-          Verifique sua conexão e recarregue a página.
-        </p>
-        <button onclick="location.reload()" style="
-          margin-top: 30px;
-          padding: 14px 28px;
-          background: var(--acid);
-          color: var(--ink);
-          border: none;
-          border-radius: 4px;
-          font-weight: 600;
-          cursor: pointer;
-        ">Tentar novamente</button>
-      </div>
+    elements.app.innerHTML = `
+      <section class="catalog-error" role="alert">
+        <h1>Ops!</h1>
+        <p>Could not load the city catalog. Check your connection and reload the page.</p>
+        <button type="button" onclick="location.reload()">Try again</button>
+      </section>
     `;
   }
 
@@ -1708,22 +1852,6 @@
    * Configura todos os event listeners da aplicação
    */
   function setupEventListeners() {
-    // Botão iniciar
-    if (elements.start) {
-      elements.start.addEventListener("click", () => {
-        elements.welcome.classList.add("is-hidden");
-        elements.radio.play()
-          .then(() => setPlayingState(true))
-          .catch((error) => {
-            console.warn("[VOLTA] Autoplay bloqueado:", error.message);
-            setPlayingState(false);
-          });
-        videoCommand("playVideo");
-      });
-    } else {
-      console.error("[VOLTA] Botão start não encontrado!");
-    }
-    
     // Navegação de cidades
     $("#cities-button").addEventListener("click", () => {
       openLayer(elements.drawer);
@@ -1731,6 +1859,38 @@
     });
     
     $("#about-button").addEventListener("click", () => openLayer(elements.about));
+
+    elements.mapButton.addEventListener("click", () => {
+      openLayer(elements.mapModal);
+      initializeWorldMap();
+    });
+
+    elements.closeMapButtons.forEach((button) => {
+      button.addEventListener("click", () => closeLayer(elements.mapModal));
+    });
+
+    elements.mapContainer.addEventListener("click", (event) => {
+      const playButton = event.target.closest("[data-map-play]");
+      if (!playButton) return;
+
+      event.preventDefault();
+      playMapRide(Number(playButton.dataset.city), playButton.dataset.mode);
+    });
+
+    elements.mapDirectory.addEventListener("click", (event) => {
+      const playButton = event.target.closest("[data-map-play]");
+      if (playButton) {
+        event.preventDefault();
+        playMapRide(Number(playButton.dataset.city), playButton.dataset.mode);
+        return;
+      }
+
+      const cityButton = event.target.closest("[data-map-city-select]");
+      if (cityButton) {
+        closeLayer(elements.mapModal);
+        selectCity(Number(cityButton.dataset.mapCitySelect), { silent: true });
+      }
+    });
     
     elements.closeDrawerButtons.forEach((button) => {
       button.addEventListener("click", () => closeLayer(elements.drawer));
@@ -1819,7 +1979,7 @@
           await document.exitFullscreen();
         }
       } catch (error) {
-        console.warn("[VOLTA] Fullscreen não disponível:", error.message);
+        console.warn("[YouCity] Fullscreen unavailable:", error.message);
         showToast(MESSAGES.fullscreenUnavailable);
       }
     });
@@ -1829,18 +1989,10 @@
       setTimeout(() => elements.video.classList.add("is-ready"), 900);
     });
     
-    // Erro na rádio
+    // Radio errors share the same guarded retry scheduler as play() failures.
     elements.radio.addEventListener("error", () => {
-      if (state.radioPlaying) {
-        // Tenta auto-retry
-        if (state.radioRetryCount < CONFIG.RADIO_MAX_RETRIES) {
-          state.radioRetryCount++;
-          setTimeout(() => setRadio(state.radioIndex + 1, true), CONFIG.RADIO_RETRY_DELAY);
-        } else {
-          setPlayingState(false);
-          state.radioRetryCount = 0;
-        }
-      }
+      setPlayingState(false);
+      scheduleRadioRetry();
     });
     
     // =========================================================================
@@ -1872,7 +2024,7 @@
     if (elements.filterContinent) {
       elements.filterContinent.addEventListener("change", (e) => setContinent(e.target.value));
     } else {
-      console.warn("[VOLTA] Elemento filter-continent não encontrado");
+      console.warn("[YouCity] filter-continent element not found");
     }
     
     // Autoplay
@@ -1908,22 +2060,6 @@
       btn.addEventListener("click", () => closeLayer(elements.statsModal));
     });
     
-    // Mixer de áudio
-    elements.mixerBtn.addEventListener("click", () => openLayer(elements.audioModal));
-    
-    elements.closeAudioButtons.forEach(btn => {
-      btn.addEventListener("click", () => closeLayer(elements.audioModal));
-    });
-    
-    elements.mixerSliders.forEach(slider => {
-      slider.addEventListener("input", (e) => {
-        const effect = e.target.id.replace("fx-", "");
-        setAudioEffect(effect, Number(e.target.value));
-      });
-    });
-    
-    elements.mixerReset.addEventListener("click", resetAudioEffects);
-    
     // Atalhos de teclado
     document.addEventListener("keydown", (event) => {
       // Ignora se estiver em input
@@ -1937,53 +2073,44 @@
           selectCity(state.cityIndex - 1);
           break;
         case " ":
-          if (elements.welcome.classList.contains("is-hidden")) {
-            event.preventDefault();
-            toggleRadio();
-          }
+          event.preventDefault();
+          toggleRadio();
           break;
         case "Escape":
           closeLayer(elements.drawer);
           closeLayer(elements.about);
+          closeLayer(elements.mapModal);
           closeLayer(elements.statsModal);
-          closeLayer(elements.audioModal);
           closeShareFan();
+          break;
+        case "m":
+        case "M":
+          openLayer(elements.mapModal);
+          initializeWorldMap();
           break;
         case "r":
         case "R":
-          if (elements.welcome.classList.contains("is-hidden")) {
-            selectRandomCity();
-          }
+          selectRandomCity();
           break;
         case "h":
         case "H":
-          if (elements.welcome.classList.contains("is-hidden")) {
-            togglePlayer();
-          }
+          togglePlayer();
           break;
         case "f":
         case "F":
-          if (elements.welcome.classList.contains("is-hidden")) {
-            toggleFavorite();
-          }
+          toggleFavorite();
           break;
         case "p":
         case "P":
-          if (elements.welcome.classList.contains("is-hidden")) {
-            togglePiP();
-          }
+          togglePiP();
           break;
         case "a":
         case "A":
-          if (elements.welcome.classList.contains("is-hidden")) {
-            toggleAutoplay();
-          }
+          toggleAutoplay();
           break;
         case "t":
         case "T":
-          if (elements.welcome.classList.contains("is-hidden")) {
-            cycleTheme();
-          }
+          cycleTheme();
           break;
       }
     });
@@ -2029,7 +2156,7 @@
     
     swipeArea.addEventListener("touchstart", (e) => {
       // Ignora se tocar em controles interativos
-      if (e.target.closest(".player-card, .drawer, .about-modal, button, input, a")) {
+      if (e.target.closest(".player-card, .drawer, .about-modal, .map-modal, button, input, a")) {
         return;
       }
       

@@ -1,25 +1,57 @@
-# VOLTA
+# YouCity
 
-Experiência imersiva e totalmente estática de passeios urbanos com rádio local. Não há banco de dados, backend, login ou coleta de dados.
+Fully static immersive urban rides with local radio. There is no database, backend, login, or data collection.
 
-O catálogo atual reúne 179 cidades: todas possuem passeio `Drive`, 120 possuem `Bike` e 129 possuem `Walk`. As modalidades são habilitadas conforme a disponibilidade de cada cidade.
+The catalog currently includes 179 cities: all have `Drive`, `Bike`, `Walk`, and `Drone` options. Ride modes are enabled according to each city's availability. The world map uses static city-center coordinates and links to the catalog's YouTube videos.
 
-## Executar localmente
+## Run locally
 
-Qualquer servidor de arquivos estáticos funciona. Por exemplo:
+For the quick interactive preview, serve the project root:
 
 ```bash
 python3 -m http.server 4173
 ```
 
-Depois, abra `http://localhost:4173`.
+Then open `http://localhost:4173`.
 
-## Publicação
+To preview the same SEO output that will be deployed to Cloudflare Pages:
 
-Envie `index.html`, `styles.css`, `cities-data.js`, `app.js` e a pasta `assets` para Netlify, Vercel, GitHub Pages ou qualquer hospedagem estática.
+```bash
+node scripts/build-static.js
+node scripts/seo-check.js
+python3 -m http.server 4174 --directory dist
+```
 
-## Mídia
+Open `http://localhost:4174`. The generated city file is available at
+`http://localhost:4174/city/sao-paulo.html`; Cloudflare Pages also serves it at
+the extensionless URL `/city/sao-paulo` after deployment.
 
-Os vídeos são incorporados do YouTube e as rádios são streams públicos externos. Portanto, a interface não precisa de servidor, mas a experiência depende de conexão com a internet e da disponibilidade dessas fontes. Navegadores exigem um clique inicial antes de reproduzir áudio.
+## Deployment
 
-A capa de abertura em `assets/hero-saopaulo.webp` foi criada especialmente para o projeto e permanece local.
+For a direct static upload, publish `dist/` after running the SEO build:
+
+```bash
+SEO_SITE_URL=https://your-domain.example node scripts/build-static.js
+node scripts/seo-check.js
+```
+
+Cloudflare Pages configuration:
+
+- Root directory: `/`
+- Build command: `node scripts/build-static.js`
+- Output directory: `dist`
+- Production environment variable: `SEO_SITE_URL=https://your-real-domain.example`
+
+The build creates the home page, one crawlable `/city/<city-slug>` page per city, `robots.txt`, `sitemap.xml`, `404.html`, `_headers`, and `_redirects`. It also publishes the map coordinate/provider configuration and the empty travel-recommendation hooks. If no custom domain is configured yet, the fallback URL is `https://youcity.pages.dev`; set `SEO_SITE_URL` to the final domain before production deployment. See [docs/SEO.md](docs/SEO.md) for the release checklist.
+
+For other static hosts, upload the generated `dist/` directory rather than the source files directly.
+
+## Media
+
+Videos are embedded from YouTube, the world map uses Leaflet with OpenStreetMap tiles, and radio stations are public external streams. City-specific stations are sourced from Radio Browser's directory, with the original catalog retained as a fallback. The interface therefore needs no server, but the experience depends on an internet connection and source availability. Browsers may require an initial click before playing audio.
+
+Map tiles and future hotel, flight, and car-rental links are configured in
+`map-config.js` and `travel-config.js`. Travel recommendations are intentionally
+empty until providers are reviewed and selected.
+
+The cover image in `assets/hero-saopaulo.webp` was created specifically for the project and remains local.

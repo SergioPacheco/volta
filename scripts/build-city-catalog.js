@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const inputPath = process.argv[2];
-if (!inputPath) throw new Error("Informe o caminho do bundle de origem.");
+if (!inputPath) throw new Error("Provide the path to the source bundle.");
 
 const source = fs.readFileSync(inputPath, "utf8");
 const starts = [...source.matchAll(/\{\"city\":\"/g)].map((match) => match.index);
@@ -64,7 +64,7 @@ const catalog = [...new Map(parsed.map((item) => [item.city, item])).values()]
       walk: modeVideos(item, "walk")
     },
     radios: (item.radio_url || []).slice(0, 5).map((url, index) => ({
-      name: item.name?.[index] || `Rádio local ${index + 1}`,
+      name: item.name?.[index] || `Local radio ${index + 1}`,
       url
     }))
   }))
@@ -75,10 +75,10 @@ const catalog = [...new Map(parsed.map((item) => [item.city, item])).values()]
   });
 
 if (catalog.length !== 179) {
-  throw new Error(`Catálogo incompleto: ${catalog.length} de 179 cidades.`);
+  throw new Error(`Incomplete catalog: ${catalog.length} of 179 cities.`);
 }
 
-const output = `// Catálogo estático de passeios e rádios. Gerado em 27/08/2026.\nwindow.CITY_CATALOG = ${JSON.stringify(catalog)};\n`;
+const output = `// Static catalog of rides and radio stations. Generated on 2026-08-27.\nwindow.CITY_CATALOG = ${JSON.stringify(catalog)};\n`;
 const outputPath = path.resolve(__dirname, "..", "cities-data.js");
 fs.writeFileSync(outputPath, output);
 

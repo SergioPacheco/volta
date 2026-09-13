@@ -1,0 +1,2 @@
+# Keep the canonical URL extensionless.
+/index.html / 301
