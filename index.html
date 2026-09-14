@@ -38,7 +38,6 @@
     <title>YouCity — cities in motion</title>
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
     <link rel="preload" as="image" type="image/webp" href="/assets/hero-saopaulo.webp" />
-    <link rel="preconnect" href="https://www.youtube-nocookie.com" />
     <link rel="preconnect" href="https://i.ytimg.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -73,16 +72,25 @@
     <main class="app" id="app">
       <div class="media-layer" aria-hidden="true">
         <div class="poster" id="poster"></div>
-        <iframe
-          id="city-video"
-          class="city-video"
-          title="City ride"
-          allow="autoplay; encrypted-media; picture-in-picture"
-          referrerpolicy="strict-origin-when-cross-origin"
-        ></iframe>
+        <div id="city-video-shell" class="city-video-shell">
+          <div id="city-video-container"></div>
+        </div>
         <div class="color-wash" id="color-wash"></div>
         <div class="vignette"></div>
         <div class="grain"></div>
+      </div>
+
+      <section class="video-gate" id="video-gate" aria-labelledby="video-gate-title">
+        <div class="video-gate-card">
+          <span class="video-gate-kicker" id="video-gate-mode">DRIVE</span>
+          <h2 id="video-gate-title">Explore the city</h2>
+          <p>Start the ride when you are ready.</p>
+          <button class="video-gate-button" id="start-video" type="button">Start exploring</button>
+        </div>
+      </section>
+      <div class="video-loading" id="video-loading" role="status" aria-live="polite" aria-hidden="true">
+        <span class="video-loading-dot" aria-hidden="true"></span>
+        Loading ride…
       </div>
 
       <header class="topbar">

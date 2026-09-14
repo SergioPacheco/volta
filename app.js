@@ -19,6 +19,7 @@
     CLOCK_INTERVAL: 60_000,
     RADIO_RETRY_DELAY: 2000,
     RADIO_MAX_RETRIES: 2,
+    VIDEO_SWITCH_DEBOUNCE: 400,
     DEFAULT_VOLUME: 64,
     AUTOPLAY_INTERVAL: 180_000, // 3 minutes
     POMODORO_DURATION: 25 * 60, // 25 minutes in seconds
@@ -311,7 +312,13 @@
 
   const elements = {
     app: $("#app"),
-    video: $("#city-video"),
+    videoShell: $("#city-video-shell"),
+    videoContainer: $("#city-video-container"),
+    videoGate: $("#video-gate"),
+    videoGateMode: $("#video-gate-mode"),
+    videoGateTitle: $("#video-gate-title"),
+    startVideo: $("#start-video"),
+    videoLoading: $("#video-loading"),
     poster: $("#poster"),
     radio: $("#radio-player"),
     cityName: $("#city-name"),
@@ -393,6 +400,10 @@
     streetSoundOn: false,
     currentSpeed: 1,
     currentMode: CONFIG.modes.DRIVE,
+    currentVideoId: null,
+    videoRequestId: 0,
+    videoChangeTimer: null,
+    playbackSessionStarted: false,
     videoReadyTimer: null,
     toastTimer: null,
     radioRetryCount: 0,
@@ -747,74 +758,255 @@
   }
 
   // -----------------------------------------------------------------------------
-  // Controle do player de vídeo (YouTube iframe API)
+  // Controle do player de vídeo (YouTube IFrame Player API)
   // -----------------------------------------------------------------------------
   
-  /**
-   * Envia comando para o iframe do YouTube
-   * @param {string} func - Nome da função
-   * @param {Array} [args] - Argumentos
-   */
-  function videoCommand(func, args = []) {
-    elements.video.contentWindow?.postMessage(
-      JSON.stringify({ event: "command", func, args }),
-      "*"
-    );
+  function buildPlayerVars(ride) {
+    return {
+      autoplay: 1,
+      mute: state.streetSoundOn ? 0 : 1,
+      controls: 0,
+      loop: 1,
+      playlist: ride.id,
+      modestbranding: 1,
+      rel: 0,
+      playsinline: 1,
+      disablekb: 1,
+      fs: 0,
+      cc_load_policy: 0,
+      iv_load_policy: 3,
+      hl: "en-US",
+      start: Number(ride.start) || 0,
+      origin: window.location.origin
+    };
   }
 
+  const youtubePlayerManager = (() => {
+    let player = null;
+    let initialized = false;
+    let currentVideoId = null;
+    let apiPromise = null;
+    let initPromise = null;
+
+    function loadApi() {
+      if (window.YT?.Player) return Promise.resolve(window.YT);
+      if (apiPromise) return apiPromise;
+
+      apiPromise = new Promise((resolve, reject) => {
+        const previousReadyHandler = window.onYouTubeIframeAPIReady;
+        const script = document.createElement("script");
+        script.src = "https://www.youtube.com/iframe_api";
+        script.async = true;
+        script.onload = () => {
+          if (window.YT?.Player) {
+            resolve(window.YT);
+            return;
+          }
+          setTimeout(() => {
+            if (window.YT?.Player) resolve(window.YT);
+            else reject(new Error("YouTube IFrame Player API did not initialize"));
+          }, 0);
+        };
+        script.onerror = () => reject(new Error("YouTube IFrame Player API failed to load"));
+        window.onYouTubeIframeAPIReady = () => {
+          previousReadyHandler?.();
+          resolve(window.YT);
+        };
+        document.head.appendChild(script);
+      });
+
+      return apiPromise;
+    }
+
+    async function init(ride) {
+      if (initialized && player) return player;
+      if (initPromise) return initPromise;
+
+      initPromise = (async () => {
+        const YTApi = await loadApi();
+        if (initialized && player) return player;
+
+        player = new YTApi.Player(elements.videoContainer, {
+          host: "https://www.youtube-nocookie.com",
+          videoId: ride.id,
+          playerVars: buildPlayerVars(ride),
+          events: {
+            onReady: () => {
+              initialized = true;
+              currentVideoId = ride.id;
+              const iframe = player.getIframe?.();
+              if (iframe) {
+                iframe.classList.add("city-video");
+                iframe.title = "City ride";
+                iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+              }
+              handlePlayerReady();
+            },
+            onStateChange: (event) => {
+              if (event.data === window.YT?.PlayerState?.PLAYING) markVideoReady();
+            },
+            onError: () => handleVideoError()
+          }
+        });
+        initialized = true;
+        currentVideoId = ride.id;
+        return player;
+      })();
+
+      try {
+        return await initPromise;
+      } finally {
+        initPromise = null;
+      }
+    }
+
+    async function load(ride) {
+      if (!ride) return;
+      if (!initialized || !player) {
+        await init(ride);
+      }
+      if (currentVideoId === ride.id) return;
+      currentVideoId = ride.id;
+      player.loadVideoById({
+        videoId: ride.id,
+        startSeconds: Number(ride.start) || 0
+      });
+      if (state.currentQuality !== CONFIG.qualities.AUTO) {
+        player.setPlaybackQuality?.(`hd${state.currentQuality}`);
+      }
+    }
+
+    function command(method, args = []) {
+      if (!player || typeof player[method] !== "function") return;
+      player[method](...args);
+    }
+
+    function setPlaybackQuality(quality) {
+      if (!player || typeof player.setPlaybackQuality !== "function") return;
+      player.setPlaybackQuality(quality);
+    }
+
+    function getCurrentVideoId() {
+      return currentVideoId;
+    }
+
+    function isInitialized() {
+      return initialized && Boolean(player);
+    }
+
+    function destroy() {
+      player?.destroy();
+      player = null;
+      initialized = false;
+      currentVideoId = null;
+    }
+
+    return { init, load, command, setPlaybackQuality, getCurrentVideoId, isInitialized, destroy };
+  })();
+
   /**
-   * Constrói URL do vídeo do YouTube
-   * @param {Object} ride - Objeto do vídeo com id e start
-   * @returns {string} URL completa do embed
+   * Envia um comando para a única instância do player, quando disponível.
+   * @param {string} method - Método da API do player
+   * @param {Array} [args] - Argumentos
    */
-  function buildVideoUrl(ride) {
-    const params = new URLSearchParams({
-      autoplay: "1",
-      mute: state.streetSoundOn ? "0" : "1",
-      controls: "0",
-      loop: "1",
-      playlist: ride.id,
-      modestbranding: "1",
-      rel: "0",
-      playsinline: "1",
-      enablejsapi: "1",
-      disablekb: "1",
-      fs: "0",
-      cc_load_policy: "0",
-      iv_load_policy: "3",
-      hl: "en-US",
-      start: String(ride.start),
-      origin: window.location.origin
-    });
-    return `https://www.youtube-nocookie.com/embed/${ride.id}?${params}`;
+  function videoCommand(method, args = []) {
+    youtubePlayerManager.command(method, args);
+  }
+
+  function showVideoLoading(isLoading) {
+    elements.videoLoading.classList.toggle("is-visible", isLoading);
+    elements.videoLoading.setAttribute("aria-hidden", String(!isLoading));
+  }
+
+  function markVideoReady() {
+    clearTimeout(state.videoReadyTimer);
+    elements.videoShell.classList.add("is-ready");
+    showVideoLoading(false);
+    videoCommand("setPlaybackRate", [state.currentSpeed]);
+    if (!state.streetSoundOn) videoCommand("mute");
+  }
+
+  function startPlayback() {
+    if (state.playbackSessionStarted) return;
+    state.playbackSessionStarted = true;
+    elements.videoGate.classList.add("is-hidden");
+    updateVideo(currentCity(), { immediate: true });
+  }
+
+  function handlePlayerReady() {
+    videoCommand("setPlaybackRate", [state.currentSpeed]);
+    videoCommand(state.streetSoundOn ? "unMute" : "mute");
+    videoCommand("setVolume", [state.streetSoundOn ? CONFIG.STREET_SOUND_VOLUME : 0]);
+    state.videoReadyTimer = setTimeout(markVideoReady, CONFIG.VIDEO_READY_DELAY);
   }
 
   /**
    * Atualiza o vídeo da cidade
    * @param {Object} city - Objeto da cidade
    */
-  function updateVideo(city) {
+  function updateVideo(city, options = {}) {
     const ride = currentRide(city);
     if (!ride) {
       // Fallback: cidade sem vídeo disponível
-      elements.video.classList.remove("is-ready");
+      elements.videoShell.classList.remove("is-ready");
+      elements.videoGate.classList.remove("is-hidden");
       elements.poster.style.backgroundImage = "";
+      elements.videoGateTitle.textContent = city.name;
+      elements.videoGateMode.textContent = MODE_LABELS[state.currentMode] || state.currentMode;
       showToast(MESSAGES.noVideo);
       return;
     }
-    
-    clearTimeout(state.videoReadyTimer);
-    elements.video.classList.remove("is-ready");
-    
+
     // Poster com fallback de qualidade
     elements.poster.style.backgroundImage = `url("https://i.ytimg.com/vi/${ride.id}/maxresdefault.jpg"), url("https://i.ytimg.com/vi/${ride.id}/hqdefault.jpg")`;
-    elements.video.src = buildVideoUrl(ride);
-    
-    state.videoReadyTimer = setTimeout(() => {
-      elements.video.classList.add("is-ready");
-      videoCommand("setPlaybackRate", [state.currentSpeed]);
-      if (!state.streetSoundOn) videoCommand("mute");
-    }, CONFIG.VIDEO_READY_DELAY);
+    elements.videoGateTitle.textContent = city.name;
+    elements.videoGateMode.textContent = MODE_LABELS[state.currentMode] || state.currentMode;
+
+    if (!state.playbackSessionStarted) {
+      clearTimeout(state.videoChangeTimer);
+      state.videoRequestId++;
+      elements.videoShell.classList.remove("is-ready");
+      showVideoLoading(false);
+      return;
+    }
+
+    const playerVideoId = youtubePlayerManager.getCurrentVideoId() || state.currentVideoId;
+    if (playerVideoId === ride.id) return;
+
+    clearTimeout(state.videoChangeTimer);
+    clearTimeout(state.videoReadyTimer);
+    state.videoRequestId++;
+    const requestId = state.videoRequestId;
+    state.currentVideoId = null;
+    elements.videoShell.classList.remove("is-ready");
+    showVideoLoading(true);
+
+    const loadRide = async () => {
+      if (requestId !== state.videoRequestId) return;
+      try {
+        await youtubePlayerManager.load(ride);
+        if (requestId !== state.videoRequestId) return;
+        state.currentVideoId = ride.id;
+        state.videoReadyTimer = setTimeout(markVideoReady, CONFIG.VIDEO_READY_DELAY);
+      } catch (error) {
+        if (requestId !== state.videoRequestId) return;
+        showVideoLoading(false);
+        if (!youtubePlayerManager.isInitialized()) {
+          state.playbackSessionStarted = false;
+          elements.videoGate.classList.remove("is-hidden");
+        }
+        showToast(MESSAGES.videoUnavailable);
+        console.warn("[YouCity] YouTube player unavailable:", error.message);
+      }
+    };
+
+    if (options.immediate) loadRide();
+    else {
+      state.videoChangeTimer = setTimeout(() => {
+        state.videoChangeTimer = null;
+        loadRide();
+      }, CONFIG.VIDEO_SWITCH_DEBOUNCE);
+    }
   }
 
   /**
@@ -1369,9 +1561,10 @@
       ? "HD" 
       : state.currentQuality + "p";
     
-    // CORREÇÃO: Usar updateVideo em vez da inexistente loadVideo
-    const city = currentCity();
-    updateVideo(city);
+    const quality = state.currentQuality === CONFIG.qualities.AUTO
+      ? "default"
+      : `hd${state.currentQuality}`;
+    youtubePlayerManager.setPlaybackQuality(quality);
     
     const message = state.currentQuality === CONFIG.qualities.AUTO 
       ? MESSAGES.qualityAuto 
@@ -2160,10 +2353,8 @@
       }
     });
     
-    // Eventos do player de vídeo
-    elements.video.addEventListener("load", () => {
-      setTimeout(() => elements.video.classList.add("is-ready"), 900);
-    });
+    // O player só é criado após uma ação explícita do usuário.
+    elements.startVideo.addEventListener("click", startPlayback);
     
     // Radio errors share the same guarded retry scheduler as play() failures.
     elements.radio.addEventListener("error", () => {
@@ -2289,19 +2480,6 @@
         case "T":
           cycleTheme();
           break;
-      }
-    });
-    
-    // Mensagens do iframe do YouTube (para detectar erros)
-    window.addEventListener("message", (event) => {
-      try {
-        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-        // Detecta erro de vídeo indisponível
-        if (data.event === "onError" || (data.info && data.info.playerState === -1)) {
-          handleVideoError();
-        }
-      } catch {
-        // Ignora mensagens que não são JSON válido
       }
     });
     
