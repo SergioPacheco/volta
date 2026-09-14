@@ -10,7 +10,13 @@ const { runInNewContext } = require("node:vm");
 const ROOT_DIR = resolve(__dirname, "..");
 const OUTPUT_DIR = resolve(ROOT_DIR, "dist");
 const SITE_URL = String(process.env.SEO_SITE_URL || "https://youcity.pages.dev").replace(/\/+$/, "");
+const BASE_PATH = String(process.env.SEO_BASE_PATH || "").trim().replace(/^\/+|\/+$/g, "");
+const SITE_PATH = BASE_PATH ? `/${BASE_PATH}` : "";
 const failures = [];
+
+function sitePath(path) {
+  return `${SITE_PATH}${path}`;
+}
 
 function fail(message) {
   failures.push(message);
@@ -69,7 +75,7 @@ function checkPage(file, { indexable = true } = {}) {
   const description = firstMeta(html, "name", "description");
   const canonical = html.match(/<link\b[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/i)?.[1] || "";
   if (!description || description.length < 50) fail(`${file}: missing or unusually short meta description`);
-  if (!canonical.startsWith(`${SITE_URL}/`)) fail(`${file}: canonical is not on ${SITE_URL}`);
+  if (!canonical.startsWith(`${SITE_URL}${sitePath("/")}`)) fail(`${file}: canonical is not on ${SITE_URL}${SITE_PATH}`);
 
   for (const [attribute, value] of [
     ["property", "og:title"],
@@ -106,7 +112,7 @@ function slugify(value) {
 function checkSitemap(catalog) {
   const sitemap = read("sitemap.xml");
   const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  const expected = [`${SITE_URL}/`, ...catalog.map((city) => `${SITE_URL}/city/${slugify(city.name)}`)];
+  const expected = [`${SITE_URL}${sitePath("/")}`, ...catalog.map((city) => `${SITE_URL}${sitePath(`/city/${slugify(city.name)}`)}`)];
   if (urls.length !== expected.length) fail(`sitemap.xml: expected ${expected.length} URLs, found ${urls.length}`);
   for (const url of expected) if (!urls.includes(url)) fail(`sitemap.xml: missing ${url}`);
 }
@@ -143,7 +149,7 @@ function main() {
     return;
   }
 
-  console.log(`SEO check passed: ${pageData.length} indexable pages, ${cityFiles.length} city pages, sitemap verified for ${SITE_URL}`);
+  console.log(`SEO check passed: ${pageData.length} indexable pages, ${cityFiles.length} city pages, sitemap verified for ${SITE_URL}${SITE_PATH}`);
 }
 
 main();
