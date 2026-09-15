@@ -36,6 +36,15 @@
     return rankingStrategies.get(id) || rankingStrategies.get("default");
   }
 
+  function slugify(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
   function createConfiguredUrl(providerId, context) {
     const providerConfig = getProviderConfig(providerId);
     const template = String(providerConfig.urlTemplate || "").trim();
@@ -93,6 +102,7 @@
     getProviders,
     getRankingStrategy,
     createConfiguredUrl,
+    slugify,
     normalizeContext,
     createContext: normalizeContext,
     getAffiliateOffers(context) {

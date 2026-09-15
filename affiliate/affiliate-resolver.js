@@ -30,7 +30,7 @@
 
   function resolve(context) {
     const normalized = global.YouCityAffiliate.normalizeContext(context?.city, context?.vertical, context);
-    if (!normalized.city.id || !normalized.vertical) return [];
+    if (!normalized.city.name || !normalized.city.country || !normalized.vertical) return [];
     const offers = [];
 
     global.YouCityAffiliate.getProviders().forEach((provider) => {

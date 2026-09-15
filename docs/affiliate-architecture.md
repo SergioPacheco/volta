@@ -58,6 +58,21 @@ builder. They return no offer until `configured: true` and an approved
 `{country}`, `{countryCode}` and `{vertical}`. No provider ID or URL is
 invented by the application.
 
+## Stay22
+
+Stay22 is registered for the `hotels` vertical with public AID `youcity`.
+Its provider builds the Stay22 Allez URL dynamically from `city.name` and
+`city.country`; there is no Stay22 destination catalog. The generated link
+also receives a campaign in the form `yc_{citySlug}_{countryCode}_{vertical}`.
+The address retains accents and is encoded by `URLSearchParams`; only the
+campaign uses the shared normalized slug helper.
+
+Stay22 can be toggled with `features.providers.stay22` or
+`providers.stay22.enabled`, and its order is controlled by
+`providers.stay22.priority`. It coexists with Expedia, Booking.com and
+Travelpayouts so the existing ranking and experiment mechanisms can compare
+them later.
+
 ## Verticals
 
 The initial identifiers are `hotels`, `flights`, `cars`, `activities`, `esim`
@@ -69,16 +84,17 @@ Current provider declarations:
 
 | Vertical | Providers |
 | --- | --- |
-| hotels | Expedia, Booking.com, Travelpayouts |
+| hotels | Stay22, Expedia, Booking.com, Travelpayouts |
 | flights | Expedia, Travelpayouts |
 | cars | DiscoverCars |
 | activities | Expedia, Viator |
 | esim | Airalo |
 | insurance | Heymondo |
 
-At the current rollout: DiscoverCars is `READY`; Expedia, Booking.com,
-Viator, Travelpayouts, Airalo and Heymondo are `AWAITING_AFFILIATE_ID` and
-remain unconfigured, so they produce no URL or placeholder card.
+At the current rollout: DiscoverCars and Stay22 are `READY`; Expedia,
+Booking.com, Viator, Travelpayouts, Airalo and Heymondo are
+`AWAITING_AFFILIATE_ID` and remain unconfigured, so they produce no URL or
+placeholder card.
 
 ## Context and resolver
 

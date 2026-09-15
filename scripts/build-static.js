@@ -39,6 +39,7 @@ const STATIC_ASSETS = [
   "affiliate/providers/travelpayouts.js",
   "affiliate/providers/airalo.js",
   "affiliate/providers/heymondo.js",
+  "affiliate/providers/stay22.js",
   "drone-videos.js",
   "radio-catalog.js",
   "radio-extra-catalog.js",
@@ -363,7 +364,7 @@ function main() {
   mkdirSync(join(OUTPUT_DIR, "assets"), { recursive: true });
   mkdirSync(join(OUTPUT_DIR, "city"), { recursive: true });
 
-  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "affiliate-overrides.js", "affiliate/affiliate-config.js", "affiliate/affiliate-engine.js", "affiliate/affiliate-catalog.js", "affiliate/affiliate-tracking.js", "affiliate/affiliate-experiments.js", "affiliate/affiliate-resolver.js", "affiliate/providers/expedia.js", "affiliate/providers/booking.js", "affiliate/providers/viator.js", "affiliate/providers/discovercars.js", "affiliate/providers/travelpayouts.js", "affiliate/providers/airalo.js", "affiliate/providers/heymondo.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js", "discovercars-locations.js"]) {
+  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "affiliate-overrides.js", "affiliate/affiliate-config.js", "affiliate/affiliate-engine.js", "affiliate/affiliate-catalog.js", "affiliate/affiliate-tracking.js", "affiliate/affiliate-experiments.js", "affiliate/affiliate-resolver.js", "affiliate/providers/expedia.js", "affiliate/providers/booking.js", "affiliate/providers/viator.js", "affiliate/providers/discovercars.js", "affiliate/providers/travelpayouts.js", "affiliate/providers/airalo.js", "affiliate/providers/heymondo.js", "affiliate/providers/stay22.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js", "discovercars-locations.js"]) {
     const destination = join(OUTPUT_DIR, file);
     mkdirSync(dirname(destination), { recursive: true });
     cpSync(resolve(ROOT_DIR, file), destination);

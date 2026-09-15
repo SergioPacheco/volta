@@ -70,7 +70,8 @@ window.YOUCITY_AFFILIATE_CONFIG = {
       discovercars: true,
       travelpayouts: true,
       airalo: true,
-      heymondo: true
+      heymondo: true,
+      stay22: true
     }
   },
   providers: {
@@ -123,6 +124,14 @@ window.YOUCITY_AFFILIATE_CONFIG = {
       configured: false,
       priority: 100,
       verticals: ["insurance"]
+    },
+    stay22: {
+      name: "Stay22",
+      enabled: true,
+      configured: true,
+      priority: 100,
+      verticals: ["hotels"],
+      aid: "youcity"
     }
   },
   ranking: {

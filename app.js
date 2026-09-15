@@ -225,7 +225,7 @@
    * Creates the stable URL segment used by prerendered city pages.
    */
   function citySlug(value) {
-    return normalizeSearch(value)
+    return window.YouCityAffiliate?.slugify?.(value) || normalizeSearch(value)
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
   }

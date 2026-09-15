@@ -36,6 +36,7 @@ function load(file) {
   "affiliate/providers/travelpayouts.js",
   "affiliate/providers/airalo.js",
   "affiliate/providers/heymondo.js",
+  "affiliate/providers/stay22.js",
   "affiliate/affiliate-resolver.js"
 ].forEach(load);
 
@@ -45,6 +46,11 @@ const availableCity = { id: "sao-paulo", name: "Sao Paulo", rawCountry: "Brazil"
 const unavailableCity = { id: "st-petersburg", name: "St. Petersburg", rawCountry: "Russia", country: "Russia", countryCode: "RU" };
 const londonCity = { id: "london", name: "London", rawCountry: "UK", country: "United Kingdom" };
 const newYorkCity = { id: "new-york-city", name: "New York City", rawCountry: "USA", country: "United States" };
+const granadaCity = { name: "Granada", country: "Spain", countryCode: "ES" };
+const saoPauloCity = { name: "São Paulo", country: "Brazil", countryCode: "BR" };
+const tokyoCity = { name: "Tokyo", country: "Japan", countryCode: "JP" };
+const romeCity = { name: "Rome", country: "Italy", countryCode: "IT" };
+const barcelonaCity = { name: "Barcelona", country: "Spain", countryCode: "ES" };
 
 let offers = affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "cars"));
 assert.equal(JSON.stringify(offers.map((offer) => offer.provider)), JSON.stringify(["discovercars"]), "enabled provider should appear");
@@ -63,16 +69,55 @@ config.providers.discovercars.enabled = false;
 assert.equal(affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "cars")).length, 0, "disabled provider should be hidden");
 config.providers.discovercars.enabled = true;
 
-assert.equal(affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "hotels")).length, 0, "unconfigured provider must not create a URL");
+offers = affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "hotels"));
+assert.equal(JSON.stringify(offers.map((offer) => offer.provider)), JSON.stringify(["stay22"]), "unconfigured providers must not create URLs");
 config.providers.expedia.configured = true;
 config.providers.expedia.urlTemplate = "https://approved.example/hotels/{cityId}";
 offers = affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "hotels"));
-assert.equal(offers[0].provider, "expedia", "configured provider URL template should be resolved");
-assert.equal(offers[0].url, "https://approved.example/hotels/sao-paulo");
+const expediaOffer = offers.find((offer) => offer.provider === "expedia");
+assert.ok(expediaOffer, "configured provider URL template should be resolved");
+assert.equal(expediaOffer.url, "https://approved.example/hotels/sao-paulo");
 config.providers.expedia.configured = false;
 delete config.providers.expedia.urlTemplate;
 assert.equal(affiliate.getAffiliateOffers(affiliate.createContext(unavailableCity, "cars")).length, 0, "unavailable catalog city must be hidden");
 assert.equal(affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "activities")).length, 0, "incompatible vertical must be hidden");
+
+function stay22Offer(city, vertical = "hotels") {
+  return affiliate.getAffiliateOffers(affiliate.createContext(city, vertical)).find((offer) => offer.provider === "stay22");
+}
+
+const granadaOffer = stay22Offer(granadaCity);
+assert.ok(granadaOffer, "Stay22 should resolve without a city catalog entry");
+const granadaUrl = new URL(granadaOffer.url);
+assert.equal(granadaUrl.origin + granadaUrl.pathname, "https://www.stay22.com/allez/roam");
+assert.equal(granadaUrl.searchParams.get("aid"), "youcity");
+assert.equal(granadaUrl.searchParams.get("address"), "Granada, Spain");
+assert.equal(granadaUrl.searchParams.get("campaign"), "yc_granada_es_hotels");
+
+for (const [city, address, campaign] of [
+  [saoPauloCity, "São Paulo, Brazil", "yc_sao-paulo_br_hotels"],
+  [tokyoCity, "Tokyo, Japan", "yc_tokyo_jp_hotels"],
+  [romeCity, "Rome, Italy", "yc_rome_it_hotels"],
+  [barcelonaCity, "Barcelona, Spain", "yc_barcelona_es_hotels"],
+  [{ name: "Málaga", country: "Spain", countryCode: "ES" }, "Málaga, Spain", "yc_malaga_es_hotels"],
+  [{ name: "Córdoba", country: "Spain", countryCode: "ES" }, "Córdoba, Spain", "yc_cordoba_es_hotels"]
+]) {
+  const url = new URL(stay22Offer(city).url);
+  assert.equal(url.searchParams.get("address"), address, `${city.name} address should preserve accents`);
+  assert.equal(url.searchParams.get("campaign"), campaign);
+}
+
+config.providers.stay22.enabled = false;
+assert.equal(stay22Offer(granadaCity), undefined, "disabled Stay22 should be hidden");
+config.providers.stay22.enabled = true;
+config.providers.stay22.configured = false;
+assert.equal(stay22Offer(granadaCity), undefined, "unconfigured Stay22 should not produce an offer");
+config.providers.stay22.configured = true;
+for (const vertical of ["cars", "flights", "activities", "insurance", "esim"]) {
+  assert.equal(stay22Offer(granadaCity, vertical), undefined, `Stay22 should not appear in ${vertical}`);
+}
+assert.equal(affiliate.getAffiliateOffers(affiliate.createContext({ name: "Granada" }, "hotels")).length, 0, "city without country should be unavailable");
+assert.equal(affiliate.getAffiliateOffers(affiliate.createContext({ country: "Spain" }, "hotels")).length, 0, "city without name should be unavailable");
 
 ["test-expedia", "test-booking", "test-travelpayouts"].forEach((providerId, index) => {
   config.providers[providerId] = { enabled: true, configured: true, priority: index + 1 };
@@ -86,12 +131,12 @@ assert.equal(affiliate.getAffiliateOffers(affiliate.createContext(availableCity,
   });
 });
 offers = affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "hotels"));
-assert.equal(JSON.stringify(offers.map((offer) => offer.provider)), JSON.stringify(["test-travelpayouts", "test-booking", "test-expedia"]), "multiple providers should be ranked centrally");
+assert.equal(JSON.stringify(offers.map((offer) => offer.provider)), JSON.stringify(["stay22", "test-travelpayouts", "test-booking", "test-expedia"]), "multiple providers should be ranked centrally");
 
 const tracked = [];
 context.window.YOUCITY_ANALYTICS = { track(payload) { tracked.push(payload); } };
 const element = { dataset: {
-  travelProvider: "booking",
+  travelProvider: "stay22",
   travelVertical: "hotels",
   travelCityName: "Sao Paulo",
   travelCountry: "Brazil",
