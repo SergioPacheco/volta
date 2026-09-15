@@ -5,6 +5,7 @@
  * for every city in the catalog. No network access or third-party dependency
  * is required during the build.
  */
+const { execFileSync } = require("node:child_process");
 const { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } = require("node:fs");
 const { join, resolve } = require("node:path");
 const { runInNewContext } = require("node:vm");
@@ -19,6 +20,45 @@ const CITY_SUFFIX = String(process.env.SEO_CITY_SUFFIX || "");
 const SITE_NAME = "YouCity";
 const SOCIAL_IMAGE = `${SITE_URL}${SITE_PATH}/assets/hero-saopaulo.webp`;
 const SOCIAL_ALT = "YouCity — immersive city rides around the world";
+const STATIC_ASSETS = [
+  "styles.css",
+  "cities-data.js",
+  "map-catalog.js",
+  "map-config.js",
+  "travel-config.js",
+  "drone-videos.js",
+  "radio-catalog.js",
+  "radio-extra-catalog.js",
+  "app.js"
+];
+
+function assetVersion() {
+  const supplied = String(process.env.ASSET_VERSION || process.env.GITHUB_SHA || "").trim();
+  if (supplied) return supplied.replace(/[^a-zA-Z0-9._-]/g, "").slice(0, 32) || "dev";
+
+  try {
+    return execFileSync("git", ["rev-parse", "--short", "HEAD"], {
+      cwd: ROOT_DIR,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"]
+    }).trim() || "dev";
+  } catch {
+    return "dev";
+  }
+}
+
+const ASSET_VERSION = assetVersion();
+const STATIC_ASSET_PATTERN = new RegExp(
+  `((?:href|src)=["'])([^"']*\\/(?:${STATIC_ASSETS.map((file) => file.replace(".", "\\.")).join("|")})(?:\\?[^"']*)?)(["'])`,
+  "g"
+);
+
+function versionStaticAssets(html) {
+  return html.replace(STATIC_ASSET_PATTERN, (_, prefix, url, suffix) => {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${prefix}${url}${separator}v=${encodeURIComponent(ASSET_VERSION)}${suffix}`;
+  });
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -252,7 +292,7 @@ function buildRobots() {
 }
 
 function buildNotFound() {
-  return `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — YouCity</title><meta name="robots" content="noindex,follow"><link rel="stylesheet" href="${sitePath("/styles.css")}"></head><body><main class="seo-fallback"><h1>Page not found</h1><p>The city page you requested does not exist.</p><p><a href="${sitePath("/")}">Return to YouCity</a></p></main></body></html>\n`;
+  return versionStaticAssets(`<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — YouCity</title><meta name="robots" content="noindex,follow"><link rel="stylesheet" href="${sitePath("/styles.css")}"></head><body><main class="seo-fallback"><h1>Page not found</h1><p>The city page you requested does not exist.</p><p><a href="${sitePath("/")}">Return to YouCity</a></p></main></body></html>\n`);
 }
 
 function cityFallback(seo, catalog) {
@@ -292,7 +332,9 @@ function main() {
     if (existsSync(resolve(ROOT_DIR, file))) cpSync(resolve(ROOT_DIR, file), join(OUTPUT_DIR, file));
   }
 
-  const baseHtml = injectRuntimeBasePath(rewriteInternalPaths(readFileSync(resolve(ROOT_DIR, "index.html"), "utf8")));
+  const baseHtml = versionStaticAssets(
+    injectRuntimeBasePath(rewriteInternalPaths(readFileSync(resolve(ROOT_DIR, "index.html"), "utf8")))
+  );
   writeFileSync(join(OUTPUT_DIR, "index.html"), renderPage(baseHtml, homeSeo(catalog), homeFallback(catalog)));
 
   catalog.forEach((city, index) => {
@@ -310,7 +352,7 @@ function main() {
   writeFileSync(join(OUTPUT_DIR, "sitemap.xml"), buildSitemap(catalog));
   writeFileSync(join(OUTPUT_DIR, "404.html"), buildNotFound());
   writeFileSync(join(OUTPUT_DIR, ".nojekyll"), "");
-  console.log(`Built ${catalog.length + 1} SEO pages in ${OUTPUT_DIR} using ${SITE_URL}`);
+  console.log(`Built ${catalog.length + 1} SEO pages in ${OUTPUT_DIR} using ${SITE_URL} (assets: ${ASSET_VERSION})`);
 }
 
 main();
