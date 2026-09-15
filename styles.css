@@ -308,20 +308,21 @@ button:focus-visible, input:focus-visible {
 .world-map .leaflet-control-attribution { font-size: 9px; }
 .map-footnote { flex: 0 0 auto; margin: 12px 0 0; color: rgba(255,255,255,.42); font: 400 9px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .04em; }
 .map-unavailable { display: grid; height: 100%; min-height: 360px; place-items: center; margin: 0; padding: 24px; color: #20251f; font: 500 12px "DM Mono", monospace; text-align: center; }
-.map-popup { min-width: 230px; color: #182018; font-family: "Manrope", sans-serif; }
+.map-popup { width: min(100%, 250px); min-width: 205px; color: #182018; font-family: "Manrope", sans-serif; }
 .map-popup-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 9px; border-bottom: 1px solid #dfe4dd; }
 .map-popup-title strong { font: 600 18px/1 "Newsreader", serif; }
 .map-popup-title span { color: #69736a; font: 500 9px "DM Mono", monospace; text-transform: uppercase; }
-.map-popup-videos { max-height: 260px; overflow-y: auto; padding-top: 8px; }
-.map-video-group { padding: 7px 0; border-bottom: 1px solid #edf0ec; }
+.map-popup-videos { max-height: 235px; overflow-y: auto; padding-top: 5px; }
+.map-video-group { padding: 6px 0; border-bottom: 1px solid #edf0ec; }
 .map-video-group:last-child { border-bottom: 0; }
 .map-video-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .map-video-heading strong { font: 600 10px "DM Mono", monospace; letter-spacing: .06em; text-transform: uppercase; }
-.map-video-heading button { padding: 4px 6px; border: 0; border-radius: 3px; background: #182018; color: #d7ff43; cursor: pointer; font: 600 8px "DM Mono", monospace; text-transform: uppercase; }
+.map-video-heading > span { color: #69736a; font: 500 8px "DM Mono", monospace; text-transform: uppercase; }
+.map-video-heading button { padding: 5px 7px; border: 0; border-radius: 3px; background: #182018; color: #d7ff43; cursor: pointer; font: 600 8px "DM Mono", monospace; text-transform: uppercase; }
 .map-video-heading button:hover { background: #31412d; }
-.map-video-group ul { display: flex; flex-wrap: wrap; gap: 3px 8px; margin: 5px 0 0; padding: 0; list-style: none; }
-.map-video-group a { color: #436346; font-size: 10px; text-decoration: none; }
-.map-video-group a:hover { color: #152216; text-decoration: underline; }
+.map-video-group ul { display: flex; flex-wrap: wrap; gap: 3px 8px; margin: 4px 0 0; padding: 0; list-style: none; }
+.map-video-group li button { padding: 3px 5px; border: 1px solid #c8d2c8; border-radius: 3px; background: #f7faf6; color: #182018; cursor: pointer; font: 600 9px "DM Mono", monospace; }
+.map-video-group li button:hover { border-color: #436346; background: #edf4ec; color: #152216; }
 .map-popup-videos > p { margin: 8px 0; color: #69736a; font-size: 11px; }
 .map-directory { flex: 0 0 auto; margin-top: 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 4px; background: rgba(0,0,0,.18); }
 .map-directory summary { padding: 10px 12px; color: rgba(255,255,255,.72); cursor: pointer; font: 500 9px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .06em; }
@@ -336,21 +337,16 @@ button:focus-visible, input:focus-visible {
 .map-directory-mode strong { color: var(--lcd-green); font-size: 8px; }
 .map-directory-mode button { padding: 1px 4px; border: 1px solid rgba(215,255,67,.35); border-radius: 2px; background: transparent; color: var(--lcd-green); cursor: pointer; font: inherit; text-transform: uppercase; }
 .map-directory-mode span { display: flex; flex-wrap: wrap; gap: 0 6px; }
-.map-directory-mode a { color: rgba(255,255,255,.62); text-decoration: none; }
-.map-directory-mode a:hover { color: #fff; text-decoration: underline; }
-.map-travel { margin-top: 8px; padding-top: 8px; border-top: 1px solid #dfe4dd; }
-.map-travel > span { display: block; margin-bottom: 5px; color: #69736a; font: 600 9px "DM Mono", monospace; text-transform: uppercase; }
-.map-travel-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin: 0 0 7px; font-size: 10px; }
-.map-travel-group strong { color: #436346; }
-.map-travel-group ul { display: flex; gap: 5px; margin: 0; padding: 0; list-style: none; }
-.map-travel-group a { color: #436346; }
-.map-travel-group > strong { grid-column: 1 / -1; }
-.map-travel-group .travel-offer-action { width: 100%; min-width: 0; min-height: 33px; padding: 6px 7px; border-color: #c8d2c8; background: #f7faf6; color: #182018; }
-.map-travel-group .travel-offer-action span { overflow: hidden; color: #182018; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
-.map-travel-group .travel-offer-action small { overflow: hidden; color: #69736a; text-overflow: ellipsis; white-space: nowrap; }
-.map-travel-group .travel-offer-action b { color: #436346; }
-.map-travel-group .travel-offer-action:hover { border-color: #436346; background: #edf4ec; }
-.map-travel-group .travel-offer-action.is-placeholder { border-style: solid; border-color: #c8d2c8; background: #f7faf6; }
+.map-directory-mode span button { margin: 0; }
+.map-travel { margin-top: 7px; padding-top: 7px; border-top: 1px solid #dfe4dd; }
+.map-travel > span { display: block; margin-bottom: 5px; color: #69736a; font: 600 8px "DM Mono", monospace; text-transform: uppercase; }
+.map-travel-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+.map-travel-action { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 5px; width: 100%; min-width: 0; min-height: 30px; padding: 5px 6px; border-color: #c8d2c8; background: #f7faf6; color: #182018; }
+.map-travel-action span { overflow: hidden; color: #182018; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.map-travel-action small { overflow: hidden; margin: 0; color: #69736a; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
+.map-travel-action b { color: #436346; font-size: 12px; }
+.map-travel-action:hover { border-color: #436346; background: #edf4ec; }
+.map-travel-action.is-placeholder { border-style: solid; border-color: #c8d2c8; background: #f7faf6; }
 
 .catalog-error { display: grid; place-items: center; align-content: center; gap: 18px; min-height: 100%; padding: 32px; color: #fff; text-align: center; }
 .catalog-error h1 { margin: 0; font: 300 64px/1 "Newsreader", serif; }

@@ -408,6 +408,7 @@
     streetSoundOn: false,
     currentSpeed: 1,
     currentMode: CONFIG.modes.DRIVE,
+    currentVideoIndex: 0,
     currentVideoId: null,
     videoRequestId: 0,
     videoChangeTimer: null,
@@ -485,7 +486,7 @@
    */
   function currentRide(city = currentCity()) {
     const modeVideos = city.videos[state.currentMode];
-    if (modeVideos?.length) return modeVideos[0];
+    if (modeVideos?.length) return modeVideos[Math.min(state.currentVideoIndex, modeVideos.length - 1)] || modeVideos[0];
     const fallbackMode = firstAvailableMode(city);
     return city.videos[fallbackMode]?.[0];
   }
@@ -544,7 +545,9 @@
   function travelOfferMarkup(entry, city, options = {}) {
     if (!entry?.url) return "";
     const providerLabel = entry.name || entry.provider;
-    const label = entry.label || `Explore ${TRAVEL_CATEGORIES[entry.vertical]?.label?.toLowerCase() || "options"}`;
+    const label = options.minimal
+      ? TRAVEL_CATEGORIES[entry.vertical]?.label || "Open"
+      : entry.label || `Explore ${TRAVEL_CATEGORIES[entry.vertical]?.label?.toLowerCase() || "options"}`;
     const metadata = `data-affiliate-offer="true" data-travel-provider="${escapeHtml(entry.provider)}" data-travel-vertical="${escapeHtml(entry.vertical)}" data-travel-city="${escapeHtml(city.id)}" data-travel-city-name="${escapeHtml(city.name)}" data-travel-country="${escapeHtml(city.rawCountry || city.country)}" data-travel-country-code="${escapeHtml(city.countryCode || "")}" data-travel-placement="${escapeHtml(entry.placement || "travel_planner")}" data-travel-variant="${escapeHtml(entry.variant || "A")}" data-travel-provider-campaign="${escapeHtml(entry.tracking?.providerCampaign || "")}" data-travel-internal-campaign="${escapeHtml(entry.tracking?.internalCampaign || "")}"`;
     const compact = options.compact ? " is-compact" : "";
     return `<a class="travel-offer-action${compact}" href="${escapeHtml(entry.url)}" target="_blank" rel="sponsored noopener noreferrer" ${metadata}><span>${escapeHtml(label)}</span><small>${escapeHtml(providerLabel)}</small><b aria-hidden="true">↗</b></a>`;
@@ -657,11 +660,10 @@
     const sections = categories.map((category) => {
       const entries = offers[category] || [];
       if (!entries.length) return "";
-      const links = entries.map((entry) => travelOfferMarkup(entry, city, { compact: true })).filter(Boolean).join("");
-      return links ? `<div class="map-travel-group"><strong>${escapeHtml(TRAVEL_CATEGORIES[category].label)}</strong>${links}</div>` : "";
+      return entries.map((entry) => travelOfferMarkup(entry, city, { minimal: true })).filter(Boolean).join("");
     }).join("");
 
-    return sections ? `<div class="map-travel"><span>Travel options</span>${sections}</div>` : "";
+    return sections ? `<div class="map-travel"><span>More for this city</span><div class="map-travel-actions">${sections}</div></div>` : "";
   }
 
   function mapPopup(city, index) {
@@ -669,17 +671,17 @@
       .filter(([, videos]) => videos?.length)
       .map(([mode, videos]) => {
         const label = MODE_LABELS[mode] || mode;
-        const links = videos.map((ride, videoIndex) => `
+        const buttons = videos.map((ride, videoIndex) => `
           <li>
-            <a href="${escapeHtml(buildYoutubeWatchUrl(ride))}" target="_blank" rel="noopener noreferrer">Watch video ${videoIndex + 1} ↗</a>
+            <button type="button" data-map-play data-city="${index}" data-mode="${escapeHtml(mode)}" data-video-index="${videoIndex}">▶ Play video ${videoIndex + 1}</button>
           </li>`).join("");
         return `
           <div class="map-video-group">
             <div class="map-video-heading">
               <strong>${escapeHtml(label)}</strong>
-              <button type="button" data-map-play data-city="${index}" data-mode="${escapeHtml(mode)}">Play in YouCity</button>
+              <span>${videos.length} ${videos.length === 1 ? "video" : "videos"}</span>
             </div>
-            <ul>${links}</ul>
+            <ul>${buttons}</ul>
           </div>`;
       }).join("");
 
@@ -732,8 +734,8 @@
       const modes = Object.entries(city.videos)
         .filter(([, videos]) => videos?.length)
         .map(([mode, videos]) => {
-          const links = videos.map((ride, videoIndex) => `<a href="${escapeHtml(buildYoutubeWatchUrl(ride))}" target="_blank" rel="noopener noreferrer">${escapeHtml(MODE_LABELS[mode] || mode)} ${videoIndex + 1}</a>`).join("");
-          return `<div class="map-directory-mode"><strong>${escapeHtml(MODE_LABELS[mode] || mode)}</strong><button type="button" data-map-play data-city="${index}" data-mode="${escapeHtml(mode)}">Play</button><span>${links}</span></div>`;
+          const buttons = videos.map((ride, videoIndex) => `<button type="button" data-map-play data-city="${index}" data-mode="${escapeHtml(mode)}" data-video-index="${videoIndex}">${escapeHtml(MODE_LABELS[mode] || mode)} ${videoIndex + 1}</button>`).join("");
+          return `<div class="map-directory-mode"><strong>${escapeHtml(MODE_LABELS[mode] || mode)}</strong><span>${buttons}</span></div>`;
         }).join("");
       return `<article class="map-directory-item"><h3><button type="button" data-map-city-select="${index}">${escapeHtml(city.name)}</button><span>${escapeHtml(city.country)}</span></h3>${modes}</article>`;
     }).join("");
@@ -782,7 +784,7 @@
         fillColor: "#111411",
         fillOpacity: 0.95,
         bubblingMouseEvents: false
-      }).bindPopup(mapPopup(city, index), { maxWidth: 340, minWidth: 260 }).addTo(worldMap);
+      }).bindPopup(mapPopup(city, index), { maxWidth: 280, minWidth: 220 }).addTo(worldMap);
     });
 
     if (elements.mapResultCount) elements.mapResultCount.textContent = `${mappedCities} cities · ${cities.length} destinations`;
@@ -792,12 +794,20 @@
     setTimeout(() => worldMap?.invalidateSize(), 50);
   }
 
-  function playMapRide(cityIndex, mode) {
-    if (!Number.isInteger(cityIndex) || !cities[cityIndex]?.videos[mode]?.length) return;
+  function playMapRide(cityIndex, mode, videoIndex = 0) {
+    const videos = cities[cityIndex]?.videos[mode];
+    if (!Number.isInteger(cityIndex) || !videos?.length) return;
+    const parsedVideoIndex = Number(videoIndex);
+    const selectedVideoIndex = Number.isInteger(parsedVideoIndex)
+      ? Math.max(0, Math.min(parsedVideoIndex, videos.length - 1))
+      : 0;
     closeLayer(elements.mapModal);
     selectCity(cityIndex, { silent: true });
-    if (state.currentMode !== mode) switchMode(mode);
-    else updateVideo(currentCity());
+    state.currentMode = mode;
+    state.currentVideoIndex = selectedVideoIndex;
+    updateModeControls();
+    updateVideo(currentCity());
+    savePreferences({ currentMode: state.currentMode });
   }
 
   // -----------------------------------------------------------------------------
@@ -1181,6 +1191,7 @@
     const fallbackMode = availableModes(city).find((mode) => mode !== state.currentMode);
     if (fallbackMode) {
       state.currentMode = fallbackMode;
+      state.currentVideoIndex = 0;
       updateModeControls();
       updateVideo(city);
       showToast(MESSAGES.videoFallback);
@@ -2115,6 +2126,7 @@
     // Cada cidade pode ter apenas alguns modos; preserve o atual quando
     // possível e selecione o primeiro modo realmente disponível caso contrário.
     state.currentMode = firstAvailableMode(city);
+    state.currentVideoIndex = 0;
     
     // Atualiza UI
     elements.cityName.textContent = city.name;
@@ -2163,6 +2175,7 @@
     if (!currentCity().videos[mode]?.length || mode === state.currentMode) return;
     
     state.currentMode = mode;
+    state.currentVideoIndex = 0;
     updateModeControls();
     updateVideo(currentCity());
     savePreferences({ currentMode: state.currentMode });
@@ -2494,14 +2507,20 @@
       elements.stay22SearchResult.dataset.travelCountryCode = city.countryCode || "";
       elements.stay22SearchResult.dataset.travelPlacement = "travel_planner";
       elements.stay22SearchResult.dataset.travelProviderCampaign = new URL(url).searchParams.get("campaign") || "";
-      elements.stay22SearchStatus.textContent = "Search ready.";
+      elements.stay22SearchStatus.textContent = "Opening stay search…";
       trackStay22Action("search_submit", {
         checkinProvided: Boolean(checkin),
         checkoutProvided: Boolean(checkout),
         adultsProvided: elements.stay22Adults.value !== "",
         childrenProvided: elements.stay22Children.value !== ""
       });
-      elements.stay22SearchResult.focus();
+      trackTravelClick(elements.stay22SearchResult);
+      const searchWindow = window.open(url, "_blank", "noopener,noreferrer");
+      if (!searchWindow) {
+        elements.stay22SearchResult.hidden = false;
+        elements.stay22SearchStatus.textContent = "Popup blocked. Open stay search.";
+        elements.stay22SearchResult.focus();
+      }
     });
 
     elements.stay22SearchResult.addEventListener("click", (event) => {
@@ -2549,14 +2568,14 @@
       if (!playButton) return;
 
       event.preventDefault();
-      playMapRide(Number(playButton.dataset.city), playButton.dataset.mode);
+      playMapRide(Number(playButton.dataset.city), playButton.dataset.mode, playButton.dataset.videoIndex);
     });
 
     elements.mapDirectory.addEventListener("click", (event) => {
       const playButton = event.target.closest("[data-map-play]");
       if (playButton) {
         event.preventDefault();
-        playMapRide(Number(playButton.dataset.city), playButton.dataset.mode);
+        playMapRide(Number(playButton.dataset.city), playButton.dataset.mode, playButton.dataset.videoIndex);
         return;
       }
 
