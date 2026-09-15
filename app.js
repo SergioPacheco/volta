@@ -276,12 +276,7 @@
   // -----------------------------------------------------------------------------
   // City catalog processing
   // -----------------------------------------------------------------------------
-  const cityCatalog = [
-    ...(window.CITY_CATALOG || []),
-    ...(window.CITY_EXTRA_CATALOG || [])
-  ];
-
-  const cities = cityCatalog.map((item) => {
+  const cities = (window.CITY_CATALOG || []).map((item) => {
     const [country, region, countryTimeZone] = COUNTRY_INFO[item.country] || [item.country, "World", "UTC"];
     return {
       ...item,

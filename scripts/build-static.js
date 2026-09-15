@@ -45,14 +45,9 @@ function slugify(value) {
 function loadCatalog() {
   const context = { window: {} };
   runInNewContext(readFileSync(resolve(ROOT_DIR, "cities-data.js"), "utf8"), context);
-  runInNewContext(readFileSync(resolve(ROOT_DIR, "spain-video-catalog.js"), "utf8"), context);
   runInNewContext(readFileSync(resolve(ROOT_DIR, "drone-videos.js"), "utf8"), context);
   const droneCatalog = context.window.DRONE_CATALOG || {};
-  const cityCatalog = [
-    ...(context.window.CITY_CATALOG || []),
-    ...(context.window.CITY_EXTRA_CATALOG || [])
-  ];
-  return cityCatalog.map((city) => ({
+  return (context.window.CITY_CATALOG || []).map((city) => ({
     ...city,
     videos: {
       ...city.videos,
@@ -289,7 +284,7 @@ function main() {
   mkdirSync(join(OUTPUT_DIR, "assets"), { recursive: true });
   mkdirSync(join(OUTPUT_DIR, "city"), { recursive: true });
 
-  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js", "spain-video-catalog.js"]) {
+  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js"]) {
     cpSync(resolve(ROOT_DIR, file), join(OUTPUT_DIR, file));
   }
   cpSync(resolve(ROOT_DIR, "assets"), join(OUTPUT_DIR, "assets"), { recursive: true });
