@@ -22,6 +22,8 @@
 
   function discoverCarsEntry(city) {
     const locations = global.YOUCITY_DISCOVERCARS_LOCATIONS || {};
+    const directKey = cityKey(city);
+    if (directKey && locations[directKey]) return locations[directKey];
     return Object.values(locations).find((location) =>
       location.youCityId === city?.id
       && (

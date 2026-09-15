@@ -171,7 +171,7 @@
     Seattle: "America/Los_Angeles", Vancouver: "America/Vancouver", Brisbane: "Australia/Brisbane",
     "Gold Coast": "Australia/Brisbane", Melbourne: "Australia/Melbourne", Dunedin: "Pacific/Auckland",
     Cancun: "America/Cancun", Tijuana: "America/Tijuana", Novosibirsk: "Asia/Novosibirsk",
-    Yekaterinburg: "Asia/Yekaterinburg", "St. Petersburg": "Europe/Moscow"
+    Yekaterinburg: "Asia/Yekaterinburg", "St. Petersburg": "Europe/Moscow", Granada: "Europe/Madrid"
   };
 
   const CITY_NOTES = {
@@ -182,7 +182,8 @@
     "Rio De Janeiro": "The city meets the sea between tunnels, hills, and a light that changes everything.",
     London: "Fine rain, old brick, and the calm rhythm of streets along the Thames.",
     Seoul: "Dawn reflects on the asphalt between markets, signs, and wide avenues.",
-    Lisbon: "Hills, tiled facades, and the Atlantic appearing at the end of every narrow street."
+    Lisbon: "Hills, tiled facades, and the Atlantic appearing at the end of every narrow street.",
+    Granada: "The Alhambra and Generalife, Albaicín, Sacromonte, Mirador de San Nicolás, and Sierra Nevada meet in a city made for wandering."
   };
 
   const MODE_LABELS = { 
@@ -191,6 +192,7 @@
     [CONFIG.modes.WALK]: "Walk",
     [CONFIG.modes.DRONE]: "Drone"
   };
+  const MODE_ORDER = [CONFIG.modes.DRIVE, CONFIG.modes.BIKE, CONFIG.modes.WALK, CONFIG.modes.DRONE];
 
   const THEME_NAMES = {
     [CONFIG.themes.DEFAULT]: MESSAGES.themeDefault,
@@ -279,7 +281,7 @@
   // -----------------------------------------------------------------------------
   // City catalog processing
   // -----------------------------------------------------------------------------
-  const cities = (window.CITY_CATALOG || []).map((item) => {
+  const cities = (window.YOUCITY_CATALOG || window.CITY_CATALOG || []).map((item) => {
     const [country, region, countryTimeZone] = COUNTRY_INFO[item.country] || [item.country, "World", "UTC"];
     return {
       ...item,
@@ -291,20 +293,8 @@
       region,
       timeZone: CITY_TIME_ZONES[item.name] || countryTimeZone,
       note: CITY_NOTES[item.name] || `Real streets, local radio, and the rhythm of ${CITY_NAMES[item.name] || item.name} through the window.`,
-      videos: {
-        ...item.videos,
-        [CONFIG.modes.DRONE]: (window.DRONE_CATALOG?.[item.name] || []).map((ride) =>
-          typeof ride === "string" ? { id: ride, start: 0 } : ride
-        )
-      },
-      radios: [
-        ...(window.RADIO_CATALOG?.[item.name] || []),
-        ...(window.RADIO_EXTRA_CATALOG?.[item.name] || []),
-        ...(item.radios || [])
-      ]
-        .filter((radio, index, radios) => radios.findIndex((candidate) => candidate.url === radio.url) === index)
-        .slice(0, 5)
-        .map((radio) => ({ ...radio, mark: stationMark(radio.name) }))
+      videos: item.videos,
+      radios: (item.radios || []).map((radio) => ({ ...radio, mark: stationMark(radio.name) }))
     };
   });
 
@@ -479,6 +469,15 @@
     return cities[state.cityIndex];
   }
 
+  function availableModes(city) {
+    return MODE_ORDER.filter((mode) => city?.videos?.[mode]?.length);
+  }
+
+  function firstAvailableMode(city, preferredMode = state.currentMode) {
+    if (city?.videos?.[preferredMode]?.length) return preferredMode;
+    return availableModes(city)[0] || CONFIG.modes.DRIVE;
+  }
+
   /**
    * Retorna o vídeo atual para o modo selecionado
    * @param {Object} [city] - Cidade (padrão: cidade atual)
@@ -487,7 +486,8 @@
   function currentRide(city = currentCity()) {
     const modeVideos = city.videos[state.currentMode];
     if (modeVideos?.length) return modeVideos[0];
-    return city.videos[CONFIG.modes.DRIVE][0];
+    const fallbackMode = firstAvailableMode(city);
+    return city.videos[fallbackMode]?.[0];
   }
 
   function escapeHtml(value) {
@@ -621,6 +621,31 @@
     affiliate.observeImpressions(elements.travelPlanner);
   }
 
+  let discoverCarsCatalogPromise = null;
+
+  function ensureDiscoverCarsCatalog() {
+    if (window.YOUCITY_DISCOVERCARS_LOCATIONS) return Promise.resolve(true);
+    if (discoverCarsCatalogPromise) return discoverCarsCatalogPromise;
+
+    discoverCarsCatalogPromise = new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = sitePath("/discovercars-locations.js");
+      script.async = true;
+      script.dataset.youcityDiscoverCars = "true";
+      script.addEventListener("load", () => {
+        renderTravelPlanner(currentCity());
+        resolve(true);
+      }, { once: true });
+      script.addEventListener("error", () => {
+        discoverCarsCatalogPromise = null;
+        resolve(false);
+      }, { once: true });
+      document.head.appendChild(script);
+    });
+
+    return discoverCarsCatalogPromise;
+  }
+
   function trackTravelClick(target) {
     if (!target) return;
     affiliate.trackClick(target, { mode: state.currentMode });
@@ -746,7 +771,7 @@
     const bounds = [];
     let mappedCities = 0;
     cities.forEach((city, index) => {
-      const coordinates = window.CITY_COORDINATES?.[city.rawName];
+      const coordinates = city.coordinates || window.CITY_COORDINATES?.[city.rawName];
       if (!Array.isArray(coordinates)) return;
       mappedCities += 1;
       bounds.push(coordinates);
@@ -1150,9 +1175,19 @@
       modeVideos.shift(); // Remove vídeo com problema
       updateVideo(city);
       showToast(MESSAGES.videoFallback);
-    } else {
-      showToast(MESSAGES.videoUnavailable);
+      return;
     }
+
+    const fallbackMode = availableModes(city).find((mode) => mode !== state.currentMode);
+    if (fallbackMode) {
+      state.currentMode = fallbackMode;
+      updateModeControls();
+      updateVideo(city);
+      showToast(MESSAGES.videoFallback);
+      return;
+    }
+
+    showToast(MESSAGES.videoUnavailable);
   }
 
   // -----------------------------------------------------------------------------
@@ -2033,7 +2068,10 @@
     }
     
     elements.grid.innerHTML = matches.map(({ city, index }) => {
-      const thumbnail = city.videos[CONFIG.modes.DRIVE][0]?.id;
+      const thumbnailRide = MODE_ORDER
+        .map((mode) => city.videos[mode]?.[0])
+        .find(Boolean);
+      const thumbnail = thumbnailRide?.id;
       const modes = Object.entries(city.videos)
         .filter(([, videos]) => videos.length)
         .map(([mode]) => MODE_LABELS[mode])
@@ -2045,7 +2083,7 @@
              role="button" 
              tabindex="0"
              data-city="${index}">
-          <img src="https://i.ytimg.com/vi/${thumbnail}/hqdefault.jpg" alt="" loading="lazy" />
+          ${thumbnail ? `<img src="https://i.ytimg.com/vi/${thumbnail}/hqdefault.jpg" alt="" loading="lazy" />` : '<span class="city-card-placeholder" aria-hidden="true"></span>'}
           <span class="card-favorite${isFav ? " is-active" : ""}" role="button" tabindex="0" data-favorite="${index}" aria-label="${isFav ? "Remove from favorites" : "Add to favorites"}">
             <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
           </span>
@@ -2074,10 +2112,9 @@
     
     const city = currentCity();
     
-    // Se modo atual não disponível, volta para drive
-    if (!city.videos[state.currentMode]?.length) {
-      state.currentMode = CONFIG.modes.DRIVE;
-    }
+    // Cada cidade pode ter apenas alguns modos; preserve o atual quando
+    // possível e selecione o primeiro modo realmente disponível caso contrário.
+    state.currentMode = firstAvailableMode(city);
     
     // Atualiza UI
     elements.cityName.textContent = city.name;
@@ -2367,7 +2404,10 @@
     // Preview mode para QA
     const previewMode = new URLSearchParams(window.location.search).get("preview");
     if (previewMode === "drawer") openLayer(elements.drawer);
-    if (previewMode === "travel") openLayer(elements.travelDrawer);
+    if (previewMode === "travel") {
+      openLayer(elements.travelDrawer);
+      ensureDiscoverCarsCatalog();
+    }
     
     // Salva estatísticas ao fechar a página
     window.addEventListener("beforeunload", saveStats);
@@ -2406,7 +2446,10 @@
     
     $("#about-button").addEventListener("click", () => openLayer(elements.about));
 
-    elements.travelButton.addEventListener("click", () => openLayer(elements.travelDrawer));
+    elements.travelButton.addEventListener("click", () => {
+      openLayer(elements.travelDrawer);
+      ensureDiscoverCarsCatalog();
+    });
 
     elements.mapButton.addEventListener("click", () => {
       openLayer(elements.mapModal);

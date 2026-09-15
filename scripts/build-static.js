@@ -8,7 +8,7 @@
 const { execFileSync } = require("node:child_process");
 const { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } = require("node:fs");
 const { dirname, join, resolve } = require("node:path");
-const { runInNewContext } = require("node:vm");
+const { loadCatalog: loadCanonicalCatalog } = require("./load-catalog");
 
 const ROOT_DIR = resolve(__dirname, "..");
 const OUTPUT_DIR = resolve(ROOT_DIR, "dist");
@@ -23,6 +23,7 @@ const SOCIAL_ALT = "YouCity — immersive city rides around the world";
 const STATIC_ASSETS = [
   "styles.css",
   "cities-data.js",
+  "catalog-runtime.js",
   "map-catalog.js",
   "map-config.js",
   "affiliate/affiliate-config.js",
@@ -46,6 +47,7 @@ const STATIC_ASSETS = [
   "discovercars-locations.js",
   "app.js"
 ];
+const STATIC_FILES = [...STATIC_ASSETS, "map-config.js"];
 
 function assetVersion() {
   const supplied = String(process.env.ASSET_VERSION || process.env.GITHUB_SHA || "").trim();
@@ -95,22 +97,6 @@ function slugify(value) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-}
-
-function loadCatalog() {
-  const context = { window: {} };
-  runInNewContext(readFileSync(resolve(ROOT_DIR, "cities-data.js"), "utf8"), context);
-  runInNewContext(readFileSync(resolve(ROOT_DIR, "drone-videos.js"), "utf8"), context);
-  const droneCatalog = context.window.DRONE_CATALOG || {};
-  return (context.window.CITY_CATALOG || []).map((city) => ({
-    ...city,
-    videos: {
-      ...city.videos,
-      drone: (droneCatalog[city.name] || []).map((ride) =>
-        typeof ride === "string" ? { id: ride, start: 0 } : ride
-      )
-    }
-  }));
 }
 
 function loadDiscoverCarsCatalog() {
@@ -355,7 +341,7 @@ function homeFallback(catalog) {
 }
 
 function main() {
-  const catalog = loadCatalog();
+  const catalog = loadCanonicalCatalog(ROOT_DIR);
   const discoverCarsCatalog = loadDiscoverCarsCatalog();
   if (!catalog.length) throw new Error("The city catalog is empty.");
 
@@ -364,7 +350,7 @@ function main() {
   mkdirSync(join(OUTPUT_DIR, "assets"), { recursive: true });
   mkdirSync(join(OUTPUT_DIR, "city"), { recursive: true });
 
-  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "affiliate-overrides.js", "affiliate/affiliate-config.js", "affiliate/affiliate-engine.js", "affiliate/affiliate-catalog.js", "affiliate/affiliate-tracking.js", "affiliate/affiliate-experiments.js", "affiliate/affiliate-resolver.js", "affiliate/providers/expedia.js", "affiliate/providers/booking.js", "affiliate/providers/viator.js", "affiliate/providers/discovercars.js", "affiliate/providers/travelpayouts.js", "affiliate/providers/airalo.js", "affiliate/providers/heymondo.js", "affiliate/providers/stay22.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js", "discovercars-locations.js"]) {
+  for (const file of STATIC_FILES) {
     const destination = join(OUTPUT_DIR, file);
     mkdirSync(dirname(destination), { recursive: true });
     cpSync(resolve(ROOT_DIR, file), destination);

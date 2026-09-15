@@ -5,7 +5,7 @@
  */
 const { existsSync, readdirSync, readFileSync } = require("node:fs");
 const { join, resolve } = require("node:path");
-const { runInNewContext } = require("node:vm");
+const { loadCatalog: loadCanonicalCatalog } = require("./load-catalog");
 
 const ROOT_DIR = resolve(__dirname, "..");
 const OUTPUT_DIR = resolve(ROOT_DIR, "dist");
@@ -45,9 +45,7 @@ function allHtmlFiles(directory, prefix = "") {
 }
 
 function expectedCities() {
-  const context = { window: {} };
-  runInNewContext(readFileSync(resolve(ROOT_DIR, "cities-data.js"), "utf8"), context);
-  return context.window.CITY_CATALOG || [];
+  return loadCanonicalCatalog(ROOT_DIR);
 }
 
 function checkRequiredFiles() {

@@ -93,5 +93,6 @@ window.DRONE_CATALOG = {
   "Vancouver": [{ id: "WbfjRoQVZSw", start: 0, confidence: "A" }],
   "Vienna": [{ id: "_8D2ukmn0cs", start: 0, confidence: "A" }],
   "Warsaw": [{ id: "FcjeOHCLaDQ", start: 0, confidence: "A" }],
-  "Zurich": [{ id: "4XceEfga_Fo", start: 0, confidence: "A" }]
+  "Zurich": [{ id: "4XceEfga_Fo", start: 0, confidence: "A" }],
+  "Granada": [{ id: "c6u22gDXtYw", start: 0, confidence: "A" }]
 };

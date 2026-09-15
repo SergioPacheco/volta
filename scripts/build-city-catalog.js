@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const vm = require("vm");
 
 const inputPath = process.argv[2];
 if (!inputPath) throw new Error("Provide the path to the source bundle.");
@@ -54,7 +55,9 @@ const modeVideos = (item, mode) => {
   }));
 };
 
-const catalog = [...new Map(parsed.map((item) => [item.city, item])).values()]
+const parsedCatalog = [...new Map(
+  parsed.map((item) => [`${item.city}\u0000${item.country}`, item])
+).values()]
   .map((item) => ({
     name: item.city,
     country: item.country,
@@ -74,9 +77,23 @@ const catalog = [...new Map(parsed.map((item) => [item.city, item])).values()]
     return left.name.localeCompare(right.name, "en");
   });
 
-if (catalog.length !== 179) {
-  throw new Error(`Incomplete catalog: ${catalog.length} of 179 cities.`);
+if (parsedCatalog.length !== 179) {
+  throw new Error(`Incomplete source catalog: ${parsedCatalog.length} of 179 cities.`);
 }
+
+// Keep curated records that are intentionally maintained in cities-data.js
+// (for example cities added after the upstream source bundle was generated).
+const currentCatalogPath = path.resolve(__dirname, "..", "cities-data.js");
+const currentContext = { window: {} };
+if (fs.existsSync(currentCatalogPath)) {
+  vm.runInNewContext(fs.readFileSync(currentCatalogPath, "utf8"), currentContext);
+}
+
+const cityKey = (city) => `${city.name}\u0000${city.country}`;
+const sourceKeys = new Set(parsedCatalog.map(cityKey));
+const curatedCities = (currentContext.window.CITY_CATALOG || [])
+  .filter((city) => !sourceKeys.has(cityKey(city)));
+const catalog = [...new Map([...parsedCatalog, ...curatedCities].map((city) => [cityKey(city), city])).values()];
 
 const output = `// Static catalog of rides and radio stations. Generated on 2026-08-27.\nwindow.CITY_CATALOG = ${JSON.stringify(catalog)};\n`;
 const outputPath = path.resolve(__dirname, "..", "cities-data.js");

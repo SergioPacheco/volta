@@ -5,23 +5,20 @@
  * Network metadata validation is performed before an ID is added to
  * drone-videos.js; this check protects the catalog from structural regressions.
  */
-const { readFileSync } = require("node:fs");
 const { resolve } = require("node:path");
-const { runInNewContext } = require("node:vm");
+const { loadCatalogContext } = require("./load-catalog");
 
 const ROOT_DIR = resolve(__dirname, "..");
-const context = { window: {} };
-runInNewContext(readFileSync(resolve(ROOT_DIR, "cities-data.js"), "utf8"), context);
-runInNewContext(readFileSync(resolve(ROOT_DIR, "drone-videos.js"), "utf8"), context);
+const context = loadCatalogContext(ROOT_DIR);
 
-const cities = context.window.CITY_CATALOG || [];
+const cities = context.window.YOUCITY_CATALOG || context.window.CITY_CATALOG || [];
 const catalog = context.window.DRONE_CATALOG || {};
 const cityNames = new Set(cities.map((city) => city.name));
 const failures = [];
 const ids = new Map();
 
 for (const [city, rides] of Object.entries(catalog)) {
-  if (!cityNames.has(city)) failures.push(`${city}: not present in cities-data.js`);
+  if (!cityNames.has(city)) failures.push(`${city}: not present in the city catalog`);
   if (!Array.isArray(rides) || !rides.length) {
     failures.push(`${city}: expected at least one ride`);
     continue;

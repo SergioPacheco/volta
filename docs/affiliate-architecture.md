@@ -143,6 +143,12 @@ affiliate ID or approved URL is still pending.
 
 ## Catalog and overrides
 
+The browser and build use `catalog-runtime.js` as the canonical city view. It
+combines the unified ride catalog, audited Drone entries, coordinates and
+radio sources, removes duplicate ride IDs/radio URLs, and caps the runtime
+radio list at five stations per city. The specialized source files remain
+separate because their update and review rules differ.
+
 Provider configuration and destination data are separate. DiscoverCars reads
 the generated `discovercars-locations.js`, which is derived from the official
 catalog and only exposes `VERIFIED` city-level matches. Ambiguous and missing
@@ -159,9 +165,9 @@ can map a city key to a provider-specific destination, for example:
 }
 ```
 
-The current city catalog does not contain Granada, so no Granada link is
-generated. Adding a city later still requires both a YouCity city record and a
-verified provider catalog match.
+Granada is part of the canonical city catalog. Adding another city still
+requires a YouCity city record and, separately, a verified provider catalog
+match when that provider needs destination-specific data.
 
 ## Tracking and attribution
 
