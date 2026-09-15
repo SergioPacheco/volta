@@ -61,9 +61,11 @@ For other static hosts, upload the generated `dist/` directory rather than the s
 Videos are embedded from YouTube, the world map uses Leaflet with OpenStreetMap tiles, and radio stations are public external streams. City-specific stations are sourced from Radio Browser's directory, with the original catalog retained as a fallback. The interface therefore needs no server, but the experience depends on an internet connection and source availability. Browsers may require an initial click before playing audio.
 
 Map tiles and travel links are configured in `map-config.js` and
-`travel-config.js`. DiscoverCars is catalog-driven; see
+`affiliate/affiliate-config.js`. DiscoverCars is catalog-driven; see
 [`docs/discovercars-integration.md`](docs/discovercars-integration.md) for the
 official sitemap update process and review rules. Other travel providers remain
-preview hooks until they are reviewed and selected.
+unconfigured until their approved public affiliate URLs/IDs are added.
+See [`docs/affiliate-architecture.md`](docs/affiliate-architecture.md) for the
+provider contract and rollout model.
 
 The cover image in `assets/hero-saopaulo.webp` was created specifically for the project and remains local.

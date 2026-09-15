@@ -54,6 +54,7 @@ Cloudflare files.
 The page content remains dependent on Leaflet/OpenStreetMap, YouTube, and
 public radio providers at runtime; those external media URLs are not treated
 as SEO URLs. Leaflet is loaded only after the visitor opens the map. Future
-hotel, flight, and car-rental links can be added by city in `travel-config.js`;
+hotel, flight, and car-rental links are resolved centrally through
+`affiliate/affiliate-config.js` and the provider catalogs;
 the active map tile provider can be changed in `map-config.js`; the map currently
 renders no empty recommendation blocks.

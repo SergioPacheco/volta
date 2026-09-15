@@ -19,7 +19,6 @@ const SITEMAP_INDEX_URL = "https://www.discovercars.com/sitemap.xml";
 const ROBOTS_URL = "https://www.discovercars.com/robots.txt";
 const LOCATIONS_URL = "https://www.discovercars.com/locations";
 const DISCOVERCARS_ORIGIN = "https://www.discovercars.com";
-const AFFILIATE_ID = "youcity";
 const STATUS = Object.freeze({ VERIFIED: "VERIFIED", NOT_AVAILABLE: "NOT_AVAILABLE", AMBIGUOUS: "AMBIGUOUS", NEEDS_REVIEW: "NEEDS_REVIEW" });
 
 const COUNTRY_CODES = {
@@ -222,12 +221,6 @@ async function validateOverridePage(override, url) {
   return normalizeText(`${title} ${headings.join(" ")}`).includes(normalizeText(override.expectedName));
 }
 
-function affiliateUrl(path) {
-  const url = new URL(path, DISCOVERCARS_ORIGIN);
-  url.searchParams.set("a_aid", AFFILIATE_ID);
-  return url.toString();
-}
-
 function relatedLocationsFor(candidate, airportPages) {
   const related = airportPages
     .filter((airport) => airport.countryCode === candidate.countryCode && airport.root === candidate.root && airport.citySlug === candidate.slug)
@@ -313,7 +306,6 @@ function writeOutputs(results, source) {
   const catalog = {
     version: 1,
     generatedAt,
-    affiliateId: AFFILIATE_ID,
     source: { locations: LOCATIONS_URL, robots: ROBOTS_URL, sitemap: SITEMAP_INDEX_URL, sitemapFiles: source.sitemapUrls, mode: source.sourceMode, robotsChecked: source.robotsChecked },
     matching: { cityAndCountryRequired: true, airportsSeparate: true, ambiguousIsDisabled: true },
     locations

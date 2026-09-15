@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "discovercars:update": "node scripts/update-discovercars-locations.js",
-    "discovercars:test": "node scripts/test-discovercars.js"
+    "discovercars:test": "node scripts/test-discovercars.js",
+    "affiliate:test": "node scripts/test-affiliates.js",
+    "test": "npm run affiliate:test && npm run discovercars:test"
   }
 }

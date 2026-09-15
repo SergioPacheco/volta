@@ -7,7 +7,7 @@
  */
 const { execFileSync } = require("node:child_process");
 const { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } = require("node:fs");
-const { join, resolve } = require("node:path");
+const { dirname, join, resolve } = require("node:path");
 const { runInNewContext } = require("node:vm");
 
 const ROOT_DIR = resolve(__dirname, "..");
@@ -25,7 +25,20 @@ const STATIC_ASSETS = [
   "cities-data.js",
   "map-catalog.js",
   "map-config.js",
-  "travel-config.js",
+  "affiliate/affiliate-config.js",
+  "affiliate-overrides.js",
+  "affiliate/affiliate-engine.js",
+  "affiliate/affiliate-catalog.js",
+  "affiliate/affiliate-tracking.js",
+  "affiliate/affiliate-experiments.js",
+  "affiliate/affiliate-resolver.js",
+  "affiliate/providers/expedia.js",
+  "affiliate/providers/booking.js",
+  "affiliate/providers/viator.js",
+  "affiliate/providers/discovercars.js",
+  "affiliate/providers/travelpayouts.js",
+  "affiliate/providers/airalo.js",
+  "affiliate/providers/heymondo.js",
   "drone-videos.js",
   "radio-catalog.js",
   "radio-extra-catalog.js",
@@ -103,6 +116,15 @@ function loadDiscoverCarsCatalog() {
   const file = resolve(ROOT_DIR, "data/discovercars-locations.json");
   if (!existsSync(file)) return {};
   return JSON.parse(readFileSync(file, "utf8")).locations || {};
+}
+
+function writeAffiliateOverridesAsset() {
+  const source = resolve(ROOT_DIR, "data/affiliate-overrides.json");
+  const overrides = existsSync(source) ? JSON.parse(readFileSync(source, "utf8")) : {};
+  writeFileSync(
+    join(OUTPUT_DIR, "affiliate-overrides.js"),
+    `// Generated from data/affiliate-overrides.json.\nwindow.YOUCITY_AFFILIATE_OVERRIDES = ${JSON.stringify(overrides)};\n`
+  );
 }
 
 function countryName(country) {
@@ -341,9 +363,12 @@ function main() {
   mkdirSync(join(OUTPUT_DIR, "assets"), { recursive: true });
   mkdirSync(join(OUTPUT_DIR, "city"), { recursive: true });
 
-  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js", "discovercars-locations.js"]) {
-    cpSync(resolve(ROOT_DIR, file), join(OUTPUT_DIR, file));
+  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "affiliate-overrides.js", "affiliate/affiliate-config.js", "affiliate/affiliate-engine.js", "affiliate/affiliate-catalog.js", "affiliate/affiliate-tracking.js", "affiliate/affiliate-experiments.js", "affiliate/affiliate-resolver.js", "affiliate/providers/expedia.js", "affiliate/providers/booking.js", "affiliate/providers/viator.js", "affiliate/providers/discovercars.js", "affiliate/providers/travelpayouts.js", "affiliate/providers/airalo.js", "affiliate/providers/heymondo.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js", "discovercars-locations.js"]) {
+    const destination = join(OUTPUT_DIR, file);
+    mkdirSync(dirname(destination), { recursive: true });
+    cpSync(resolve(ROOT_DIR, file), destination);
   }
+  writeAffiliateOverridesAsset();
   cpSync(resolve(ROOT_DIR, "assets"), join(OUTPUT_DIR, "assets"), { recursive: true });
   for (const file of ["_headers", "_redirects"]) {
     if (existsSync(resolve(ROOT_DIR, file))) cpSync(resolve(ROOT_DIR, file), join(OUTPUT_DIR, file));

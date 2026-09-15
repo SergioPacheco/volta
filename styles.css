@@ -386,6 +386,7 @@ button:focus-visible, input:focus-visible {
 .travel-planner-actions .drawer-close { position: static; }
 .travel-planner-kicker, .travel-secondary-heading { color: var(--lcd-green); font: 500 9px "DM Mono", monospace; letter-spacing: .12em; text-transform: uppercase; }
 .travel-planner h2 { margin: 5px 0 0; font: 300 28px/.95 "Newsreader", serif; letter-spacing: -.03em; }
+.travel-planner-location { margin: 6px 0 0; color: var(--text-subtle); font: 400 9px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .08em; }
 .travel-preview-badge { padding: 4px 6px; border: 1px solid rgba(215,255,67,.45); border-radius: 3px; color: var(--acid); font: 600 8px "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
 .travel-category { margin-top: 10px; padding: 10px; border: 1px solid rgba(255,255,255,.11); border-radius: 7px; background: rgba(255,255,255,.045); }
 .travel-category-heading { display: flex; align-items: center; gap: 9px; }

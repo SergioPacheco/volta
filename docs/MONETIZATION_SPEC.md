@@ -3,6 +3,11 @@
 Especificação e backlog para adicionar monetização ao YouCity mantendo o
 projeto estático, sem backend e sem banco de dados.
 
+> A implementação atual usa o Affiliate Engine modular documentado em
+> [`docs/affiliate-architecture.md`](affiliate-architecture.md). O namespace
+> `YOUCITY_TRAVEL` permanece somente como alias de compatibilidade; novos
+> providers devem ser adicionados em `affiliate/`.
+
 ## 1. Objetivo
 
 Transformar cada página `/city/<slug>` em uma experiência de descoberta e
