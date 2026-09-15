@@ -14,11 +14,14 @@
   // -----------------------------------------------------------------------------
   const CONFIG = {
     VIDEO_READY_DELAY: 1500,
+    YOUTUBE_API_TIMEOUT: 15_000,
+    VIDEO_LOAD_TIMEOUT: 12_000,
     TOAST_DURATION: 2600,
     STREET_SOUND_VOLUME: 32,
     CLOCK_INTERVAL: 60_000,
     RADIO_RETRY_DELAY: 2000,
-    RADIO_MAX_RETRIES: 2,
+    RADIO_LOAD_TIMEOUT: 10_000,
+    RADIO_MAX_RETRIES: 4,
     VIDEO_SWITCH_DEBOUNCE: 400,
     DEFAULT_VOLUME: 64,
     AUTOPLAY_INTERVAL: 180_000, // 3 minutes
@@ -409,7 +412,9 @@
     toastTimer: null,
     radioRetryCount: 0,
     radioRetryTimer: null,
+    radioLoadTimer: null,
     radioRequestId: 0,
+    videoUserGesture: false,
     clockIntervalId: null,
     // Novas funcionalidades
     favorites: new Set(),
@@ -765,7 +770,9 @@
   function buildPlayerVars(ride) {
     return {
       autoplay: 1,
-      mute: state.streetSoundOn ? 0 : 1,
+      // Start muted so browsers can honor autoplay. Street sound is restored
+      // after the player reaches PLAYING or after an explicit user gesture.
+      mute: 1,
       controls: 0,
       loop: 1,
       playlist: ride.id,
@@ -785,73 +792,152 @@
   const youtubePlayerManager = (() => {
     let player = null;
     let initialized = false;
+    let playerReady = false;
     let currentVideoId = null;
     let apiPromise = null;
     let initPromise = null;
+    let readyPromise = null;
 
     function loadApi() {
       if (window.YT?.Player) return Promise.resolve(window.YT);
       if (apiPromise) return apiPromise;
 
       apiPromise = new Promise((resolve, reject) => {
+        let settled = false;
+        let pollTimer = null;
+        let timeoutTimer = null;
+
+        const finish = (error) => {
+          if (settled) return;
+          settled = true;
+          if (pollTimer) clearInterval(pollTimer);
+          if (timeoutTimer) clearTimeout(timeoutTimer);
+          if (error) reject(error);
+          else resolve(window.YT);
+        };
+
+        const checkReady = () => {
+          if (window.YT?.Player) finish();
+        };
+
         const previousReadyHandler = window.onYouTubeIframeAPIReady;
-        const script = document.createElement("script");
-        script.src = "https://www.youtube.com/iframe_api";
-        script.async = true;
-        script.onload = () => {
-          if (window.YT?.Player) {
-            resolve(window.YT);
-            return;
+        window.onYouTubeIframeAPIReady = (...args) => {
+          try {
+            previousReadyHandler?.(...args);
+          } finally {
+            checkReady();
           }
-          setTimeout(() => {
-            if (window.YT?.Player) resolve(window.YT);
-            else reject(new Error("YouTube IFrame Player API did not initialize"));
-          }, 0);
         };
-        script.onerror = () => reject(new Error("YouTube IFrame Player API failed to load"));
-        window.onYouTubeIframeAPIReady = () => {
-          previousReadyHandler?.();
-          resolve(window.YT);
-        };
-        document.head.appendChild(script);
+
+        const script = [...document.scripts].find((candidate) =>
+          candidate.src.includes("youtube.com/iframe_api")
+        );
+        if (!script) {
+          const apiScript = document.createElement("script");
+          apiScript.src = "https://www.youtube.com/iframe_api";
+          apiScript.async = true;
+          apiScript.onload = checkReady;
+          apiScript.onerror = () => finish(new Error("YouTube IFrame Player API failed to load"));
+          document.head.appendChild(apiScript);
+        } else {
+          checkReady();
+        }
+
+        pollTimer = setInterval(checkReady, 50);
+        timeoutTimer = setTimeout(
+          () => finish(new Error("YouTube IFrame Player API did not initialize")),
+          CONFIG.YOUTUBE_API_TIMEOUT
+        );
+      }).catch((error) => {
+        // A transient API failure must not poison every subsequent video load.
+        apiPromise = null;
+        throw error;
       });
 
       return apiPromise;
     }
 
     async function init(ride) {
-      if (initialized && player) return player;
+      if (playerReady && player) return player;
       if (initPromise) return initPromise;
 
       initPromise = (async () => {
         const YTApi = await loadApi();
-        if (initialized && player) return player;
+        if (playerReady && player) return player;
 
-        player = new YTApi.Player(elements.videoContainer, {
-          host: "https://www.youtube-nocookie.com",
-          videoId: ride.id,
-          playerVars: buildPlayerVars(ride),
-          events: {
-            onReady: () => {
-              initialized = true;
-              currentVideoId = ride.id;
-              const iframe = player.getIframe?.();
-              if (iframe) {
-                iframe.classList.add("city-video");
-                iframe.title = "City ride";
-                iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-              }
-              handlePlayerReady();
-            },
-            onStateChange: (event) => {
-              if (event.data === window.YT?.PlayerState?.PLAYING) markVideoReady();
-            },
-            onError: () => handleVideoError()
-          }
+        let resolveReady;
+        let rejectReady;
+        const readyTimeout = setTimeout(() => {
+          rejectReady(new Error("YouTube player did not become ready"));
+        }, CONFIG.VIDEO_LOAD_TIMEOUT);
+        readyPromise = new Promise((resolve, reject) => {
+          resolveReady = resolve;
+          rejectReady = reject;
         });
-        initialized = true;
-        currentVideoId = ride.id;
-        return player;
+        playerReady = false;
+
+        try {
+          player = new YTApi.Player(elements.videoContainer, {
+            host: "https://www.youtube-nocookie.com",
+            videoId: ride.id,
+            playerVars: buildPlayerVars(ride),
+            events: {
+              onReady: (event) => {
+                clearTimeout(readyTimeout);
+                initialized = true;
+                playerReady = true;
+                currentVideoId = ride.id;
+                const readyPlayer = event.target || player;
+                const iframe = readyPlayer.getIframe?.();
+                if (iframe) {
+                  iframe.classList.add("city-video");
+                  iframe.title = "City ride";
+                  iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+                }
+                handlePlayerReady();
+                resolveReady(readyPlayer);
+              },
+              onStateChange: (event) => {
+                if (event.data === window.YT?.PlayerState?.BUFFERING) showVideoLoading(true);
+                if (event.data === window.YT?.PlayerState?.PLAYING) markVideoReady();
+              },
+              onAutoplayBlocked: () => {
+                // The player starts muted. This is only a fallback for browsers
+                // that block even muted autoplay or a restored audible preference.
+                videoCommand("mute");
+                videoCommand("playVideo");
+              },
+              onError: (event) => {
+                const error = new Error(`YouTube player error ${event.data}`);
+                error.code = event.data;
+                if (!playerReady) {
+                  clearTimeout(readyTimeout);
+                  rejectReady(error);
+                  return;
+                }
+                handleVideoError(event.data);
+              }
+            }
+          });
+        } catch (error) {
+          clearTimeout(readyTimeout);
+          rejectReady(error);
+        }
+
+        try {
+          await readyPromise;
+          return player;
+        } catch (error) {
+          player?.destroy();
+          player = null;
+          initialized = false;
+          playerReady = false;
+          currentVideoId = null;
+          throw error;
+        } finally {
+          clearTimeout(readyTimeout);
+          readyPromise = null;
+        }
       })();
 
       try {
@@ -863,15 +949,20 @@
 
     async function load(ride) {
       if (!ride) return;
-      if (!initialized || !player) {
+      if (!playerReady || !player) {
         await init(ride);
       }
-      if (currentVideoId === ride.id) return;
+      if (!player) throw new Error("YouTube player is unavailable");
+      if (currentVideoId === ride.id) {
+        player.playVideo?.();
+        return;
+      }
       currentVideoId = ride.id;
       player.loadVideoById({
         videoId: ride.id,
         startSeconds: Number(ride.start) || 0
       });
+      player.playVideo?.();
       if (state.currentQuality !== CONFIG.qualities.AUTO) {
         player.setPlaybackQuality?.(`hd${state.currentQuality}`);
       }
@@ -891,18 +982,26 @@
       return currentVideoId;
     }
 
+    function getPlayerState() {
+      return player && typeof player.getPlayerState === "function"
+        ? player.getPlayerState()
+        : null;
+    }
+
     function isInitialized() {
-      return initialized && Boolean(player);
+      return initialized && playerReady && Boolean(player);
     }
 
     function destroy() {
       player?.destroy();
       player = null;
       initialized = false;
+      playerReady = false;
       currentVideoId = null;
+      readyPromise = null;
     }
 
-    return { init, load, command, setPlaybackQuality, getCurrentVideoId, isInitialized, destroy };
+    return { init, load, command, setPlaybackQuality, getCurrentVideoId, getPlayerState, isInitialized, destroy };
   })();
 
   /**
@@ -924,11 +1023,21 @@
     elements.videoShell.classList.add("is-ready");
     showVideoLoading(false);
     videoCommand("setPlaybackRate", [state.currentSpeed]);
-    if (!state.streetSoundOn) videoCommand("mute");
+    if (state.streetSoundOn && state.videoUserGesture) {
+      videoCommand("unMute");
+      videoCommand("setVolume", [CONFIG.STREET_SOUND_VOLUME]);
+    } else {
+      videoCommand("mute");
+      videoCommand("setVolume", [0]);
+    }
   }
 
-  function startPlayback() {
-    if (state.playbackSessionStarted) return;
+  function startPlayback(options = {}) {
+    if (options.userGesture) state.videoUserGesture = true;
+    if (state.playbackSessionStarted) {
+      videoCommand("playVideo");
+      return;
+    }
     state.playbackSessionStarted = true;
     elements.videoGate.classList.add("is-hidden");
     updateVideo(currentCity(), { immediate: true });
@@ -936,9 +1045,19 @@
 
   function handlePlayerReady() {
     videoCommand("setPlaybackRate", [state.currentSpeed]);
-    videoCommand(state.streetSoundOn ? "unMute" : "mute");
-    videoCommand("setVolume", [state.streetSoundOn ? CONFIG.STREET_SOUND_VOLUME : 0]);
-    state.videoReadyTimer = setTimeout(markVideoReady, CONFIG.VIDEO_READY_DELAY);
+    videoCommand("mute");
+    videoCommand("setVolume", [0]);
+    videoCommand("playVideo");
+    state.videoReadyTimer = setTimeout(() => {
+      if (youtubePlayerManager.getPlayerState() === window.YT?.PlayerState?.PLAYING) {
+        markVideoReady();
+        return;
+      }
+      // Some browsers report the iframe ready before the media element has
+      // started buffering. A second play command prevents the frozen-poster
+      // state without masking a real player error.
+      videoCommand("playVideo");
+    }, CONFIG.VIDEO_READY_DELAY);
   }
 
   /**
@@ -1102,6 +1221,13 @@
     }
   }
 
+  function clearRadioLoadTimer() {
+    if (state.radioLoadTimer) {
+      clearTimeout(state.radioLoadTimer);
+      state.radioLoadTimer = null;
+    }
+  }
+
   /**
    * Schedules one retry for the current radio failure.
    */
@@ -1124,16 +1250,30 @@
     }, CONFIG.RADIO_RETRY_DELAY);
   }
 
+  function handleRadioMediaError() {
+    if (!state.radioWantsPlay) return;
+    clearRadioLoadTimer();
+    const mediaError = elements.radio.error;
+    const errorCode = mediaError?.code ? ` (media error ${mediaError.code})` : "";
+    console.warn(`[YouCity] Radio stream unavailable${errorCode}:`, elements.radio.src);
+    setPlayingState(false);
+    scheduleRadioRetry();
+  }
+
   function setRadio(nextIndex = 0, shouldPlay = state.radioPlaying, options = {}) {
     const radios = currentCity().radios;
 
     clearRadioRetryTimer();
+    clearRadioLoadTimer();
+    elements.radio.pause();
     state.radioWantsPlay = shouldPlay;
+    state.radioAutoplayPending = false;
     if (!options.preserveRetries) state.radioRetryCount = 0;
     const requestId = ++state.radioRequestId;
     
     if (!radios.length) {
       elements.radio.removeAttribute("src");
+      elements.radio.load();
       elements.stationName.innerHTML = "NO SIGNAL<small> --</small>";
       elements.lcdMeta.textContent = "-- · NO SIGNAL";
       elements.play.disabled = true;
@@ -1154,8 +1294,22 @@
     
     elements.radio.src = station.url;
     elements.radio.volume = Number(elements.volume.value) / 100;
+    // Explicitly restart resource selection after changing a live stream URL.
+    // This avoids play() racing the previous station on slower browsers.
+    elements.radio.load();
     
     if (shouldPlay) {
+      state.radioLoadTimer = setTimeout(() => {
+        state.radioLoadTimer = null;
+        if (
+          requestId === state.radioRequestId
+          && state.radioWantsPlay
+          && !state.radioAutoplayPending
+          && elements.radio.readyState < HTMLMediaElement.HAVE_METADATA
+        ) {
+          handleRadioMediaError();
+        }
+      }, CONFIG.RADIO_LOAD_TIMEOUT);
       playRadioWithRetry(requestId);
     } else {
       setPlayingState(false);
@@ -1166,9 +1320,21 @@
    * Tenta reproduzir rádio com retry automático
    */
   function playRadioWithRetry(requestId = state.radioRequestId) {
-    elements.radio.play()
+    if (requestId !== state.radioRequestId || !state.radioWantsPlay) return;
+
+    const playPromise = elements.radio.play();
+    if (!playPromise || typeof playPromise.then !== "function") {
+      if (!elements.radio.paused) {
+        clearRadioLoadTimer();
+        setPlayingState(true);
+      }
+      return;
+    }
+
+    playPromise
       .then(() => {
         if (requestId !== state.radioRequestId) return;
+        clearRadioLoadTimer();
         state.radioAutoplayPending = false;
         setPlayingState(true);
         state.radioRetryCount = 0;
@@ -1182,6 +1348,13 @@
         if (error.name === "NotAllowedError") {
           state.radioAutoplayPending = true;
           setPlayingState(false);
+          return;
+        }
+
+        // A source change can abort the first play() call before metadata is
+        // available. Retry the same station once before moving to the next.
+        if (error.name === "AbortError" && elements.radio.readyState < HTMLMediaElement.HAVE_METADATA) {
+          setTimeout(() => playRadioWithRetry(requestId), 250);
           return;
         }
 
@@ -1223,20 +1396,17 @@
       return showToast(MESSAGES.noRadio);
     }
     
-    if (state.radioPlaying || state.radioWantsPlay) {
-      if (state.radioAutoplayPending) {
-        state.radioAutoplayPending = false;
-        playRadioWithRetry();
-        return;
-      }
-
+    if (state.radioPlaying) {
       state.radioWantsPlay = false;
+      state.radioAutoplayPending = false;
       clearRadioRetryTimer();
+      clearRadioLoadTimer();
       state.radioRequestId++;
       elements.radio.pause();
       setPlayingState(false);
     } else {
       state.radioWantsPlay = true;
+      state.radioAutoplayPending = false;
       playRadioWithRetry();
     }
   }
@@ -2335,6 +2505,7 @@
     // Som da rua
     elements.streetSound.addEventListener("click", () => {
       state.streetSoundOn = !state.streetSoundOn;
+      state.videoUserGesture = true;
       elements.streetSound.classList.toggle("is-active", state.streetSoundOn);
       elements.streetSound.setAttribute("aria-pressed", String(state.streetSoundOn));
       videoCommand(state.streetSoundOn ? "unMute" : "mute");
@@ -2376,13 +2547,20 @@
       }
     });
     
-    // O player só é criado após uma ação explícita do usuário.
-    elements.startVideo.addEventListener("click", startPlayback);
+    // A reprodução automática começa sem som; um clique libera também o áudio.
+    elements.startVideo.addEventListener("click", () => startPlayback({ userGesture: true }));
     
     // Radio errors share the same guarded retry scheduler as play() failures.
-    elements.radio.addEventListener("error", () => {
-      setPlayingState(false);
-      scheduleRadioRetry();
+    elements.radio.addEventListener("error", handleRadioMediaError);
+    elements.radio.addEventListener("playing", () => {
+      if (state.radioWantsPlay) {
+        clearRadioLoadTimer();
+        state.radioAutoplayPending = false;
+        setPlayingState(true);
+      }
+    });
+    elements.radio.addEventListener("ended", () => {
+      if (state.radioWantsPlay) scheduleRadioRetry();
     });
     
     // =========================================================================
