@@ -36,6 +36,8 @@
       favorites: "volta-favorites",
       stats: "volta-stats",
       theme: "volta-theme",
+      onboardingSeen: "youcity-onboarding-seen",
+      swipeHintSeen: "youcity-swipe-hint-seen",
     },
     filters: {
       ALL: "all",
@@ -93,6 +95,15 @@
     themeContrast: "Theme: High contrast",
     modeSwitch: (mode, city) => `${mode} in ${city}`,
   };
+
+  const VIDEO_STATES = Object.freeze({
+    IDLE: "IDLE",
+    LOADING: "LOADING",
+    PLAYING: "PLAYING",
+    RETRYING: "RETRYING",
+    UNAVAILABLE: "UNAVAILABLE",
+    ERROR: "ERROR"
+  });
 
   // -----------------------------------------------------------------------------
   // Dados estáticos
@@ -310,8 +321,12 @@
     videoGate: $("#video-gate"),
     videoGateMode: $("#video-gate-mode"),
     videoGateTitle: $("#video-gate-title"),
+    videoGateMessage: $("#video-gate-message"),
+    videoOptions: $("#video-options"),
+    videoList: $("#video-list"),
     startVideo: $("#start-video"),
     videoLoading: $("#video-loading"),
+    videoLoadingMessage: $("#video-loading-message"),
     poster: $("#poster"),
     sourceLink: $("#source-link"),
     radio: $("#radio-player"),
@@ -332,6 +347,7 @@
     stay22Children: $("#stay22-children"),
     stay22SearchStatus: $("#stay22-search-status"),
     stay22SearchResult: $("#stay22-search-result"),
+    stay22BrowseButton: $("#stay22-browse-button"),
     stay22MapButton: $("#stay22-map-button"),
     stay22MapPanel: $("#stay22-map-panel"),
     stay22MapClose: $("#stay22-map-close"),
@@ -367,6 +383,11 @@
     playerCard: document.querySelector(".player-card"),
     playerMinimize: $("#player-minimize"),
     playerRestore: $("#player-restore"),
+    radioSummaryName: $("#radio-summary-name"),
+    radioSummaryPlay: $("#radio-summary-play"),
+    radioExpand: $("#radio-expand"),
+    moreButton: $("#more-button"),
+    moreMenu: $("#more-menu"),
     // Novas funcionalidades
     favoriteBtn: $("#favorite-btn"),
     infoTimezone: $("#info-timezone"),
@@ -414,6 +435,8 @@
     videoChangeTimer: null,
     playbackSessionStarted: false,
     videoReadyTimer: null,
+    videoStatusTimer: null,
+    videoState: VIDEO_STATES.IDLE,
     toastTimer: null,
     radioRetryCount: 0,
     radioRetryTimer: null,
@@ -438,6 +461,8 @@
     sessionStartTime: Date.now(),
     totalTravelTime: 0,
     playerHidden: false,
+    radioExpanded: false,
+    videoRecoveryMode: false,
     // Volume knob drag state
     volumeKnob: {
       isDragging: false,
@@ -529,6 +554,11 @@
       .filter(([id, info]) => info.placement === "primary" && !["activities", "hotels", "cars"].includes(id))
       .map(([id]) => id));
   const SECONDARY_TRAVEL_CATEGORIES = Object.entries(TRAVEL_CATEGORIES).filter(([, info]) => info.placement === "secondary").map(([id]) => id);
+  const TRAVEL_ACTION_LABELS = {
+    hotels: "Find hotels",
+    activities: "Things to do",
+    cars: "Find a car"
+  };
 
   function affiliateContext(city, vertical, placement) {
     return affiliate.createContext(city, vertical, { placement, mode: state.currentMode });
@@ -547,7 +577,7 @@
     const providerLabel = entry.name || entry.provider;
     const label = options.minimal
       ? TRAVEL_CATEGORIES[entry.vertical]?.label || "Open"
-      : entry.label || `Explore ${TRAVEL_CATEGORIES[entry.vertical]?.label?.toLowerCase() || "options"}`;
+      : entry.label || TRAVEL_ACTION_LABELS[entry.vertical] || `Explore ${TRAVEL_CATEGORIES[entry.vertical]?.label?.toLowerCase() || "options"}`;
     const metadata = `data-affiliate-offer="true" data-travel-provider="${escapeHtml(entry.provider)}" data-travel-vertical="${escapeHtml(entry.vertical)}" data-travel-city="${escapeHtml(city.id)}" data-travel-city-name="${escapeHtml(city.name)}" data-travel-country="${escapeHtml(city.rawCountry || city.country)}" data-travel-country-code="${escapeHtml(city.countryCode || "")}" data-travel-placement="${escapeHtml(entry.placement || "travel_planner")}" data-travel-variant="${escapeHtml(entry.variant || "A")}" data-travel-provider-campaign="${escapeHtml(entry.tracking?.providerCampaign || "")}" data-travel-internal-campaign="${escapeHtml(entry.tracking?.internalCampaign || "")}"`;
     const compact = options.compact ? " is-compact" : "";
     return `<a class="travel-offer-action${compact}" href="${escapeHtml(entry.url)}" target="_blank" rel="sponsored noopener noreferrer" ${metadata}><span>${escapeHtml(label)}</span><small>${escapeHtml(providerLabel)}</small><b aria-hidden="true">↗</b></a>`;
@@ -591,8 +621,28 @@
       elements.stay22Tools.hidden = !hotelsEnabled;
       if (!hotelsEnabled) return;
 
+      const stayTitle = elements.stay22Tools.querySelector("#stay22-stay-title");
+      const stayDescription = elements.stay22Tools.querySelector(".stay22-tools-heading small");
+      if (stayTitle) stayTitle.textContent = `Stay in ${city.name}`;
+      if (stayDescription) stayDescription.textContent = "Find places to stay";
+
       const searchEnabled = stay22.isEnabled("searchbar");
       const mapEnabled = stay22.isEnabled("map");
+      const browseUrl = stay22.createRoamUrl(affiliateContext(city, "hotels", "travel_planner"));
+      elements.stay22BrowseButton.hidden = !browseUrl;
+      if (browseUrl) {
+        elements.stay22BrowseButton.href = browseUrl;
+        elements.stay22BrowseButton.dataset.affiliateOffer = "true";
+        elements.stay22BrowseButton.dataset.travelProvider = "stay22";
+        elements.stay22BrowseButton.dataset.travelVertical = "hotels";
+        elements.stay22BrowseButton.dataset.travelCityName = city.name;
+        elements.stay22BrowseButton.dataset.travelCountry = city.country;
+        elements.stay22BrowseButton.dataset.travelCountryCode = city.countryCode || "";
+        elements.stay22BrowseButton.dataset.travelPlacement = "travel_planner";
+        elements.stay22BrowseButton.dataset.travelProviderCampaign = new URL(browseUrl).searchParams.get("campaign") || "";
+      } else {
+        elements.stay22BrowseButton.removeAttribute("href");
+      }
       elements.stay22SearchForm.hidden = !searchEnabled;
       elements.stay22MapButton.hidden = !mapEnabled;
       elements.stay22SearchStatus.textContent = "";
@@ -612,7 +662,11 @@
     if (!elements.travelPlanner || !elements.travelPrimary || !elements.travelSecondary) return;
     if (elements.travelPlannerLocation) elements.travelPlannerLocation.textContent = `${city.name} · ${city.country}`;
     const offers = resolveTravelOffers(city);
-    const primary = PRIMARY_TRAVEL_CATEGORIES.map((category) => travelCategoryMarkup(category, offers[category], city)).filter(Boolean).join("");
+    // Hotels have one canonical section (the date search below), so avoid a
+    // second provider-card version of the same action.
+    const primary = PRIMARY_TRAVEL_CATEGORIES
+      .filter((category) => category !== "hotels")
+      .map((category) => travelCategoryMarkup(category, offers[category], city)).filter(Boolean).join("");
     const secondary = SECONDARY_TRAVEL_CATEGORIES.map((category) => travelCategoryMarkup(category, offers[category], city, { secondary: true, compact: true })).filter(Boolean).join("");
 
     elements.travelPrimary.innerHTML = primary;
@@ -685,9 +739,12 @@
           </div>`;
       }).join("");
 
+    const travel = travelRecommendationMarkup(city);
     return `<div class="map-popup">
       <div class="map-popup-title"><strong>${escapeHtml(city.name)}</strong><span>${escapeHtml(city.country)}</span></div>
-      <div class="map-popup-videos">${modeSections || "<p>No videos available.</p>"}${travelRecommendationMarkup(city)}</div>
+      <div class="map-popup-availability"><span>${availableModes(city).length ? "Available" : "No video yet"}</span></div>
+      <div class="map-popup-videos">${modeSections || "<p>No videos available.</p>"}</div>
+      ${travel ? `<details class="map-trip-plan"><summary>Plan this trip</summary>${travel.replace("<div class=\"map-travel\">", "<div class=\"map-travel map-travel-inside\">")}</details>` : ""}
     </div>`;
   }
 
@@ -802,12 +859,7 @@
       ? Math.max(0, Math.min(parsedVideoIndex, videos.length - 1))
       : 0;
     closeLayer(elements.mapModal);
-    selectCity(cityIndex, { silent: true });
-    state.currentMode = mode;
-    state.currentVideoIndex = selectedVideoIndex;
-    updateModeControls();
-    updateVideo(currentCity());
-    savePreferences({ currentMode: state.currentMode });
+    selectCity(cityIndex, { silent: true, mode, videoIndex: selectedVideoIndex });
   }
 
   // -----------------------------------------------------------------------------
@@ -945,7 +997,7 @@
                 resolveReady(readyPlayer);
               },
               onStateChange: (event) => {
-                if (event.data === window.YT?.PlayerState?.BUFFERING) showVideoLoading(true);
+                if (event.data === window.YT?.PlayerState?.BUFFERING) setVideoState(VIDEO_STATES.LOADING);
                 if (event.data === window.YT?.PlayerState?.PLAYING) markVideoReady();
               },
               onAutoplayBlocked: () => {
@@ -1060,15 +1112,41 @@
     youtubePlayerManager.command(method, args);
   }
 
-  function showVideoLoading(isLoading) {
+  function showVideoLoading(isLoading, message = "Loading video…") {
+    clearTimeout(state.videoStatusTimer);
     elements.videoLoading.classList.toggle("is-visible", isLoading);
     elements.videoLoading.setAttribute("aria-hidden", String(!isLoading));
+    if (isLoading) {
+      if (elements.videoLoadingMessage) elements.videoLoadingMessage.textContent = message;
+      state.videoStatusTimer = setTimeout(() => {
+        if (elements.videoLoading.classList.contains("is-visible")) {
+          if (elements.videoLoadingMessage) elements.videoLoadingMessage.textContent = "Still loading…";
+        }
+      }, 4500);
+    }
+  }
+
+  function setVideoState(nextState, message = "") {
+    state.videoState = nextState;
+    elements.videoShell.dataset.videoState = nextState.toLowerCase();
+    const loadingMessages = {
+      [VIDEO_STATES.LOADING]: "Loading video…",
+      [VIDEO_STATES.RETRYING]: "Trying another video…"
+    };
+    if (nextState === VIDEO_STATES.LOADING || nextState === VIDEO_STATES.RETRYING) {
+      showVideoLoading(true, message || loadingMessages[nextState]);
+    } else {
+      showVideoLoading(false);
+    }
+    if (message && elements.videoGateMessage && nextState !== VIDEO_STATES.PLAYING) {
+      elements.videoGateMessage.textContent = message;
+    }
   }
 
   function markVideoReady() {
     clearTimeout(state.videoReadyTimer);
     elements.videoShell.classList.add("is-ready");
-    showVideoLoading(false);
+    setVideoState(VIDEO_STATES.PLAYING);
     videoCommand("setPlaybackRate", [state.currentSpeed]);
     if (state.streetSoundOn && state.videoUserGesture) {
       videoCommand("unMute");
@@ -1080,7 +1158,23 @@
   }
 
   function startPlayback(options = {}) {
+    if (state.videoRecoveryMode) {
+      state.videoRecoveryMode = false;
+      const alternateMode = availableModes(currentCity()).find((mode) => mode !== state.currentMode);
+      if (alternateMode) switchMode(alternateMode);
+      else selectRandomCity();
+      return;
+    }
+    if (!currentRide()) {
+      selectRandomCity();
+      return;
+    }
     if (options.userGesture) state.videoUserGesture = true;
+    if (options.userGesture) {
+      try { localStorage.setItem(CONFIG.storageKeys.onboardingSeen, "true"); } catch (error) {
+        console.warn("[YouCity] Failed to save onboarding state:", error.message);
+      }
+    }
     if (state.playbackSessionStarted) {
       videoCommand("playVideo");
       return;
@@ -1113,14 +1207,18 @@
    */
   function updateVideo(city, options = {}) {
     const ride = currentRide(city);
+    renderVideoList(city);
     updateRideSourceLink(ride);
     if (!ride) {
       // Fallback: cidade sem vídeo disponível
+      setVideoState(VIDEO_STATES.UNAVAILABLE, `No ${MODE_LABELS[state.currentMode] || state.currentMode} video is currently available. Try another mode.`);
       elements.videoShell.classList.remove("is-ready");
       elements.videoGate.classList.add("is-hidden");
       elements.poster.style.backgroundImage = "";
       elements.videoGateTitle.textContent = city.name;
       elements.videoGateMode.textContent = MODE_LABELS[state.currentMode] || state.currentMode;
+      elements.videoGate.classList.remove("is-hidden");
+      elements.startVideo.textContent = "Try another city";
       showToast(MESSAGES.noVideo);
       return;
     }
@@ -1129,12 +1227,14 @@
     elements.poster.style.backgroundImage = `url("https://i.ytimg.com/vi/${ride.id}/maxresdefault.jpg"), url("https://i.ytimg.com/vi/${ride.id}/hqdefault.jpg")`;
     elements.videoGateTitle.textContent = city.name;
     elements.videoGateMode.textContent = MODE_LABELS[state.currentMode] || state.currentMode;
+    elements.startVideo.textContent = "▶ Start";
+    state.videoRecoveryMode = false;
 
     if (!state.playbackSessionStarted) {
+      setVideoState(VIDEO_STATES.IDLE, "Choose a mode and press play.");
       clearTimeout(state.videoChangeTimer);
       state.videoRequestId++;
       elements.videoShell.classList.remove("is-ready");
-      showVideoLoading(false);
       return;
     }
 
@@ -1147,7 +1247,7 @@
     const requestId = state.videoRequestId;
     state.currentVideoId = null;
     elements.videoShell.classList.remove("is-ready");
-    showVideoLoading(true);
+    setVideoState(options.loadingState || VIDEO_STATES.LOADING, options.loadingMessage || "Loading video…");
 
     const loadRide = async () => {
       if (requestId !== state.videoRequestId) return;
@@ -1158,7 +1258,10 @@
         state.videoReadyTimer = setTimeout(markVideoReady, CONFIG.VIDEO_READY_DELAY);
       } catch (error) {
         if (requestId !== state.videoRequestId) return;
-        showVideoLoading(false);
+        setVideoState(VIDEO_STATES.ERROR, "Unable to load this ride. Try another mode to continue.");
+        elements.videoGate.classList.remove("is-hidden");
+        state.videoRecoveryMode = true;
+        elements.startVideo.textContent = "Try another mode";
         showToast(MESSAGES.videoUnavailable);
         console.warn("[YouCity] YouTube player unavailable:", error.message);
       }
@@ -1173,6 +1276,22 @@
     }
   }
 
+  function renderVideoList(city = currentCity()) {
+    if (!elements.videoList || !elements.videoOptions) return;
+    const availableRideModes = MODE_ORDER.filter((mode) => city?.videos?.[mode]?.length);
+    const totalVideos = availableRideModes.reduce((total, mode) => total + city.videos[mode].length, 0);
+    elements.videoOptions.hidden = totalVideos < 2;
+    elements.videoList.innerHTML = availableRideModes.map((mode) => `
+      <section class="video-list-group" aria-labelledby="video-list-${mode}">
+        <strong id="video-list-${mode}">${escapeHtml(MODE_LABELS[mode] || mode)}</strong>
+        ${city.videos[mode].map((video, index) => `
+          <button type="button" class="video-list-item${mode === state.currentMode && index === state.currentVideoIndex ? " is-active" : ""}" data-video-mode="${escapeHtml(mode)}" data-video-index="${index}">
+            <span aria-hidden="true">▶</span>
+            <span>${escapeHtml(video.title || `${MODE_LABELS[mode]} ride ${index + 1}`)}</span>
+          </button>`).join("")}
+      </section>`).join("");
+  }
+
   /**
    * Trata erros de vídeo indisponível
    */
@@ -1182,8 +1301,8 @@
     
     // Tenta próximo vídeo do mesmo modo
     if (modeVideos && modeVideos.length > 1) {
-      modeVideos.shift(); // Remove vídeo com problema
-      updateVideo(city);
+      state.currentVideoIndex = (state.currentVideoIndex + 1) % modeVideos.length;
+      updateVideo(city, { loadingState: VIDEO_STATES.RETRYING, loadingMessage: "Trying another video…" });
       showToast(MESSAGES.videoFallback);
       return;
     }
@@ -1193,11 +1312,15 @@
       state.currentMode = fallbackMode;
       state.currentVideoIndex = 0;
       updateModeControls();
-      updateVideo(city);
+      updateVideo(city, { loadingState: VIDEO_STATES.RETRYING, loadingMessage: "Loading another video…" });
       showToast(MESSAGES.videoFallback);
       return;
     }
 
+    setVideoState(VIDEO_STATES.UNAVAILABLE, "No playable video found. Choose another mode to continue.");
+    state.videoRecoveryMode = true;
+    elements.videoGate.classList.remove("is-hidden");
+    elements.startVideo.textContent = "Try another mode";
     showToast(MESSAGES.videoUnavailable);
   }
 
@@ -1255,11 +1378,12 @@
     elements.modeButtons.forEach((button) => {
       const mode = button.dataset.mode;
       const available = currentCity().videos[mode]?.length > 0;
-      button.disabled = !available;
+      button.hidden = !available;
+      button.disabled = false;
       button.classList.toggle("is-active", mode === state.currentMode);
       button.title = available
         ? `${MODE_LABELS[mode]} in ${currentCity().name}`
-        : "This ride type is unavailable in this city";
+        : "";
     });
     elements.cityRegion.textContent = `${currentCity().region} · ${MODE_LABELS[state.currentMode]}`;
   }
@@ -1334,6 +1458,7 @@
       elements.radio.removeAttribute("src");
       elements.radio.load();
       elements.stationName.innerHTML = "NO SIGNAL<small> --</small>";
+      if (elements.radioSummaryName) elements.radioSummaryName.textContent = "No local radio";
       elements.lcdMeta.textContent = "-- · NO SIGNAL";
       elements.play.disabled = true;
       elements.stereoLed.classList.remove("is-active");
@@ -1347,6 +1472,7 @@
     
     const station = radios[state.radioIndex];
     elements.stationName.innerHTML = `${station.name}<small> FM</small>`;
+    if (elements.radioSummaryName) elements.radioSummaryName.textContent = station.name;
     elements.lcdMeta.textContent = `CH-${String(state.radioIndex + 1).padStart(2, "0")} · ${currentCity().name.toUpperCase().slice(0, 12)}`;
     elements.stereoLed.classList.add("is-active");
     elements.rdsLed.classList.toggle("is-active", station.name.length > 10);
@@ -1444,6 +1570,10 @@
     }
     
     elements.play.setAttribute("aria-label", playing ? "Pause radio" : "Play radio");
+    if (elements.radioSummaryPlay) {
+      elements.radioSummaryPlay.textContent = playing ? "❚❚" : "▶";
+      elements.radioSummaryPlay.setAttribute("aria-label", playing ? "Pause radio" : "Play radio");
+    }
     elements.equalizer.classList.toggle("is-playing", playing);
   }
 
@@ -1468,6 +1598,13 @@
       state.radioAutoplayPending = false;
       playRadioWithRetry();
     }
+  }
+
+  function toggleRadioExpanded(expanded = !state.radioExpanded) {
+    state.radioExpanded = expanded;
+    elements.playerCard.classList.toggle("is-expanded", expanded);
+    elements.radioExpand?.setAttribute("aria-expanded", String(expanded));
+    elements.radioExpand?.setAttribute("aria-label", expanded ? "Collapse radio controls" : "Expand radio controls");
   }
 
   // -----------------------------------------------------------------------------
@@ -1623,7 +1760,7 @@
    * @param {number} index - Índice da cidade
    */
   function trackVisit(index) {
-    state.visitedCities.add(cities[index].city);
+    state.visitedCities.add(cities[index].rawName || cities[index].id);
     saveStats();
   }
 
@@ -1894,8 +2031,10 @@
   function getShareData() {
     const city = currentCity();
     const countryName = COUNTRY_INFO[city.country]?.[0] || city.country;
-    const url = `${window.location.origin}${sitePath(`/city/${citySlug(city.rawName || city.name)}`)}`;
-    const text = `🌍 Exploring ${city.name}, ${countryName} on YouCity — an immersive urban ride with local radio`;
+    const params = new URLSearchParams({ mode: state.currentMode });
+    if (state.currentVideoIndex > 0) params.set("video", String(state.currentVideoIndex + 1));
+    const url = `${window.location.origin}${sitePath(`/city/${citySlug(city.rawName || city.name)}?${params.toString()}`)}`;
+    const text = `🌍 Exploring ${city.name} by ${MODE_LABELS[state.currentMode].toLowerCase()} on YouCity — an immersive urban ride with local radio`;
     const title = `YouCity — ${city.name}`;
     return { url, text, title };
   }
@@ -1958,40 +2097,53 @@
   }
 
   /**
-   * Carrega cidade da URL (com sanitização)
-   * @returns {number|null} Índice da cidade ou null
+   * Reads the canonical city, mode and ride index from the current URL.
    */
-  function loadCityFromURL() {
+  function loadRouteFromURL() {
     try {
       const params = new URLSearchParams(window.location.search);
       const pathWithoutBase = BASE_PATH && window.location.pathname.startsWith(BASE_PATH)
         ? window.location.pathname.slice(BASE_PATH.length) || "/"
         : window.location.pathname;
       const cityPath = pathWithoutBase.match(/^\/city\/([^/]+)(?:\.html)?\/?$/i)?.[1];
-      const cityName = params.get("city");
-
-      if (cityPath) {
-        const requestedSlug = citySlug(decodeURIComponent(cityPath));
-        const pathIndex = cities.findIndex((city) =>
-          citySlug(city.name) === requestedSlug || citySlug(city.rawName) === requestedSlug
-        );
-        if (pathIndex !== -1) return pathIndex;
-      }
-      
-      // CORREÇÃO: Sanitiza entrada para prevenir XSS
-      const sanitizedCityName = sanitizeInput(cityName);
-      
-      if (sanitizedCityName) {
-        const normalizedRequestedCity = normalizeSearch(sanitizedCityName);
-        const index = cities.findIndex((city) =>
-          [city.name, city.rawName].some((name) => normalizeSearch(name) === normalizedRequestedCity)
-        );
-        if (index !== -1) return index;
-      }
+      const requestedCity = cityPath ? decodeURIComponent(cityPath) : sanitizeInput(params.get("city"));
+      const requestedSlug = requestedCity ? citySlug(requestedCity) : "";
+      const cityIndex = requestedSlug
+        ? cities.findIndex((city) => citySlug(city.name) === requestedSlug || citySlug(city.rawName) === requestedSlug)
+        : null;
+      const mode = params.get("mode");
+      const video = Number.parseInt(params.get("video"), 10);
+      return {
+        cityIndex: cityIndex === -1 ? null : cityIndex,
+        mode: Object.values(CONFIG.modes).includes(mode) ? mode : null,
+        videoIndex: Number.isInteger(video) && video > 0 ? video - 1 : 0,
+        isDeepLink: Boolean(cityPath || params.get("city") || params.get("mode") || params.get("video"))
+      };
     } catch (error) {
-      console.warn("[YouCity] Could not load city from URL:", error.message);
+      console.warn("[YouCity] Could not parse route:", error.message);
+      return { cityIndex: null, mode: null, videoIndex: 0, isDeepLink: false };
     }
-    return null;
+  }
+
+  function syncURL({ replace = false } = {}) {
+    const city = currentCity();
+    if (!city) return;
+    const params = new URLSearchParams();
+    const modeVideos = city.videos[state.currentMode] || [];
+    if (modeVideos.length) params.set("mode", state.currentMode);
+    if (modeVideos.length > 1 && state.currentVideoIndex > 0) params.set("video", String(state.currentVideoIndex + 1));
+    const query = params.toString();
+    const url = `${sitePath(`/city/${citySlug(city.rawName || city.name)}`)}${query ? `?${query}` : ""}`;
+    const method = replace ? "replaceState" : "pushState";
+    window.history[method]({ city: city.id, mode: state.currentMode, video: state.currentVideoIndex }, "", url);
+  }
+
+  /**
+   * Carrega cidade da URL (com sanitização)
+   * @returns {number|null} Índice da cidade ou null
+   */
+  function loadCityFromURL() {
+    return loadRouteFromURL().cityIndex;
   }
 
   // -----------------------------------------------------------------------------
@@ -2078,7 +2230,7 @@
       return;
     }
     
-    elements.grid.innerHTML = matches.map(({ city, index }) => {
+    const renderCards = (entries) => entries.map(({ city, index }) => {
       const thumbnailRide = MODE_ORDER
         .map((mode) => city.videos[mode]?.[0])
         .find(Boolean);
@@ -2104,6 +2256,33 @@
           </span>
         </div>`;
     }).join("");
+
+    const shouldGroup = !normalized && state.currentFilter === CONFIG.filters.ALL && !state.currentContinent;
+    if (!shouldGroup) {
+      elements.grid.innerHTML = renderCards(matches);
+      return;
+    }
+
+    const featured = matches.filter(({ index }) => index === state.cityIndex || isFavorite(index)).slice(0, 4);
+    const recent = matches.filter(({ city }) => state.visitedCities.has(city.rawName)).slice(0, 4);
+    const used = new Set([...featured, ...recent].map(({ index }) => index));
+    const all = matches.filter(({ index }) => !used.has(index));
+    const section = (label, entries) => entries.length
+      ? `<section class="city-grid-section"><h3>${label}</h3><div class="city-grid-section-list">${renderCards(entries)}</div></section>`
+      : "";
+    const alphaGroups = new Map();
+    all.forEach((entry) => {
+      const letter = normalizeSearch(entry.city.name).charAt(0).toUpperCase() || "#";
+      if (!alphaGroups.has(letter)) alphaGroups.set(letter, []);
+      alphaGroups.get(letter).push(entry);
+    });
+    const allCities = all.length
+      ? `<section class="city-grid-section"><h3>All cities</h3>${[...alphaGroups.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([letter, entries]) => `<div class="city-alpha-group"><h4>${letter}</h4><div class="city-grid-section-list">${renderCards(entries)}</div></div>`)
+        .join("")}</section>`
+      : "";
+    elements.grid.innerHTML = `${section("Featured", featured)}${section("Recent", recent)}${allCities}`;
   }
 
   // -----------------------------------------------------------------------------
@@ -2125,8 +2304,9 @@
     
     // Cada cidade pode ter apenas alguns modos; preserve o atual quando
     // possível e selecione o primeiro modo realmente disponível caso contrário.
-    state.currentMode = firstAvailableMode(city);
-    state.currentVideoIndex = 0;
+    state.currentMode = firstAvailableMode(city, options.mode || state.currentMode);
+    state.currentVideoIndex = Number.isInteger(options.videoIndex) ? Math.max(0, options.videoIndex) : 0;
+    if (!city.videos[state.currentMode]?.[state.currentVideoIndex]) state.currentVideoIndex = 0;
     
     // Atualiza UI
     elements.cityName.textContent = city.name;
@@ -2149,6 +2329,7 @@
     updateCityInfo();
     renderTravelPlanner(city);
     trackVisit(state.cityIndex);
+    syncURL({ replace: options.replaceURL || false });
     
     // Salva preferência
     savePreferences({ cityIndex: state.cityIndex, currentMode: state.currentMode });
@@ -2179,6 +2360,7 @@
     updateModeControls();
     updateVideo(currentCity());
     savePreferences({ currentMode: state.currentMode });
+    syncURL();
     showToast(MESSAGES.modeSwitch(MODE_LABELS[mode], currentCity().name));
   }
 
@@ -2225,7 +2407,21 @@
    * @param {HTMLElement} layer - Elemento da camada
    */
   function openLayer(layer) {
-    previouslyFocusedElement = document.activeElement;
+    const layers = [elements.drawer, elements.travelDrawer, elements.about, elements.mapModal, elements.statsModal]
+      .filter(Boolean);
+    const activeElement = document.activeElement;
+    const activeInsideAnotherLayer = layers.some((other) => other !== layer && other.contains(activeElement));
+    layers.forEach((other) => {
+      if (other === layer || !other.classList.contains("is-open")) return;
+      other.classList.remove("is-open");
+      other.setAttribute("aria-hidden", "true");
+      if (other._focusTrapHandler) {
+        other.removeEventListener("keydown", other._focusTrapHandler);
+        delete other._focusTrapHandler;
+      }
+    });
+    previouslyFocusedElement = activeInsideAnotherLayer ? null : activeElement;
+    if (activeInsideAnotherLayer) activeElement.blur();
     layer.classList.add("is-open");
     layer.setAttribute("aria-hidden", "false");
     
@@ -2266,6 +2462,25 @@
       previouslyFocusedElement.focus();
       previouslyFocusedElement = null;
     }
+  }
+
+  function closeMoreMenu() {
+    elements.moreMenu?.classList.remove("is-open");
+    elements.moreButton?.setAttribute("aria-expanded", "false");
+  }
+
+  function runOverflowAction(action) {
+    closeMoreMenu();
+    const actions = {
+      share: shareCity,
+      map: () => { openLayer(elements.mapModal); initializeWorldMap(); },
+      theme: cycleTheme,
+      fullscreen: () => $("#fullscreen-button").click(),
+      about: () => openLayer(elements.about),
+      stats: () => { updateStats(); openLayer(elements.statsModal); },
+      random: selectRandomCity
+    };
+    actions[action]?.();
   }
 
   // -----------------------------------------------------------------------------
@@ -2406,13 +2621,25 @@
     renderRail();
     renderGrid();
     
-    // Seleciona cidade da URL ou uma cidade aleatória ao abrir o site
-    const cityFromURL = loadCityFromURL();
-    const initialCity = cityFromURL !== null 
-      ? cityFromURL 
+    // Seleciona a rota compartilhada ou uma cidade aleatória ao abrir o site.
+    const route = loadRouteFromURL();
+    const initialCity = route.cityIndex !== null
+      ? route.cityIndex
       : Math.floor(Math.random() * cities.length);
-    selectCity(initialCity, { silent: true, autoplayRadio: true });
-    startPlayback();
+    selectCity(initialCity, {
+      silent: true,
+      mode: route.mode || undefined,
+      videoIndex: route.videoIndex,
+      replaceURL: true
+    });
+
+    let onboardingSeen = false;
+    try { onboardingSeen = localStorage.getItem(CONFIG.storageKeys.onboardingSeen) === "true"; } catch (error) {
+      console.warn("[YouCity] Failed to read onboarding state:", error.message);
+    }
+    // Deep links prepare the selected ride but never autoplay it.
+    if (onboardingSeen && !route.isDeepLink) startPlayback();
+    else elements.videoGate.classList.remove("is-hidden");
     
     // Preview mode para QA
     const previewMode = new URLSearchParams(window.location.search).get("preview");
@@ -2451,6 +2678,19 @@
    * Configura todos os event listeners da aplicação
    */
   function setupEventListeners() {
+    elements.moreButton?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const isOpen = elements.moreMenu.classList.toggle("is-open");
+      elements.moreButton.setAttribute("aria-expanded", String(isOpen));
+    });
+    elements.moreMenu?.addEventListener("click", (event) => {
+      const action = event.target.closest("[data-overflow-action]")?.dataset.overflowAction;
+      if (action) runOverflowAction(action);
+    });
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".overflow-menu-wrapper")) closeMoreMenu();
+    });
+
     // Navegação de cidades
     $("#cities-button").addEventListener("click", () => {
       openLayer(elements.drawer);
@@ -2527,6 +2767,10 @@
       if (!elements.stay22SearchResult.href) return;
       trackTravelClick(elements.stay22SearchResult);
       event.stopPropagation();
+    });
+
+    elements.stay22BrowseButton.addEventListener("click", () => {
+      trackStay22Action("browse_open", { action: "browse" });
     });
 
     elements.stay22Checkin.addEventListener("change", () => {
@@ -2621,6 +2865,14 @@
     // Minimizar / Restaurar player
     elements.playerMinimize.addEventListener("click", () => togglePlayer(true));
     elements.playerRestore.addEventListener("click", () => togglePlayer(false));
+    elements.radioExpand?.addEventListener("click", () => toggleRadioExpanded());
+    elements.radioSummaryPlay?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleRadio();
+    });
+    $("#radio-summary")?.addEventListener("click", (event) => {
+      if (!event.target.closest("button")) toggleRadioExpanded();
+    });
     
     // Controles de rádio
     elements.play.addEventListener("click", toggleRadio);
@@ -2690,6 +2942,21 @@
     
     // A reprodução automática começa sem som; um clique libera também o áudio.
     elements.startVideo.addEventListener("click", () => startPlayback({ userGesture: true }));
+    elements.videoList?.addEventListener("click", (event) => {
+      const item = event.target.closest("[data-video-index]");
+      if (!item) return;
+      const selectedIndex = Number(item.dataset.videoIndex);
+      if (!Number.isInteger(selectedIndex)) return;
+      const selectedMode = item.dataset.videoMode || state.currentMode;
+      if (!currentCity().videos[selectedMode]?.[selectedIndex]) return;
+      state.currentMode = selectedMode;
+      state.currentVideoIndex = selectedIndex;
+      updateModeControls();
+      renderVideoList();
+      updateVideo(currentCity(), { immediate: state.playbackSessionStarted });
+      if (state.playbackSessionStarted) elements.videoGate.classList.add("is-hidden");
+      syncURL();
+    });
     
     // Radio errors share the same guarded retry scheduler as play() failures.
     elements.radio.addEventListener("error", handleRadioMediaError);
@@ -2768,6 +3035,17 @@
     elements.closeStatsButtons.forEach(btn => {
       btn.addEventListener("click", () => closeLayer(elements.statsModal));
     });
+
+    window.addEventListener("popstate", () => {
+      const nextRoute = loadRouteFromURL();
+      if (nextRoute.cityIndex === null) return;
+      selectCity(nextRoute.cityIndex, {
+        silent: true,
+        mode: nextRoute.mode || undefined,
+        videoIndex: nextRoute.videoIndex,
+        replaceURL: true
+      });
+    });
     
     // Atalhos de teclado
     document.addEventListener("keydown", (event) => {
@@ -2793,6 +3071,7 @@
           closeLayer(elements.mapModal);
           closeLayer(elements.statsModal);
           closeShareFan();
+          closeMoreMenu();
           break;
         case "m":
         case "M":
@@ -2851,8 +3130,21 @@
     
     // Área principal para swipe (exclui player e drawer)
     const swipeArea = elements.app;
+    const mobileHint = document.querySelector(".hint-mobile");
+    try {
+      if (localStorage.getItem(CONFIG.storageKeys.swipeHintSeen) === "true") mobileHint?.classList.add("is-hidden");
+    } catch (error) {
+      console.warn("[YouCity] Failed to read swipe hint state:", error.message);
+    }
+    const hideSwipeHint = () => {
+      mobileHint?.classList.add("is-hidden");
+      try { localStorage.setItem(CONFIG.storageKeys.swipeHintSeen, "true"); } catch (error) {
+        console.warn("[YouCity] Failed to save swipe hint state:", error.message);
+      }
+    };
     
     swipeArea.addEventListener("touchstart", (e) => {
+      hideSwipeHint();
       // Ignora se tocar em controles interativos
       if (e.target.closest(".player-card, .drawer, .about-modal, .map-modal, button, input, a")) {
         return;
@@ -2907,6 +3199,7 @@
         } else {
           selectCity(state.cityIndex - 1);
         }
+        hideSwipeHint();
       }
       
       touchState.startX = 0;

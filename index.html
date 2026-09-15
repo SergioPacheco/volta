@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -89,13 +89,23 @@
         <div class="video-gate-card">
           <span class="video-gate-kicker" id="video-gate-mode">DRIVE</span>
           <h2 id="video-gate-title">Explore the city</h2>
-          <p>Start the ride when you are ready.</p>
-          <button class="video-gate-button" id="start-video" type="button">Start exploring</button>
+          <p id="video-gate-message">Choose a mode and press play.</p>
+          <nav class="video-gate-mode-control" aria-label="Choose ride mode before starting">
+            <button type="button" data-mode="drive">Drive</button>
+            <button type="button" data-mode="bike">Bike</button>
+            <button type="button" data-mode="walk">Walk</button>
+            <button type="button" data-mode="drone">Drone</button>
+          </nav>
+          <button class="video-gate-button" id="start-video" type="button">▶ Start</button>
+          <details class="video-options" id="video-options">
+            <summary>Browse available rides</summary>
+            <div class="video-list" id="video-list" aria-label="Available rides"></div>
+          </details>
         </div>
       </section>
       <div class="video-loading" id="video-loading" role="status" aria-live="polite" aria-hidden="true">
         <span class="video-loading-dot" aria-hidden="true"></span>
-        Loading ride…
+        <span id="video-loading-message">Loading video…</span>
       </div>
 
       <header class="topbar">
@@ -108,11 +118,11 @@
         </button>
 
         <div class="top-actions">
-          <button class="icon-button" id="pip-button" type="button" aria-label="Picture-in-Picture" title="Picture-in-Picture (P)">
+          <button class="icon-button secondary-action" id="pip-button" type="button" aria-label="Picture-in-Picture" title="Picture-in-Picture (P)">
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><rect x="11" y="10" width="9" height="6" rx="1"/></svg>
           </button>
           <div class="share-fan-wrapper">
-          <button class="icon-button" id="share-button" type="button" aria-label="Share city" title="Share" aria-expanded="false" aria-haspopup="true">
+          <button class="icon-button" id="share-button" type="button" aria-label="Share this ride" title="Share this ride" aria-expanded="false" aria-haspopup="true">
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
             </button>
             <div class="share-fan" id="share-fan" role="menu" aria-label="Sharing options">
@@ -136,16 +146,16 @@
               </button>
             </div>
           </div>
-          <button class="icon-button" id="map-button" type="button" aria-label="Open world map" title="World map (M)">
+          <button class="icon-button secondary-action" id="map-button" type="button" aria-label="Open world map" title="World map (M)">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.2 2.4 3.3 5.4 3.3 9s-1.1 6.6-3.3 9c-2.2-2.4-3.3-5.4-3.3-9S9.8 5.4 12 3zM5.2 6.5c2 .9 4.3 1.3 6.8 1.3s4.8-.4 6.8-1.3M5.2 17.5c2-.9 4.3-1.3 6.8-1.3s4.8.4 6.8 1.3"></path></svg>
           </button>
-          <button class="icon-button" id="stats-button" type="button" aria-label="Statistics" title="Your statistics">
+          <button class="icon-button secondary-action" id="stats-button" type="button" aria-label="Statistics" title="Your statistics">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
           </button>
-          <button class="icon-button" id="theme-button" type="button" aria-label="Change theme" title="Change visual theme">
+          <button class="icon-button secondary-action" id="theme-button" type="button" aria-label="Change theme" title="Change visual theme">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           </button>
-          <button class="icon-button" id="fullscreen-button" type="button" aria-label="Fullscreen">
+          <button class="icon-button secondary-action" id="fullscreen-button" type="button" aria-label="Fullscreen">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path></svg>
           </button>
           <button class="menu-button travel-menu-button" id="travel-button" type="button" aria-label="Plan your trip" title="Plan your trip">
@@ -156,6 +166,20 @@
             <span>Explore cities</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
           </button>
+          <div class="overflow-menu-wrapper">
+            <button class="icon-button overflow-button" id="more-button" type="button" aria-label="More options" title="More options" aria-expanded="false" aria-controls="more-menu">
+              <span aria-hidden="true">⋯</span>
+            </button>
+            <div class="overflow-menu" id="more-menu" role="menu" aria-label="More options">
+              <button type="button" role="menuitem" data-overflow-action="share">Share</button>
+              <button type="button" role="menuitem" data-overflow-action="map">World map</button>
+              <button type="button" role="menuitem" data-overflow-action="theme">Theme</button>
+              <button type="button" role="menuitem" data-overflow-action="fullscreen">Fullscreen</button>
+              <button type="button" role="menuitem" data-overflow-action="about">About</button>
+              <button type="button" role="menuitem" data-overflow-action="stats">Statistics</button>
+              <button type="button" role="menuitem" data-overflow-action="random">Random city</button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -179,6 +203,12 @@
           <span class="info-item" id="info-timezone"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><b>--:--</b></span>
           <span class="info-item" id="info-population"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><b>--</b></span>
         </div>
+        <nav class="mobile-mode-control" aria-label="Choose ride mode">
+          <button type="button" data-mode="drive">Drive</button>
+          <button type="button" data-mode="bike">Bike</button>
+          <button type="button" data-mode="walk">Walk</button>
+          <button type="button" data-mode="drone">Drone</button>
+        </nav>
       </section>
 
       <aside class="rail" aria-label="City navigation">
@@ -222,6 +252,13 @@
             </div>
           </div>
         </div>
+
+        <div class="radio-summary" id="radio-summary">
+          <span aria-hidden="true">♫</span>
+          <strong id="radio-summary-name">Local radio</strong>
+          <button class="radio-summary-play" id="radio-summary-play" type="button" aria-label="Play radio">▶</button>
+          <button class="radio-expand" id="radio-expand" type="button" aria-expanded="false" aria-controls="radio-details" aria-label="Expand radio controls">⌃</button>
+        </div>
         
         <!-- Main section: volume + deck -->
         <div class="player-card-main">
@@ -233,7 +270,7 @@
           </div>
 
           <!-- Main deck -->
-          <div class="stereo-deck">
+          <div class="stereo-deck" id="radio-details">
           <!-- LCD screen -->
           <div class="lcd-screen">
             <div class="lcd-text">
@@ -334,7 +371,7 @@
             <div class="travel-planner-header">
               <div>
                 <span class="travel-planner-kicker">Plan your trip</span>
-                <h2 id="travel-planner-title">Travel options</h2>
+                <h2 id="travel-planner-title">Plan your trip</h2>
                 <p class="travel-planner-location" id="travel-planner-location"></p>
               </div>
               <div class="travel-planner-actions">
@@ -350,7 +387,7 @@
                 <span class="travel-category-icon" aria-hidden="true">🏨</span>
                 <div>
                   <strong id="stay22-stay-title">Stay in this city</strong>
-                  <small>Search dates or browse the accommodation map</small>
+                  <small>Find places to stay in this city</small>
                 </div>
               </div>
               <form class="stay22-search" id="stay22-search-form" novalidate>
@@ -370,7 +407,10 @@
                 <p class="stay22-search-status" id="stay22-search-status" role="status" aria-live="polite"></p>
                 <a class="stay22-search-result" id="stay22-search-result" target="_blank" rel="sponsored noopener noreferrer" hidden>Open stay search ↗</a>
               </form>
-              <button class="stay22-map-button" id="stay22-map-button" type="button">View stays on map</button>
+              <div class="stay22-quick-actions">
+                <a class="stay22-browse-button" id="stay22-browse-button" target="_blank" rel="sponsored noopener noreferrer" hidden>Find hotels ↗</a>
+                <button class="stay22-map-button" id="stay22-map-button" type="button">View on map</button>
+              </div>
               <section class="stay22-map-panel" id="stay22-map-panel" aria-labelledby="stay22-map-title" hidden>
                 <div class="stay22-map-header">
                   <h3 id="stay22-map-title">Stays nearby</h3>
