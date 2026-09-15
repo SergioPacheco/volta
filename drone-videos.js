@@ -1,7 +1,6 @@
-// Audited drone candidates from volta_drone_179_cidades.xlsx.
-// Only IDs with accessible YouTube metadata, a city match in the title, and no
-// explicit music marker are enabled. Unreviewed cities intentionally have no
-// Drone mode until a suitable video is validated.
+// Reviewed drone candidates from the original city audit and subsequent destination research.
+// Only IDs with accessible YouTube metadata and a destination match are enabled.
+// Unreviewed destinations intentionally have no Drone mode until a suitable video is validated.
 window.DRONE_CATALOG = {
   "Sao Paulo": [{ id: "H_JV9XnqAm4", start: 0, confidence: "A" }],
   "Abu Dhabi": [{ id: "_5CSitKheXQ", start: 0, confidence: "A" }],
@@ -62,5 +61,12 @@ window.DRONE_CATALOG = {
   "Tel Aviv": [{ id: "59aJswKv2DI", start: 0, confidence: "B" }],
   "Tokyo": [{ id: "X2aY-HgWjzg", start: 0, confidence: "A" }],
   "Toronto": [{ id: "znbYbNlymYs", start: 0, confidence: "A" }],
-  "Washington DC": [{ id: "qHCMjr-ezu4", start: 0, confidence: "A" }]
+  "Washington DC": [{ id: "qHCMjr-ezu4", start: 0, confidence: "A" }],
+  "Bali": [{ id: "Lm9ZxasfHh0", start: 0, confidence: "A" }],
+  "Lombok": [{ id: "gbAwtZBKLcg", start: 0, confidence: "A" }],
+  "Nusa Penida": [{ id: "8XG_ObGmgC0", start: 0, confidence: "B" }],
+  "Gili Islands": [{ id: "4TUGQD3BpN0", start: 0, confidence: "B" }],
+  "Komodo": [{ id: "cGb_Ydx37WE", start: 0, confidence: "A" }],
+  "Raja Ampat": [{ id: "p1xdVKuO1N8", start: 0, confidence: "A" }],
+  "Sumba": [{ id: "J1gz8EpZ5PY", start: 0, confidence: "A" }]
 };

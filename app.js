@@ -950,7 +950,7 @@
     if (!ride) {
       // Fallback: cidade sem vídeo disponível
       elements.videoShell.classList.remove("is-ready");
-      elements.videoGate.classList.remove("is-hidden");
+      elements.videoGate.classList.add("is-hidden");
       elements.poster.style.backgroundImage = "";
       elements.videoGateTitle.textContent = city.name;
       elements.videoGateMode.textContent = MODE_LABELS[state.currentMode] || state.currentMode;
@@ -992,10 +992,6 @@
       } catch (error) {
         if (requestId !== state.videoRequestId) return;
         showVideoLoading(false);
-        if (!youtubePlayerManager.isInitialized()) {
-          state.playbackSessionStarted = false;
-          elements.videoGate.classList.remove("is-hidden");
-        }
         showToast(MESSAGES.videoUnavailable);
         console.warn("[YouCity] YouTube player unavailable:", error.message);
       }
@@ -2183,6 +2179,7 @@
       ? cityFromURL 
       : Math.floor(Math.random() * cities.length);
     selectCity(initialCity, { silent: true, autoplayRadio: true });
+    startPlayback();
     
     // Preview mode para QA
     const previewMode = new URLSearchParams(window.location.search).get("preview");
