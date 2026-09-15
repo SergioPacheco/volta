@@ -80,7 +80,7 @@ window.YOUCITY_AFFILIATE_CONFIG = {
       map: true,
       cars: false,
       flights: false,
-      script: false
+      script: true
     }
   },
   providers: {
@@ -150,14 +150,14 @@ window.YOUCITY_AFFILIATE_CONFIG = {
         map: true,
         cars: false,
         flights: false,
-        script: false
+        script: true
       },
       roam: {
         forceProvider: null,
         excludeProviders: []
       },
       stay22Automation: {
-        scriptInstalled: false,
+        scriptInstalled: true,
         nova: "managed-by-stay22",
         spark: "managed-by-stay22",
         linkSwap: "managed-by-stay22"
@@ -167,8 +167,11 @@ window.YOUCITY_AFFILIATE_CONFIG = {
       status: {
         cars: "NEEDS_EXTERNAL_CONFIGURATION",
         flights: "NEEDS_EXTERNAL_CONFIGURATION",
-        script: "AWAITING_STAY22_SCRIPT",
-        retail: "UNKNOWN"
+        script: "READY",
+        nova: "READY_VIA_SCRIPT",
+        spark: "READY_VIA_SCRIPT",
+        linkSwap: "READY_VIA_SCRIPT",
+        retail: "ACCOUNT_NOT_ENABLED"
       }
     }
   },

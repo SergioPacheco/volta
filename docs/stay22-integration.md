@@ -16,12 +16,12 @@ feature needs them. No Stay22 city catalog is maintained.
 | Cars | NEEDS_EXTERNAL_CONFIGURATION | DiscoverCars remains the active car link |
 | Flights | NEEDS_EXTERNAL_CONFIGURATION | No documented origin/destination construction is used |
 | Roam experiments | READY | Validated `provider` and `excludeproviders`, opt-in only |
-| Stay22 Script | AWAITING_STAY22_SCRIPT | Domain-specific Hub snippet is not in the repository |
-| Nova | AWAITING_STAY22_SCRIPT | Managed by the official Stay22 Script |
-| Spark | AWAITING_STAY22_SCRIPT | Managed by the official Stay22 Script |
-| LinkSwap | AWAITING_STAY22_SCRIPT | Managed by the official Stay22 Script |
+| Stay22 Script | READY | Domain-specific Hub snippet is installed in `index.html` |
+| Nova | READY_VIA_SCRIPT | Managed by the official Stay22 Script |
+| Spark | READY_VIA_SCRIPT | Managed by the official Stay22 Script |
+| LinkSwap | READY_VIA_SCRIPT | Managed by the official Stay22 Script |
 | Connected Trips | SUPPORTED_AUTOMATICALLY | Session-based Stay22/Booking behavior |
-| Retail | UNKNOWN / ACCOUNT_CONTROLLED | Nova and account rollout determine eligibility |
+| Retail | ACCOUNT_NOT_ENABLED | Script is active, but the Retail confirmation is absent |
 | YouTube monetization | OUT_OF_SCOPE | Not implemented |
 
 ## URLs and campaign tracking
@@ -83,10 +83,10 @@ resolved when their own approved configuration is supplied.
 
 ## Script, Nova, Spark and LinkSwap
 
-The repository contains no Hub-generated Stay22 Script. `index.html` contains
-an `AWAITING_STAY22_SCRIPT` comment immediately before `</head>`; paste the
-exact unmodified snippet generated in Stay22 Hub → Script Builder for the
-YouCity domain there. Do not replace it with a guessed URL or snippet.
+The Hub-generated Stay22 Script is installed in `index.html` immediately before
+`</head>`. It must remain the exact unmodified snippet generated in Stay22 Hub
+→ Script Builder for the YouCity domain. Do not replace it with a guessed URL
+or snippet.
 
 Nova, Spark and LinkSwap are represented as `managed-by-stay22` metadata in
 `providers.stay22.stay22Automation`. They are not reimplemented by YouCity. Before enabling the
@@ -102,9 +102,9 @@ because it is not available as an Allez Generator product; any eligible session
 revenue is automatic.
 
 Retail is not added to the Travel Planner. It is account-controlled through
-Nova/Stay22 rollout. After installing the official script, verify the account
-state in DevTools → Console using Stay22’s own indication. Until then YouCity
-reports `UNKNOWN`, not an error and not an assumption that Retail is enabled.
+Nova/Stay22 rollout. The current production Console confirms the script is
+active but does not show Stay22’s Retail-enabled indication, so YouCity reports
+`ACCOUNT_NOT_ENABLED`. This is not treated as a YouCity error.
 
 ## Feature flags
 
@@ -118,7 +118,7 @@ Individual public flags live at `config.features.stay22`:
   map: true,
   cars: false,
   flights: false,
-  script: false
+  script: true
 }
 ```
 
@@ -141,9 +141,8 @@ conversion reporting. The official reporting contract is the protected
 
 ## External setup still required
 
-1. Generate the domain-specific Stay22 Script in Hub and paste it unmodified in
-   the marked location in `index.html`.
-2. Validate LinkSwap against the existing affiliate providers in staging.
+1. Validate LinkSwap against the existing affiliate providers in staging.
+2. Confirm Retail eligibility with Stay22 if the exact Console indication is absent.
 3. If Stay22 provides a documented Cars/Flights Generator contract suitable for
    this UI, add the approved construction details and enable those flags.
 4. If reporting is desired, configure the API key and reporting base URL only

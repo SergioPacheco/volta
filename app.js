@@ -522,7 +522,11 @@
 
   const affiliate = window.YouCityAffiliate;
   const TRAVEL_CATEGORIES = affiliate?.getVerticals?.() || {};
-  const PRIMARY_TRAVEL_CATEGORIES = Object.entries(TRAVEL_CATEGORIES).filter(([, info]) => info.placement === "primary").map(([id]) => id);
+  const PRIMARY_TRAVEL_CATEGORIES = ["activities", "hotels", "cars"]
+    .filter((id) => TRAVEL_CATEGORIES[id]?.placement === "primary")
+    .concat(Object.entries(TRAVEL_CATEGORIES)
+      .filter(([id, info]) => info.placement === "primary" && !["activities", "hotels", "cars"].includes(id))
+      .map(([id]) => id));
   const SECONDARY_TRAVEL_CATEGORIES = Object.entries(TRAVEL_CATEGORIES).filter(([, info]) => info.placement === "secondary").map(([id]) => id);
 
   function affiliateContext(city, vertical, placement) {

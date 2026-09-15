@@ -6,7 +6,8 @@ const { resolve } = require("node:path");
 const vm = require("node:vm");
 
 const ROOT_DIR = resolve(__dirname, "..");
-assert.match(readFileSync(resolve(ROOT_DIR, "index.html"), "utf8"), /AWAITING_STAY22_SCRIPT/, "missing Hub snippet must be documented");
+const indexHtml = readFileSync(resolve(ROOT_DIR, "index.html"), "utf8");
+assert.ok(/AWAITING_STAY22_SCRIPT/.test(indexHtml) || /https:\/\/scripts\.stay22\.com\/letmeallez\.js/.test(indexHtml), "Stay22 script must be installed or explicitly documented as pending");
 const catalog = require(resolve(ROOT_DIR, "data/discovercars-locations.json"));
 const context = vm.createContext({
   URL,
