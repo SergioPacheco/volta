@@ -10,6 +10,7 @@ feature needs them. No Stay22 city catalog is maintained.
 | Capability | Status | Implementation |
 | --- | --- | --- |
 | Hotels / Roam | READY | `/allez/roam` |
+| Vacation rentals | READY | `/allez/roam?provider=vrbo` |
 | Activities / GetYourGuide | READY | `/allez/getyourguide` |
 | Accommodation Search | READY | `/allez/searchbar` with validated dates |
 | Accommodation Map | READY | Lazy `/embed/gm` iframe, opened on demand |
@@ -38,8 +39,10 @@ https://www.stay22.com/embed/gm?aid=youcity&address=Tokyo%2C+Japan&campaign=yc_t
 Only campaign values are ASCII-normalized. The standard shape is
 `yc_<citySlug>_<countryCode>_<vertical>_<placement>`.
 
-Roam is the default for accommodation. `provider` is only emitted for a
-validated provider in the explicit configuration or an enabled experiment.
+Roam is the default for accommodation. Vacation rentals use the same
+Stay22 monetization path with the validated `vrbo` provider. `provider` is
+otherwise only emitted for a validated provider in the explicit configuration
+or an enabled experiment.
 The supported configuration shape is:
 
 ```js
@@ -57,8 +60,9 @@ switch must be enabled; the default is disabled.
 
 ## Search and map
 
-The Travel Planner keeps the regular “Hotels in <city>” Roam link and adds an
-optional accommodation search form. Search only produces a URL when both dates
+The Travel Planner keeps the regular “Hotels in <city>” Roam link, adds a
+separate vacation-rental link routed to VRBO, and adds an optional
+accommodation search form. Search only produces a URL when both dates
 are valid, are in `YYYY-MM-DD`, are not in the past, and checkout is after
 check-in. Adults and children are optional and are passed only when valid.
 

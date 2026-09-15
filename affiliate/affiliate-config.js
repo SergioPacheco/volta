@@ -139,7 +139,7 @@ window.YOUCITY_AFFILIATE_CONFIG = {
       enabled: true,
       configured: true,
       priority: 100,
-      verticals: ["hotels", "activities"],
+      verticals: ["hotels", "vacation-rentals", "activities"],
       aid: "youcity",
       // Public integration switches. Cars and flights stay off until their
       // documented Allez construction contract is confirmed for this UI.

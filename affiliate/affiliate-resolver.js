@@ -1,6 +1,7 @@
 (function initializeAffiliateResolver(global) {
   const verticals = {
     hotels: { label: "Stay", icon: "🛏", description: "Hotels and stays", placement: "primary" },
+    "vacation-rentals": { label: "Vacation rentals", icon: "⌂", description: "Homes, apartments & short stays", placement: "primary" },
     flights: { label: "Get there", icon: "✈", description: "Compare flights", placement: "secondary" },
     cars: { label: "Get around", icon: "🚗", description: "Car rentals", placement: "primary" },
     activities: { label: "Things to do", icon: "🎟", description: "Tours, attractions & experiences", placement: "primary" },

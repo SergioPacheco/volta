@@ -5,7 +5,12 @@
   };
   const SEARCHBAR_ENDPOINT = "https://www.stay22.com/allez/searchbar";
   const MAP_ENDPOINT = "https://www.stay22.com/embed/gm";
-  const VERTICALS = Object.keys(ENDPOINTS);
+  const VERTICAL_ENDPOINTS = {
+    hotels: "hotels",
+    "vacation-rentals": "hotels",
+    activities: "activities"
+  };
+  const VERTICALS = Object.keys(VERTICAL_ENDPOINTS);
   const ROAM_PROVIDERS = new Set(["booking", "expedia", "hotelscom", "vrbo", "agoda", "kayak"]);
 
   function providerConfig() {
@@ -30,7 +35,7 @@
   }
 
   function supports(city, vertical) {
-    return isEnabled(vertical)
+    return isEnabled(vertical === "vacation-rentals" ? "hotels" : vertical)
       && VERTICALS.includes(vertical)
       && Boolean(city?.name)
       && Boolean(city?.country);
@@ -57,6 +62,10 @@
     const roam = config.roam || {};
     let forceProvider = validProvider(roam.forceProvider) ? roam.forceProvider : null;
     let variant = "stay22_roam";
+    if (!forceProvider && context?.vertical === "vacation-rentals") {
+      forceProvider = "vrbo";
+      variant = "stay22_vrbo";
+    }
     const experimentRouting = global.YouCityAffiliateExperiments?.getStay22Routing?.(context);
     if (!forceProvider && validProvider(experimentRouting?.forceProvider)) {
       forceProvider = experimentRouting.forceProvider;
@@ -71,7 +80,8 @@
     if (!supports(context?.city, context?.vertical)) return "";
     const config = providerConfig();
     if (!config.aid) return "";
-    const url = new URL(ENDPOINTS[context.vertical]);
+    const endpoint = VERTICAL_ENDPOINTS[context.vertical];
+    const url = new URL(ENDPOINTS[endpoint]);
     url.searchParams.set("aid", config.aid);
     url.searchParams.set("address", `${context.city.name}, ${context.city.country}`);
     const routing = routingOptions(context);
@@ -159,7 +169,9 @@
         tracking: { providerCampaign: createCampaign(context) },
         label: context.vertical === "activities"
           ? `Things to do in ${context.city.name}`
-          : `Hotels in ${context.city.name}`
+          : context.vertical === "vacation-rentals"
+            ? `Vacation rentals in ${context.city.name}`
+            : `Hotels in ${context.city.name}`
       };
     }
   };

@@ -60,13 +60,15 @@ invented by the application.
 
 ## Stay22
 
-Stay22 is registered for the `hotels` and `activities` verticals with public
-AID `youcity`. Hotels use `/allez/roam` by default and activities use
-`/allez/getyourguide`. The provider builds links dynamically from city data;
-there is no Stay22 destination catalog.
+Stay22 is registered for the `hotels`, `vacation-rentals` and `activities`
+verticals with public AID `youcity`. Hotels and vacation rentals use
+`/allez/roam` (vacation rentals force the validated `vrbo` route), while
+activities use `/allez/getyourguide`. The provider builds links dynamically
+from city data; there is no Stay22 destination catalog.
 
 The same provider module exposes the documented accommodation Searchbar URL
-(`/allez/searchbar`) and Map URL (`/embed/gm`) for the Travel Planner. Search
+(`/allez/searchbar`) and Map URL (`/embed/gm`) for the Travel Planner. The
+planner also exposes a separate vacation-rental link routed to VRBO. Search
 dates are validated before URL generation, and the Map iframe is lazy and
 on-demand. Campaigns use
 `yc_{citySlug}_{countryCode}_{vertical}_{placement}` while addresses retain
@@ -98,6 +100,7 @@ Current provider declarations:
 | Vertical | Providers |
 | --- | --- |
 | hotels | Stay22, Expedia, Booking.com, Travelpayouts |
+| vacation-rentals | Stay22 / VRBO |
 | flights | Expedia, Travelpayouts |
 | cars | DiscoverCars |
 | activities | Stay22 / GetYourGuide, Expedia, Viator |

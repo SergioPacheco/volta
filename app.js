@@ -348,6 +348,7 @@
     stay22SearchStatus: $("#stay22-search-status"),
     stay22SearchResult: $("#stay22-search-result"),
     stay22BrowseButton: $("#stay22-browse-button"),
+    stay22RentalsButton: $("#stay22-rentals-button"),
     stay22MapButton: $("#stay22-map-button"),
     stay22MapPanel: $("#stay22-map-panel"),
     stay22MapClose: $("#stay22-map-close"),
@@ -556,6 +557,7 @@
   const SECONDARY_TRAVEL_CATEGORIES = Object.entries(TRAVEL_CATEGORIES).filter(([, info]) => info.placement === "secondary").map(([id]) => id);
   const TRAVEL_ACTION_LABELS = {
     hotels: "Find hotels",
+    "vacation-rentals": "Find vacation rentals",
     activities: "Things to do",
     cars: "Find a car"
   };
@@ -629,6 +631,7 @@
       const searchEnabled = stay22.isEnabled("searchbar");
       const mapEnabled = stay22.isEnabled("map");
       const browseUrl = stay22.createRoamUrl(affiliateContext(city, "hotels", "travel_planner"));
+      const rentalsUrl = stay22.createRoamUrl(affiliateContext(city, "vacation-rentals", "travel_planner"));
       elements.stay22BrowseButton.hidden = !browseUrl;
       if (browseUrl) {
         elements.stay22BrowseButton.href = browseUrl;
@@ -642,6 +645,20 @@
         elements.stay22BrowseButton.dataset.travelProviderCampaign = new URL(browseUrl).searchParams.get("campaign") || "";
       } else {
         elements.stay22BrowseButton.removeAttribute("href");
+      }
+      elements.stay22RentalsButton.hidden = !rentalsUrl;
+      if (rentalsUrl) {
+        elements.stay22RentalsButton.href = rentalsUrl;
+        elements.stay22RentalsButton.dataset.affiliateOffer = "true";
+        elements.stay22RentalsButton.dataset.travelProvider = "stay22";
+        elements.stay22RentalsButton.dataset.travelVertical = "vacation-rentals";
+        elements.stay22RentalsButton.dataset.travelCityName = city.name;
+        elements.stay22RentalsButton.dataset.travelCountry = city.country;
+        elements.stay22RentalsButton.dataset.travelCountryCode = city.countryCode || "";
+        elements.stay22RentalsButton.dataset.travelPlacement = "travel_planner";
+        elements.stay22RentalsButton.dataset.travelProviderCampaign = new URL(rentalsUrl).searchParams.get("campaign") || "";
+      } else {
+        elements.stay22RentalsButton.removeAttribute("href");
       }
       elements.stay22SearchForm.hidden = !searchEnabled;
       elements.stay22MapButton.hidden = !mapEnabled;
@@ -662,10 +679,7 @@
     if (!elements.travelPlanner || !elements.travelPrimary || !elements.travelSecondary) return;
     if (elements.travelPlannerLocation) elements.travelPlannerLocation.textContent = `${city.name} · ${city.country}`;
     const offers = resolveTravelOffers(city);
-    // Hotels have one canonical section (the date search below), so avoid a
-    // second provider-card version of the same action.
     const primary = PRIMARY_TRAVEL_CATEGORIES
-      .filter((category) => category !== "hotels")
       .map((category) => travelCategoryMarkup(category, offers[category], city)).filter(Boolean).join("");
     const secondary = SECONDARY_TRAVEL_CATEGORIES.map((category) => travelCategoryMarkup(category, offers[category], city, { secondary: true, compact: true })).filter(Boolean).join("");
 

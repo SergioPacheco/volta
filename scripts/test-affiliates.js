@@ -96,6 +96,14 @@ assert.equal(granadaUrl.searchParams.get("aid"), "youcity");
 assert.equal(granadaUrl.searchParams.get("address"), "Granada, Spain");
 assert.equal(granadaUrl.searchParams.get("campaign"), "yc_granada_es_hotels_travelplanner");
 
+const vacationRentalOffer = affiliate.getAffiliateOffers(affiliate.createContext(granadaCity, "vacation-rentals"))[0];
+assert.ok(vacationRentalOffer, "Stay22 should resolve vacation rentals");
+const vacationRentalUrl = new URL(vacationRentalOffer.url);
+assert.equal(vacationRentalUrl.pathname, "/allez/roam");
+assert.equal(vacationRentalUrl.searchParams.get("provider"), "vrbo");
+assert.equal(vacationRentalOffer.variant, "stay22_vrbo");
+assert.equal(vacationRentalOffer.label, "Vacation rentals in Granada");
+
 for (const [city, address, campaign] of [
   [saoPauloCity, "São Paulo, Brazil", "yc_sao-paulo_br_hotels_travelplanner"],
   [tokyoCity, "Tokyo, Japan", "yc_tokyo_jp_hotels_travelplanner"],
