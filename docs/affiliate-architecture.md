@@ -60,12 +60,20 @@ invented by the application.
 
 ## Stay22
 
-Stay22 is registered for the `hotels` vertical with public AID `youcity`.
-Its provider builds the Stay22 Allez URL dynamically from `city.name` and
-`city.country`; there is no Stay22 destination catalog. The generated link
-also receives a campaign in the form `yc_{citySlug}_{countryCode}_{vertical}`.
-The address retains accents and is encoded by `URLSearchParams`; only the
-campaign uses the shared normalized slug helper.
+Stay22 is registered for the `hotels` and `activities` verticals with public
+AID `youcity`. It uses GetYourGuide for activities. The provider builds the
+Stay22 Allez URL dynamically from `city.name` and `city.country`; there is no
+Stay22 destination catalog.
+
+The endpoints are:
+
+- `hotels` → `https://www.stay22.com/allez/roam`
+- `activities` → `https://www.stay22.com/allez/getyourguide`
+
+Each generated link receives a campaign in the form
+`yc_{citySlug}_{countryCode}_{vertical}`. The address retains accents and is
+encoded by `URLSearchParams`; only the campaign uses the shared normalized slug
+helper.
 
 Stay22 can be toggled with `features.providers.stay22` or
 `providers.stay22.enabled`, and its order is controlled by
@@ -87,7 +95,7 @@ Current provider declarations:
 | hotels | Stay22, Expedia, Booking.com, Travelpayouts |
 | flights | Expedia, Travelpayouts |
 | cars | DiscoverCars |
-| activities | Expedia, Viator |
+| activities | Stay22 / GetYourGuide, Expedia, Viator |
 | esim | Airalo |
 | insurance | Heymondo |
 

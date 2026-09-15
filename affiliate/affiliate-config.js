@@ -130,7 +130,7 @@ window.YOUCITY_AFFILIATE_CONFIG = {
       enabled: true,
       configured: true,
       priority: 100,
-      verticals: ["hotels"],
+      verticals: ["hotels", "activities"],
       aid: "youcity"
     }
   },

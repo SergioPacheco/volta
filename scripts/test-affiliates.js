@@ -80,7 +80,7 @@ assert.equal(expediaOffer.url, "https://approved.example/hotels/sao-paulo");
 config.providers.expedia.configured = false;
 delete config.providers.expedia.urlTemplate;
 assert.equal(affiliate.getAffiliateOffers(affiliate.createContext(unavailableCity, "cars")).length, 0, "unavailable catalog city must be hidden");
-assert.equal(affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "activities")).length, 0, "incompatible vertical must be hidden");
+assert.ok(affiliate.getAffiliateOffers(affiliate.createContext(availableCity, "activities")).some((offer) => offer.provider === "stay22"), "Stay22 should appear for activities");
 
 function stay22Offer(city, vertical = "hotels") {
   return affiliate.getAffiliateOffers(affiliate.createContext(city, vertical)).find((offer) => offer.provider === "stay22");
@@ -107,17 +107,40 @@ for (const [city, address, campaign] of [
   assert.equal(url.searchParams.get("campaign"), campaign);
 }
 
+for (const [city, address, campaign] of [
+  [granadaCity, "Granada, Spain", "yc_granada_es_activities"],
+  [barcelonaCity, "Barcelona, Spain", "yc_barcelona_es_activities"],
+  [romeCity, "Rome, Italy", "yc_rome_it_activities"],
+  [tokyoCity, "Tokyo, Japan", "yc_tokyo_jp_activities"],
+  [saoPauloCity, "São Paulo, Brazil", "yc_sao-paulo_br_activities"],
+  [{ name: "Málaga", country: "Spain", countryCode: "ES" }, "Málaga, Spain", "yc_malaga_es_activities"],
+  [{ name: "Córdoba", country: "Spain", countryCode: "ES" }, "Córdoba, Spain", "yc_cordoba_es_activities"],
+  [{ name: "Québec", country: "Canada", countryCode: "CA" }, "Québec, Canada", "yc_quebec_ca_activities"],
+  [{ name: "Kraków", country: "Poland", countryCode: "PL" }, "Kraków, Poland", "yc_krakow_pl_activities"],
+  [{ name: "Zürich", country: "Switzerland", countryCode: "CH" }, "Zürich, Switzerland", "yc_zurich_ch_activities"]
+]) {
+  const offer = stay22Offer(city, "activities");
+  assert.ok(offer, `Stay22 activities should resolve for ${city.name}`);
+  const url = new URL(offer.url);
+  assert.equal(url.origin + url.pathname, "https://www.stay22.com/allez/getyourguide");
+  assert.equal(url.searchParams.get("aid"), "youcity");
+  assert.equal(url.searchParams.get("address"), address, `${city.name} activities address should preserve accents`);
+  assert.equal(url.searchParams.get("campaign"), campaign);
+  assert.equal(offer.label, `Things to do in ${city.name}`);
+}
+
 config.providers.stay22.enabled = false;
 assert.equal(stay22Offer(granadaCity), undefined, "disabled Stay22 should be hidden");
 config.providers.stay22.enabled = true;
 config.providers.stay22.configured = false;
 assert.equal(stay22Offer(granadaCity), undefined, "unconfigured Stay22 should not produce an offer");
 config.providers.stay22.configured = true;
-for (const vertical of ["cars", "flights", "activities", "insurance", "esim"]) {
+for (const vertical of ["cars", "flights", "insurance", "esim"]) {
   assert.equal(stay22Offer(granadaCity, vertical), undefined, `Stay22 should not appear in ${vertical}`);
 }
 assert.equal(affiliate.getAffiliateOffers(affiliate.createContext({ name: "Granada" }, "hotels")).length, 0, "city without country should be unavailable");
 assert.equal(affiliate.getAffiliateOffers(affiliate.createContext({ country: "Spain" }, "hotels")).length, 0, "city without name should be unavailable");
+assert.ok(affiliate.getProvider("viator"), "Viator should remain registered");
 
 ["test-expedia", "test-booking", "test-travelpayouts"].forEach((providerId, index) => {
   config.providers[providerId] = { enabled: true, configured: true, priority: index + 1 };
@@ -137,7 +160,7 @@ const tracked = [];
 context.window.YOUCITY_ANALYTICS = { track(payload) { tracked.push(payload); } };
 const element = { dataset: {
   travelProvider: "stay22",
-  travelVertical: "hotels",
+  travelVertical: "activities",
   travelCityName: "Sao Paulo",
   travelCountry: "Brazil",
   travelPlacement: "travel_planner",
@@ -146,6 +169,8 @@ const element = { dataset: {
 context.window.YouCityAffiliateTracking.trackImpression(element);
 context.window.YouCityAffiliateTracking.trackClick(element);
 assert.equal(JSON.stringify(tracked.map((payload) => payload.event)), JSON.stringify(["affiliate_impression", "affiliate_click"]), "impression and click events should be emitted");
+assert.equal(tracked[1].provider, "stay22");
+assert.equal(tracked[1].vertical, "activities");
 
 context.window.YOUCITY_ANALYTICS = { track() { throw new Error("analytics down"); } };
 assert.doesNotThrow(() => context.window.YouCityAffiliateTracking.trackClick(element), "analytics failure must not block navigation");

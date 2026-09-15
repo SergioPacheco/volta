@@ -3,7 +3,7 @@
     hotels: { label: "Stay", icon: "🛏", description: "Hotels and stays", placement: "primary" },
     flights: { label: "Get there", icon: "✈", description: "Compare flights", placement: "secondary" },
     cars: { label: "Get around", icon: "🚗", description: "Car rentals", placement: "primary" },
-    activities: { label: "Explore", icon: "🎟", description: "Tours & experiences", placement: "primary" },
+    activities: { label: "Things to do", icon: "🎟", description: "Tours, attractions & experiences", placement: "primary" },
     esim: { label: "Stay connected", icon: "📱", description: "eSIM and internet", placement: "primary" },
     insurance: { label: "Essentials", icon: "🛡", description: "Travel insurance", placement: "secondary" },
     transfers: { label: "Transfers", icon: "↔", description: "Airport and city transfers", placement: "secondary" },

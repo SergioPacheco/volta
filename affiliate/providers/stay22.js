@@ -1,5 +1,9 @@
 (function registerStay22(global) {
-  const ENDPOINT = "https://www.stay22.com/allez/roam";
+  const ENDPOINTS = {
+    hotels: "https://www.stay22.com/allez/roam",
+    activities: "https://www.stay22.com/allez/getyourguide"
+  };
+  const VERTICALS = Object.keys(ENDPOINTS);
 
   function providerConfig() {
     return global.YouCityAffiliate.getProviderConfig("stay22");
@@ -16,7 +20,7 @@
 
   function supports(city, vertical) {
     return isEnabled()
-      && vertical === "hotels"
+      && VERTICALS.includes(vertical)
       && Boolean(city?.name)
       && Boolean(city?.country);
   }
@@ -30,13 +34,14 @@
   const provider = {
     id: "stay22",
     name: "Stay22",
-    verticals: ["hotels"],
+    verticals: VERTICALS,
     supports,
     createUrl(context) {
       if (!supports(context?.city, context?.vertical)) return "";
       const config = providerConfig();
-      if (!config.aid) return "";
-      const url = new URL(ENDPOINT);
+      const endpoint = ENDPOINTS[context.vertical];
+      if (!config.aid || !endpoint) return "";
+      const url = new URL(endpoint);
       url.searchParams.set("aid", config.aid);
       url.searchParams.set("address", `${context.city.name}, ${context.city.country}`);
       url.searchParams.set("campaign", createCampaign(context));
@@ -47,10 +52,12 @@
       if (!url) return null;
       return {
         provider: "stay22",
-        vertical: "hotels",
+        vertical: context.vertical,
         url,
         available: true,
-        label: `Hotels in ${context.city.name}`
+        label: context.vertical === "activities"
+          ? `Things to do in ${context.city.name}`
+          : `Hotels in ${context.city.name}`
       };
     }
   };
