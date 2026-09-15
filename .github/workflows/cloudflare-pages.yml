@@ -1,0 +1,45 @@
+name: Deploy YouCity to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Build site
+        env:
+          SEO_SITE_URL: https://youcity.app
+        run: node scripts/build-static.js
+
+      - name: Validate SEO
+        env:
+          SEO_SITE_URL: https://youcity.app
+        run: node scripts/seo-check.js
+
+      - name: Validate Drone catalog
+        run: node scripts/validate-drone-catalog.js
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=youcity --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
