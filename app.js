@@ -276,7 +276,12 @@
   // -----------------------------------------------------------------------------
   // City catalog processing
   // -----------------------------------------------------------------------------
-  const cities = (window.CITY_CATALOG || []).map((item) => {
+  const cityCatalog = [
+    ...(window.CITY_CATALOG || []),
+    ...(window.CITY_EXTRA_CATALOG || [])
+  ];
+
+  const cities = cityCatalog.map((item) => {
     const [country, region, countryTimeZone] = COUNTRY_INFO[item.country] || [item.country, "World", "UTC"];
     return {
       ...item,
@@ -297,7 +302,7 @@
       radios: [
         ...(window.RADIO_CATALOG?.[item.name] || []),
         ...(window.RADIO_EXTRA_CATALOG?.[item.name] || []),
-        ...item.radios
+        ...(item.radios || [])
       ]
         .filter((radio, index, radios) => radios.findIndex((candidate) => candidate.url === radio.url) === index)
         .slice(0, 5)
@@ -397,6 +402,7 @@
     radioIndex: 0,
     radioPlaying: false,
     radioWantsPlay: false,
+    radioAutoplayPending: false,
     streetSoundOn: false,
     currentSpeed: 1,
     currentMode: CONFIG.modes.DRIVE,
@@ -1172,15 +1178,32 @@
     elements.radio.play()
       .then(() => {
         if (requestId !== state.radioRequestId) return;
+        state.radioAutoplayPending = false;
         setPlayingState(true);
         state.radioRetryCount = 0;
       })
       .catch((error) => {
         if (requestId !== state.radioRequestId || !state.radioWantsPlay) return;
+
+        // Browsers commonly block audible autoplay until the first user gesture.
+        // Keep the selected station ready and resume it from that gesture instead
+        // of treating the policy rejection as a broken stream.
+        if (error.name === "NotAllowedError") {
+          state.radioAutoplayPending = true;
+          setPlayingState(false);
+          return;
+        }
+
         console.warn("[YouCity] Failed to play radio:", error.message);
         setPlayingState(false);
         scheduleRadioRetry();
       });
+  }
+
+  function resumeRadioAfterUserGesture() {
+    if (!state.radioAutoplayPending || !state.radioWantsPlay) return;
+    state.radioAutoplayPending = false;
+    playRadioWithRetry();
   }
 
   /**
@@ -1210,6 +1233,12 @@
     }
     
     if (state.radioPlaying || state.radioWantsPlay) {
+      if (state.radioAutoplayPending) {
+        state.radioAutoplayPending = false;
+        playRadioWithRetry();
+        return;
+      }
+
       state.radioWantsPlay = false;
       clearRadioRetryTimer();
       state.radioRequestId++;
@@ -1888,7 +1917,7 @@
     updateModeControls();
     updateVideo(city);
     scheduleClockUpdate();
-    setRadio(0, state.radioPlaying || options.autoplayRadio);
+    setRadio(0, state.radioPlaying || state.radioWantsPlay || options.autoplayRadio);
     renderRail();
     renderGrid(elements.search.value);
     
@@ -2158,7 +2187,7 @@
     const initialCity = cityFromURL !== null 
       ? cityFromURL 
       : Math.floor(Math.random() * cities.length);
-    selectCity(initialCity, { silent: true });
+    selectCity(initialCity, { silent: true, autoplayRadio: true });
     
     // Preview mode para QA
     const previewMode = new URLSearchParams(window.location.search).get("preview");
@@ -2294,6 +2323,8 @@
     elements.play.addEventListener("click", toggleRadio);
     $("#radio-previous").addEventListener("click", () => setRadio(state.radioIndex - 1, true));
     $("#radio-next").addEventListener("click", () => setRadio(state.radioIndex + 1, true));
+    document.addEventListener("pointerdown", resumeRadioAfterUserGesture, { passive: true });
+    document.addEventListener("keydown", resumeRadioAfterUserGesture, { passive: true });
     
     // Modos de passeio
     elements.modeButtons.forEach((button) => {

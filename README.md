@@ -2,7 +2,7 @@
 
 Fully static immersive urban rides with local radio. There is no database, backend, login, or data collection.
 
-The catalog currently includes 179 cities: all have `Drive`, `Bike`, `Walk`, and `Drone` options. Ride modes are enabled according to each city's availability. The world map uses static city-center coordinates and links to the catalog's YouTube videos.
+The catalog currently includes 187 cities: all have `Drive`, `Bike`, `Walk`, and `Drone` options. Ride modes are enabled according to each city's availability. The world map uses static city-center coordinates and links to the catalog's YouTube videos.
 
 ## Run locally
 

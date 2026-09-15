@@ -47,7 +47,11 @@ function allHtmlFiles(directory, prefix = "") {
 function expectedCities() {
   const context = { window: {} };
   runInNewContext(readFileSync(resolve(ROOT_DIR, "cities-data.js"), "utf8"), context);
-  return context.window.CITY_CATALOG || [];
+  runInNewContext(readFileSync(resolve(ROOT_DIR, "spain-video-catalog.js"), "utf8"), context);
+  return [
+    ...(context.window.CITY_CATALOG || []),
+    ...(context.window.CITY_EXTRA_CATALOG || [])
+  ];
 }
 
 function checkRequiredFiles() {
