@@ -1,5 +1,6 @@
 // Reviewed drone candidates from the original city audit and subsequent destination research.
-// Only IDs with accessible YouTube metadata and a destination match are enabled.
+// Only IDs with accessible YouTube metadata and a clear destination match are enabled.
+// New candidates were checked against YouTube oEmbed metadata before being added.
 // Unreviewed destinations intentionally have no Drone mode until a suitable video is validated.
 window.DRONE_CATALOG = {
   "Sao Paulo": [{ id: "H_JV9XnqAm4", start: 0, confidence: "A" }],
@@ -68,5 +69,29 @@ window.DRONE_CATALOG = {
   "Gili Islands": [{ id: "4TUGQD3BpN0", start: 0, confidence: "B" }],
   "Komodo": [{ id: "cGb_Ydx37WE", start: 0, confidence: "A" }],
   "Raja Ampat": [{ id: "p1xdVKuO1N8", start: 0, confidence: "A" }],
-  "Sumba": [{ id: "J1gz8EpZ5PY", start: 0, confidence: "A" }]
+  "Sumba": [{ id: "J1gz8EpZ5PY", start: 0, confidence: "A" }],
+  "Acapulco": [{ id: "tS3XJoZ8JnM", start: 0, confidence: "A" }],
+  "Ahmedabad": [{ id: "xdZFacSYPBE", start: 0, confidence: "A" }],
+  "Anchorage": [{ id: "4UCpDgJMbUo", start: 0, confidence: "A" }],
+  "Brisbane": [{ id: "FXr_RMch1Yg", start: 0, confidence: "A" }],
+  "Cape Town": [{ id: "69DzEF_RAcA", start: 0, confidence: "A" }],
+  "Denver": [{ id: "wbaDXXofyds", start: 0, confidence: "A" }],
+  "Dublin": [{ id: "WTdq5yjKcqg", start: 0, confidence: "A" }],
+  "Fortaleza": [{ id: "-jLXO0fd2Tk", start: 0, confidence: "A" }],
+  "Havana": [{ id: "hGg92N5-oM8", start: 0, confidence: "A" }],
+  "Hawaii": [{ id: "QRvNJX4SqcQ", start: 0, confidence: "A" }],
+  "Jaipur": [{ id: "GYuAbHKrV0A", start: 0, confidence: "A" }],
+  "Johannesburg": [{ id: "jU8sQWkPLvA", start: 0, confidence: "A" }],
+  "Madrid": [{ id: "w7VFfwZYeG4", start: 0, confidence: "A" }],
+  "New Orleans": [{ id: "A14iV1uVSSg", start: 0, confidence: "A" }],
+  "New York City": [{ id: "7dnLjw9dBCk", start: 0, confidence: "B" }],
+  "San Francisco": [{ id: "oLdr80iDFsc", start: 0, confidence: "A" }],
+  "Seattle": [{ id: "FnZ9uYWuk-Q", start: 0, confidence: "A" }],
+  "Sofia": [{ id: "ctpOAWZqtQg", start: 0, confidence: "A" }],
+  "Stockholm": [{ id: "GLdo5PX_UrI", start: 0, confidence: "A" }],
+  "Valencia": [{ id: "mWTDKXzOyg0", start: 0, confidence: "A" }],
+  "Vancouver": [{ id: "WbfjRoQVZSw", start: 0, confidence: "A" }],
+  "Vienna": [{ id: "_8D2ukmn0cs", start: 0, confidence: "A" }],
+  "Warsaw": [{ id: "FcjeOHCLaDQ", start: 0, confidence: "A" }],
+  "Zurich": [{ id: "4XceEfga_Fo", start: 0, confidence: "A" }]
 };
