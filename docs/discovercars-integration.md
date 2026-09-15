@@ -1,0 +1,87 @@
+# DiscoverCars integration
+
+The car-rental integration is static and catalog-driven. The browser never
+queries DiscoverCars. It loads the generated `discovercars-locations.js`, and
+the `Plan your trip` resolver exposes the car-rental card only for a city whose
+catalog status is `VERIFIED`.
+
+## Data source and matching
+
+The updater uses the official DiscoverCars sources:
+
+- [Locations](https://www.discovercars.com/locations) for the location model;
+- [robots.txt](https://www.discovercars.com/robots.txt) for the crawling policy;
+- [sitemap.xml](https://www.discovercars.com/sitemap.xml) and its advertised XML
+  files for the structured city and airport paths.
+
+City matches require both the YouCity country code and an official city-level
+path. A city path is not inferred from a successful HTTP response. Airports,
+ports, railway stations, and other pickup points remain separate records under
+the verified city. Ambiguous matches are disabled.
+
+The current snapshot was generated on 2026-09-15:
+
+```text
+YouCity cities: 195
+Verified: 128
+Not available: 58
+Ambiguous: 9
+Needs review: 0
+```
+
+The full result is in `data/discovercars-locations.json`; the review-oriented
+summary is in `reports/discovercars-locations-report.json`.
+
+## Update the catalog
+
+Run the updater from the repository root:
+
+```bash
+npm run discovercars:update
+npm run discovercars:test
+```
+
+The updater checks `robots.txt`, downloads the official sitemap index and XML
+files sequentially, applies country-aware matching, validates manual aliases,
+and writes:
+
+- `data/discovercars-locations.json` — reviewable catalog;
+- `discovercars-locations.js` — browser bundle used by the static site;
+- `reports/discovercars-locations-report.json` — status report.
+
+No weekly GitHub Action is configured. This keeps updates manual and avoids
+unnecessary requests to DiscoverCars.
+
+## Overrides
+
+Aliases that cannot be safely inferred from the city slug live in
+`data/discovercars-overrides.json`. They have priority over automatic matching
+and are validated against the official sitemap plus the expected page title or
+heading. Use `null` to force a locality off, or an object with `path` and
+`expectedName` to approve a verified alias.
+
+Current overrides cover Mexico City, Makati, Baltimore, New York City, and
+Santiago de los Caballeros. Jacksonville remains ambiguous because the
+official source has both Florida and North Carolina localities.
+
+## Affiliate links and UI
+
+The affiliate ID is `youcity`. The application applies it centrally with the
+`a_aid` query parameter, so the catalog stores the canonical DiscoverCars URL
+without repeating the affiliate parameter. Examples:
+
+```text
+https://www.discovercars.com/brazil/sao-paulo?a_aid=youcity
+https://www.discovercars.com/spain/malaga?a_aid=youcity
+https://www.discovercars.com/mexico/mexico?a_aid=youcity
+https://www.discovercars.com/usa-new-york/new-york?a_aid=youcity
+https://www.discovercars.com/dominican-republic/santiago?a_aid=youcity
+```
+
+The card is generated in the existing `Plan your trip` resolver and is also
+consumed by the map recommendations. It includes `rel="sponsored noopener
+noreferrer"` and sends the existing `affiliate_click` event with provider,
+city, country, category, placement, campaign, and mode when analytics exists.
+
+The disclosure is shown in the travel drawer. No token or secret is required;
+`youcity` is a public affiliate identifier.

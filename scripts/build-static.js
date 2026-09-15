@@ -29,6 +29,7 @@ const STATIC_ASSETS = [
   "drone-videos.js",
   "radio-catalog.js",
   "radio-extra-catalog.js",
+  "discovercars-locations.js",
   "app.js"
 ];
 
@@ -98,6 +99,12 @@ function loadCatalog() {
   }));
 }
 
+function loadDiscoverCarsCatalog() {
+  const file = resolve(ROOT_DIR, "data/discovercars-locations.json");
+  if (!existsSync(file)) return {};
+  return JSON.parse(readFileSync(file, "utf8")).locations || {};
+}
+
 function countryName(country) {
   return {
     USA: "United States",
@@ -144,6 +151,9 @@ function citySeo(city) {
   const canonical = `${SITE_URL}${path}`;
   const description = cityNote(city);
   return {
+    id: slugify(city.name),
+    rawCountry: city.country,
+    countryCode: city.countryCode || null,
     title: `${name} — YouCity`,
     description,
     canonical,
@@ -295,7 +305,7 @@ function buildNotFound() {
   return versionStaticAssets(`<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — YouCity</title><meta name="robots" content="noindex,follow"><link rel="stylesheet" href="${sitePath("/styles.css")}"></head><body><main class="seo-fallback"><h1>Page not found</h1><p>The city page you requested does not exist.</p><p><a href="${sitePath("/")}">Return to YouCity</a></p></main></body></html>\n`);
 }
 
-function cityFallback(seo, catalog) {
+function cityFallback(seo, catalog, discoverCarsCatalog) {
   const links = catalog.map((city) => {
     const name = displayCityName(city);
     return `<li><a href="${cityPath(city)}">${escapeHtml(name)}</a></li>`;
@@ -303,11 +313,17 @@ function cityFallback(seo, catalog) {
   const planner = [
     ["Things to do", "Viator"],
     ["Stay", "Booking.com · Expedia · Travelpayouts"],
-    ["Get around", "DiscoverCars"],
     ["Stay connected", "Airalo"],
     ["More travel options", "Heymondo · Travelpayouts flights"]
-  ].map(([label, providers]) => `<li><strong>${label}</strong> — ${providers} <em>(preview)</em></li>`).join("");
-  return `<section class="seo-fallback"><h2>${escapeHtml(seo.name)}, ${escapeHtml(seo.country)}</h2><p>${escapeHtml(seo.description)}</p><p>Available modes: ${escapeHtml(seo.modes.join(", "))}.</p><h2>Plan your trip to ${escapeHtml(seo.name)}</h2><ul>${planner}</ul><p>Travel options preview. Affiliate links will be added after provider approval.</p><p><a href="${sitePath("/")}">Explore all cities</a></p><h2>More destinations</h2><ul>${links}</ul></section>`;
+  ];
+  const discoverCars = Object.values(discoverCarsCatalog || {}).find((location) =>
+    location.youCityId === seo.id && location.country === seo.rawCountry
+  );
+  if (discoverCars?.status === "VERIFIED" && discoverCars.available) {
+    planner.splice(2, 0, ["Get around", "DiscoverCars"]);
+  }
+  const plannerMarkup = planner.map(([label, providers]) => `<li><strong>${label}</strong> — ${providers} <em>(preview)</em></li>`).join("");
+  return `<section class="seo-fallback"><h2>${escapeHtml(seo.name)}, ${escapeHtml(seo.country)}</h2><p>${escapeHtml(seo.description)}</p><p>Available modes: ${escapeHtml(seo.modes.join(", "))}.</p><h2>Plan your trip to ${escapeHtml(seo.name)}</h2><ul>${plannerMarkup}</ul><p>Travel options preview. Affiliate links will be added after provider approval.</p><p><a href="${sitePath("/")}">Explore all cities</a></p><h2>More destinations</h2><ul>${links}</ul></section>`;
 }
 
 function homeFallback(catalog) {
@@ -317,6 +333,7 @@ function homeFallback(catalog) {
 
 function main() {
   const catalog = loadCatalog();
+  const discoverCarsCatalog = loadDiscoverCarsCatalog();
   if (!catalog.length) throw new Error("The city catalog is empty.");
 
   rmSync(OUTPUT_DIR, { recursive: true, force: true });
@@ -324,7 +341,7 @@ function main() {
   mkdirSync(join(OUTPUT_DIR, "assets"), { recursive: true });
   mkdirSync(join(OUTPUT_DIR, "city"), { recursive: true });
 
-  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js"]) {
+  for (const file of ["styles.css", "app.js", "cities-data.js", "map-catalog.js", "map-config.js", "travel-config.js", "drone-videos.js", "radio-catalog.js", "radio-extra-catalog.js", "discovercars-locations.js"]) {
     cpSync(resolve(ROOT_DIR, file), join(OUTPUT_DIR, file));
   }
   cpSync(resolve(ROOT_DIR, "assets"), join(OUTPUT_DIR, "assets"), { recursive: true });
@@ -340,7 +357,7 @@ function main() {
   catalog.forEach((city, index) => {
     const seo = citySeo(city);
     const cityHtml = replaceStaticCity(
-      renderPage(baseHtml, seo, cityFallback(seo, catalog)),
+      renderPage(baseHtml, seo, cityFallback(seo, catalog, discoverCarsCatalog)),
       seo,
       index + 1,
       catalog.length

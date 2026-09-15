@@ -1,0 +1,8 @@
+{
+  "name": "youcity",
+  "private": true,
+  "scripts": {
+    "discovercars:update": "node scripts/update-discovercars-locations.js",
+    "discovercars:test": "node scripts/test-discovercars.js"
+  }
+}

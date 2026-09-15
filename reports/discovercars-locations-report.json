@@ -1,0 +1,1708 @@
+{
+  "generatedAt": "2026-09-15T15:18:33.896Z",
+  "source": {
+    "locations": "https://www.discovercars.com/locations",
+    "robots": "https://www.discovercars.com/robots.txt",
+    "sitemap": "https://www.discovercars.com/sitemap.xml",
+    "sitemapFiles": [
+      "https://www.discovercars.com/sitemap-1.xml"
+    ],
+    "mode": "official-sitemap",
+    "robotsChecked": true
+  },
+  "summary": {
+    "youCityCities": 195,
+    "verified": 128,
+    "notAvailable": 58,
+    "ambiguous": 9,
+    "needsReview": 0
+  },
+  "verified": [
+    {
+      "id": "sao-paulo",
+      "name": "Sao Paulo",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "abu-dhabi",
+      "name": "Abu Dhabi",
+      "country": "UAE",
+      "countryCode": "AE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "acapulco",
+      "name": "Acapulco",
+      "country": "Mexico",
+      "countryCode": "MX",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "albuquerque",
+      "name": "Albuquerque",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "amsterdam",
+      "name": "Amsterdam",
+      "country": "Netherlands",
+      "countryCode": "NL",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "anchorage",
+      "name": "Anchorage",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "ankara",
+      "name": "Ankara",
+      "country": "Turkey",
+      "countryCode": "TR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "antalya",
+      "name": "Antalya",
+      "country": "Turkey",
+      "countryCode": "TR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "asheville",
+      "name": "Asheville",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "aspen",
+      "name": "Aspen",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "athens",
+      "name": "Athens",
+      "country": "Greece",
+      "countryCode": "GR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "atlanta",
+      "name": "Atlanta",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "auckland",
+      "name": "Auckland",
+      "country": "New Zealand",
+      "countryCode": "NZ",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "austin",
+      "name": "Austin",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "baltimore",
+      "name": "Baltimore",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "barcelona",
+      "name": "Barcelona",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "basel",
+      "name": "Basel",
+      "country": "Switzerland",
+      "countryCode": "CH",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "belem",
+      "name": "Belém",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "belfast",
+      "name": "Belfast",
+      "country": "Northern Ireland",
+      "countryCode": "GB",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "belo-horizonte",
+      "name": "Belo Horizonte",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "berlin",
+      "name": "Berlin",
+      "country": "Germany",
+      "countryCode": "DE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "beverly-hills",
+      "name": "Beverly Hills",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "bordeaux",
+      "name": "Bordeaux",
+      "country": "France",
+      "countryCode": "FR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "boston",
+      "name": "Boston",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "brasilia",
+      "name": "Brasilia",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "brisbane",
+      "name": "Brisbane",
+      "country": "Australia",
+      "countryCode": "AU",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "bristol",
+      "name": "Bristol",
+      "country": "England",
+      "countryCode": "GB",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "budapest",
+      "name": "Budapest",
+      "country": "Hungary",
+      "countryCode": "HU",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "buenos-aires",
+      "name": "Buenos Aires",
+      "country": "Argentina",
+      "countryCode": "AR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "cairo",
+      "name": "Cairo",
+      "country": "Egypt",
+      "countryCode": "EG",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "cancun",
+      "name": "Cancun",
+      "country": "Mexico",
+      "countryCode": "MX",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "cape-town",
+      "name": "Cape Town",
+      "country": "South Africa",
+      "countryCode": "ZA",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "charleston",
+      "name": "Charleston",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "chicago",
+      "name": "Chicago",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "cincinnati",
+      "name": "Cincinnati",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "cleveland",
+      "name": "Cleveland",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "columbus",
+      "name": "Columbus",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "curitiba",
+      "name": "Curitiba",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "dakar",
+      "name": "Dakar",
+      "country": "Senegal",
+      "countryCode": "SN",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "dallas",
+      "name": "Dallas",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "denver",
+      "name": "Denver",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "detroit",
+      "name": "Detroit",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "dubai",
+      "name": "Dubai",
+      "country": "UAE",
+      "countryCode": "AE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "dublin",
+      "name": "Dublin",
+      "country": "Ireland",
+      "countryCode": "IE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "dunedin",
+      "name": "Dunedin",
+      "country": "New Zealand",
+      "countryCode": "NZ",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "edinburgh",
+      "name": "Edinburgh",
+      "country": "UK",
+      "countryCode": "GB",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "fortaleza",
+      "name": "Fortaleza",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "frankfurt",
+      "name": "Frankfurt",
+      "country": "Germany",
+      "countryCode": "DE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "geneva",
+      "name": "Geneva",
+      "country": "Switzerland",
+      "countryCode": "CH",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "gold-coast",
+      "name": "Gold Coast",
+      "country": "Australia",
+      "countryCode": "AU",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "guadalajara",
+      "name": "Guadalajara",
+      "country": "Mexico",
+      "countryCode": "MX",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "guatemala",
+      "name": "Guatemala",
+      "country": "Guatemala",
+      "countryCode": "GT",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "hamburg",
+      "name": "Hamburg",
+      "country": "Germany",
+      "countryCode": "DE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "hollywood",
+      "name": "Hollywood",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "houston",
+      "name": "Houston",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "ibiza",
+      "name": "Ibiza",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "indianapolis",
+      "name": "Indianapolis",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "innsbruck",
+      "name": "Innsbruck",
+      "country": "Austria",
+      "countryCode": "AT",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "istanbul",
+      "name": "Istanbul",
+      "country": "Turkey",
+      "countryCode": "TR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "izmir",
+      "name": "Izmir",
+      "country": "Turkey",
+      "countryCode": "TR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "jakarta",
+      "name": "Jakarta",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "johannesburg",
+      "name": "Johannesburg",
+      "country": "South Africa",
+      "countryCode": "ZA",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "kuala-lumpur",
+      "name": "Kuala Lumpur",
+      "country": "Malaysia",
+      "countryCode": "MY",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "las-vegas",
+      "name": "Las Vegas",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "lisbon",
+      "name": "Lisbon",
+      "country": "Portugal",
+      "countryCode": "PT",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "liverpool",
+      "name": "Liverpool",
+      "country": "England",
+      "countryCode": "GB",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "ljubljana",
+      "name": "Ljubljana",
+      "country": "Slovenia",
+      "countryCode": "SI",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "london",
+      "name": "London",
+      "country": "UK",
+      "countryCode": "GB",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "los-angeles",
+      "name": "Los Angeles",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "lyon",
+      "name": "Lyon",
+      "country": "France",
+      "countryCode": "FR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "madrid",
+      "name": "Madrid",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "makati",
+      "name": "Makati",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "manila",
+      "name": "Manila",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "melbourne",
+      "name": "Melbourne",
+      "country": "Australia",
+      "countryCode": "AU",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "mexico-city",
+      "name": "Mexico City",
+      "country": "Mexico",
+      "countryCode": "MX",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "miami",
+      "name": "Miami",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "milan",
+      "name": "Milan",
+      "country": "Italy",
+      "countryCode": "IT",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "minneapolis",
+      "name": "Minneapolis",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "monterrey",
+      "name": "Monterrey",
+      "country": "Mexico",
+      "countryCode": "MX",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "montevideo",
+      "name": "Montevideo",
+      "country": "Uruguay",
+      "countryCode": "UY",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "munich",
+      "name": "Munich",
+      "country": "Germany",
+      "countryCode": "DE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "nashville",
+      "name": "Nashville",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "new-orleans",
+      "name": "New Orleans",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "new-york-city",
+      "name": "New York City",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "nice",
+      "name": "Nice",
+      "country": "France",
+      "countryCode": "FR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "orlando",
+      "name": "Orlando",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "oslo",
+      "name": "Oslo",
+      "country": "Norway",
+      "countryCode": "NO",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "paris",
+      "name": "Paris",
+      "country": "France",
+      "countryCode": "FR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "philadelphia",
+      "name": "Philadelphia",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "phoenix",
+      "name": "Phoenix",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "pittsburgh",
+      "name": "Pittsburgh",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "porto-alegre",
+      "name": "Porto Alegre",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "prague",
+      "name": "Prague",
+      "country": "Czechia",
+      "countryCode": "CZ",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "puebla",
+      "name": "Puebla",
+      "country": "Mexico",
+      "countryCode": "MX",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "queretaro",
+      "name": "Querétaro",
+      "country": "Mexico",
+      "countryCode": "MX",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "recife",
+      "name": "Recife",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "rio-de-janeiro",
+      "name": "Rio De Janeiro",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "rome",
+      "name": "Rome",
+      "country": "Italy",
+      "countryCode": "IT",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "salvador",
+      "name": "Salvador",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "samarkand",
+      "name": "Samarkand",
+      "country": "Uzbekistan",
+      "countryCode": "UZ",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "san-diego",
+      "name": "San Diego",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "san-francisco",
+      "name": "San Francisco",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "santiago-de-los-caballeros",
+      "name": "Santiago de los Caballeros",
+      "country": "Dominican Republic",
+      "countryCode": "DO",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "santo-domingo",
+      "name": "Santo Domingo",
+      "country": "Dominican Republic",
+      "countryCode": "DO",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "seattle",
+      "name": "Seattle",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "seoul",
+      "name": "Seoul",
+      "country": "Korea",
+      "countryCode": "KR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "singapore",
+      "name": "Singapore",
+      "country": "Singapore",
+      "countryCode": "SG",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "country": "Bulgaria",
+      "countryCode": "BG",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "stockholm",
+      "name": "Stockholm",
+      "country": "Sweden",
+      "countryCode": "SE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "stuttgart",
+      "name": "Stuttgart",
+      "country": "Germany",
+      "countryCode": "DE",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "sydney",
+      "name": "Sydney",
+      "country": "Australia",
+      "countryCode": "AU",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "taipei",
+      "name": "Taipei",
+      "country": "Taiwan",
+      "countryCode": "TW",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "tampa",
+      "name": "Tampa",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "tel-aviv",
+      "name": "Tel Aviv",
+      "country": "Israel",
+      "countryCode": "IL",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "thessaloniki",
+      "name": "Thessaloniki",
+      "country": "Greece",
+      "countryCode": "GR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "country": "Japan",
+      "countryCode": "JP",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "toronto",
+      "name": "Toronto",
+      "country": "Canada",
+      "countryCode": "CA",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "trabzon",
+      "name": "Trabzon",
+      "country": "Turkey",
+      "countryCode": "TR",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "vancouver",
+      "name": "Vancouver",
+      "country": "Canada",
+      "countryCode": "CA",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "vienna",
+      "name": "Vienna",
+      "country": "Austria",
+      "countryCode": "AT",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "warsaw",
+      "name": "Warsaw",
+      "country": "Poland",
+      "countryCode": "PL",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "zurich",
+      "name": "Zurich",
+      "country": "Switzerland",
+      "countryCode": "CH",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "alicante",
+      "name": "Alicante",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "malaga",
+      "name": "Málaga",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "seville",
+      "name": "Seville",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "valencia",
+      "name": "Valencia",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "funchal",
+      "name": "Funchal",
+      "country": "Portugal",
+      "countryCode": "PT",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    },
+    {
+      "id": "bali",
+      "name": "Bali",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "status": "VERIFIED",
+      "possibleMatches": []
+    }
+  ],
+  "notAvailable": [
+    {
+      "id": "ahmedabad",
+      "name": "Ahmedabad",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "amritsar",
+      "name": "Amritsar",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "angeles-city",
+      "name": "Angeles City",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "atlantic-city",
+      "name": "Atlantic City",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "bacolod",
+      "name": "Bacolod",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "baguio",
+      "name": "Baguio",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "bangalore",
+      "name": "Bangalore",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "beijing",
+      "name": "Beijing",
+      "country": "China",
+      "countryCode": "CN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "bhopal",
+      "name": "Bhopal",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "bhubaneswar",
+      "name": "Bhubaneswar",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "bronx",
+      "name": "Bronx",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "brooklyn",
+      "name": "Brooklyn",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "campinas",
+      "name": "Campinas",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "cebu-city",
+      "name": "Cebu City",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "chandigarh",
+      "name": "Chandigarh",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "chennai",
+      "name": "Chennai",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "davos",
+      "name": "Davos",
+      "country": "Switzerland",
+      "countryCode": "CH",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "delhi",
+      "name": "Delhi",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "faisalabad",
+      "name": "Faisalabad",
+      "country": "Pakistan",
+      "countryCode": "PK",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "general-santos-city",
+      "name": "General Santos City",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "goa",
+      "name": "Goa",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "guwahati",
+      "name": "Guwahati",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "havana",
+      "name": "Havana",
+      "country": "Cuba",
+      "countryCode": "CU",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "hawaii",
+      "name": "Hawaii",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "hyderabad",
+      "name": "Hyderabad",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "islamabad",
+      "name": "Islamabad",
+      "country": "Pakistan",
+      "countryCode": "PK",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "jaipur",
+      "name": "Jaipur",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "joao-pessoa",
+      "name": "João Pessoa",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "karachi",
+      "name": "Karachi",
+      "country": "Pakistan",
+      "countryCode": "PK",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "kochi",
+      "name": "Kochi",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "kolkata",
+      "name": "Kolkata",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "kyiv",
+      "name": "Kyiv",
+      "country": "Ukraine",
+      "countryCode": "UA",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "la-romana",
+      "name": "La Romana",
+      "country": "Dominican Republic",
+      "countryCode": "DO",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "lahore",
+      "name": "Lahore",
+      "country": "Pakistan",
+      "countryCode": "PK",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "lauterbrunnen",
+      "name": "Lauterbrunnen",
+      "country": "Switzerland",
+      "countryCode": "CH",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "monaco",
+      "name": "Monaco",
+      "country": "Monaco",
+      "countryCode": "MC",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "moscow",
+      "name": "Moscow",
+      "country": "Russia",
+      "countryCode": "RU",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "narita",
+      "name": "Narita",
+      "country": "Japan",
+      "countryCode": "JP",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "niagara-falls",
+      "name": "Niagara Falls",
+      "country": "Canada",
+      "countryCode": "CA",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "nizhny-novgorod",
+      "name": "Nizhny Novgorod",
+      "country": "Russia",
+      "countryCode": "RU",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "novosibirsk",
+      "name": "Novosibirsk",
+      "country": "Russia",
+      "countryCode": "RU",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "presidente-prudente",
+      "name": "Presidente Prudente",
+      "country": "Brazil",
+      "countryCode": "BR",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "pune",
+      "name": "Pune",
+      "country": "India",
+      "countryCode": "IN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "qatar",
+      "name": "Qatar",
+      "country": "Qatar",
+      "countryCode": "QA",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "sanliurfa",
+      "name": "Sanliurfa",
+      "country": "Turkey",
+      "countryCode": "TR",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "st-petersburg",
+      "name": "St. Petersburg",
+      "country": "Russia",
+      "countryCode": "RU",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "tashkent",
+      "name": "Tashkent",
+      "country": "Uzbekistan",
+      "countryCode": "UZ",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "tehran",
+      "name": "Tehran",
+      "country": "Iran",
+      "countryCode": "IR",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "wuhan",
+      "name": "Wuhan",
+      "country": "China",
+      "countryCode": "CN",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "yekaterinburg",
+      "name": "Yekaterinburg",
+      "country": "Russia",
+      "countryCode": "RU",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "arrecife",
+      "name": "Arrecife",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "lombok",
+      "name": "Lombok",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "nusa-penida",
+      "name": "Nusa Penida",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "gili-islands",
+      "name": "Gili Islands",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "komodo",
+      "name": "Komodo",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "raja-ampat",
+      "name": "Raja Ampat",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    },
+    {
+      "id": "sumba",
+      "name": "Sumba",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "status": "NOT_AVAILABLE",
+      "possibleMatches": []
+    }
+  ],
+  "ambiguous": [
+    {
+      "id": "jacksonville",
+      "name": "Jacksonville",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "Jacksonville",
+          "path": "/usa-florida/jacksonville",
+          "url": "https://www.discovercars.com/usa-florida/jacksonville",
+          "type": "city",
+          "reason": "multiple official cities share this name"
+        },
+        {
+          "name": "Jacksonville",
+          "path": "/usa-north-carolina/jacksonville",
+          "url": "https://www.discovercars.com/usa-north-carolina/jacksonville",
+          "type": "city",
+          "reason": "multiple official cities share this name"
+        }
+      ]
+    },
+    {
+      "id": "metro-manila",
+      "name": "Metro Manila",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "Manila",
+          "path": "/philippines/manila",
+          "url": "https://www.discovercars.com/philippines/manila",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        }
+      ]
+    },
+    {
+      "id": "new-taipei-city",
+      "name": "New Taipei City",
+      "country": "Taiwan",
+      "countryCode": "TW",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "Taipei",
+          "path": "/taiwan/taipei",
+          "url": "https://www.discovercars.com/taiwan/taipei",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        }
+      ]
+    },
+    {
+      "id": "palm-beach",
+      "name": "Palm Beach",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "West Palm Beach",
+          "path": "/usa-florida/west-palm-beach",
+          "url": "https://www.discovercars.com/usa-florida/west-palm-beach",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        },
+        {
+          "name": "Long Beach",
+          "path": "/usa-california/long-beach",
+          "url": "https://www.discovercars.com/usa-california/long-beach",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        },
+        {
+          "name": "Palm Springs",
+          "path": "/usa-california/palm-springs",
+          "url": "https://www.discovercars.com/usa-california/palm-springs",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        },
+        {
+          "name": "Daytona Beach",
+          "path": "/usa-florida/daytona-beach",
+          "url": "https://www.discovercars.com/usa-florida/daytona-beach",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        },
+        {
+          "name": "Miami Beach",
+          "path": "/usa-florida/miami-beach",
+          "url": "https://www.discovercars.com/usa-florida/miami-beach",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        }
+      ]
+    },
+    {
+      "id": "san-fernando-pampanga",
+      "name": "San Fernando, Pampanga",
+      "country": "Philippines",
+      "countryCode": "PH",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "Pampanga",
+          "path": "/philippines/pampanga",
+          "url": "https://www.discovercars.com/philippines/pampanga",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        }
+      ]
+    },
+    {
+      "id": "washington-dc",
+      "name": "Washington DC",
+      "country": "USA",
+      "countryCode": "US",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "Washington",
+          "path": "/usa-washington/washington",
+          "url": "https://www.discovercars.com/usa-washington/washington",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        }
+      ]
+    },
+    {
+      "id": "las-palmas-de-gran-canaria",
+      "name": "Las Palmas de Gran Canaria",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "Gran Canaria",
+          "path": "/spain-canary-islands/gran-canaria",
+          "url": "https://www.discovercars.com/spain-canary-islands/gran-canaria",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        }
+      ]
+    },
+    {
+      "id": "palma-de-mallorca",
+      "name": "Palma de Mallorca",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "Mallorca",
+          "path": "/spain-balearic-islands/mallorca",
+          "url": "https://www.discovercars.com/spain-balearic-islands/mallorca",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        },
+        {
+          "name": "La Palma",
+          "path": "/spain-canary-islands/la-palma",
+          "url": "https://www.discovercars.com/spain-canary-islands/la-palma",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        }
+      ]
+    },
+    {
+      "id": "santa-cruz-de-tenerife",
+      "name": "Santa Cruz de Tenerife",
+      "country": "Spain",
+      "countryCode": "ES",
+      "status": "AMBIGUOUS",
+      "possibleMatches": [
+        {
+          "name": "Tenerife",
+          "path": "/spain-canary-islands/tenerife",
+          "url": "https://www.discovercars.com/spain-canary-islands/tenerife",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        },
+        {
+          "name": "Santa Susanna",
+          "path": "/spain/santa-susanna",
+          "url": "https://www.discovercars.com/spain/santa-susanna",
+          "type": "city",
+          "reason": "name-overlap-only; manual review required"
+        }
+      ]
+    }
+  ],
+  "needsReview": []
+}

@@ -1,0 +1,27 @@
+{
+  "Mexico City|MX": {
+    "path": "/mexico/mexico",
+    "expectedName": "Mexico City",
+    "note": "DiscoverCars uses /mexico/mexico for Mexico City."
+  },
+  "Makati|PH": {
+    "path": "/philippines/makati-city",
+    "expectedName": "Makati City",
+    "note": "DiscoverCars uses the fuller locality name Makati City."
+  },
+  "Baltimore|US": {
+    "path": "/usa-maryland/baltimor",
+    "expectedName": "Baltimore",
+    "note": "The official sitemap currently exposes the historical /baltimor slug."
+  },
+  "New York City|US": {
+    "path": "/usa-new-york/new-york",
+    "expectedName": "New York",
+    "note": "DiscoverCars names this locality New York."
+  },
+  "Santiago de los Caballeros|DO": {
+    "path": "/dominican-republic/santiago",
+    "expectedName": "Santiago",
+    "note": "The official page is named Santiago and its pickup details identify Santiago de los Caballeros."
+  }
+}

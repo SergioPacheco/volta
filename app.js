@@ -535,6 +535,46 @@
       || {};
   }
 
+  function createDiscoverCarsAffiliateUrl(value) {
+    if (!value) return "";
+    try {
+      const url = new URL(value, "https://www.discovercars.com");
+      const provider = travelProvider("discovercars");
+      if (url.origin !== "https://www.discovercars.com" || !url.pathname || !provider.affiliateId) return "";
+      url.searchParams.set("a_aid", provider.affiliateId);
+      return url.toString();
+    } catch {
+      return "";
+    }
+  }
+
+  function discoverCarsLocation(city) {
+    const locations = window.YOUCITY_DISCOVERCARS_LOCATIONS || {};
+    return Object.values(locations).find((location) =>
+      location.youCityId === city.id
+      && location.country === (city.rawCountry || city.country)
+    ) || null;
+  }
+
+  function resolveDiscoverCarsOffer(city) {
+    const location = discoverCarsLocation(city);
+    if (!location || location.status !== "VERIFIED" || !location.available || !location.discoverCars?.url) return null;
+    const url = createDiscoverCarsAffiliateUrl(location.discoverCars.url);
+    if (!url) return null;
+    return {
+      provider: "discovercars",
+      category: "cars",
+      label: `Rent a car in ${city.name}`,
+      description: "Compare rental car prices",
+      url,
+      campaign: "youcity-city-plan-trip",
+      placement: "city-plan-trip",
+      priority: 1,
+      active: true,
+      placeholder: false
+    };
+  }
+
   function resolveTravelOffers(city) {
     const config = travelConfig();
     const countryOverrides = config.byCountry?.[city.rawCountry] || config.byCountry?.[city.country] || {};
@@ -543,9 +583,15 @@
     const offers = {};
 
     Object.keys(TRAVEL_CATEGORIES).forEach((category) => {
-      let entries = defaults[category];
-      if (Array.isArray(countryOverrides[category])) entries = countryOverrides[category];
-      if (Array.isArray(cityOverrides[category])) entries = cityOverrides[category];
+      let entries;
+      if (category === "cars") {
+        const discoverCarsOffer = resolveDiscoverCarsOffer(city);
+        entries = discoverCarsOffer ? [discoverCarsOffer] : [];
+      } else {
+        entries = defaults[category];
+        if (Array.isArray(countryOverrides[category])) entries = countryOverrides[category];
+        if (Array.isArray(cityOverrides[category])) entries = cityOverrides[category];
+      }
 
       offers[category] = (Array.isArray(entries) ? entries : [])
         .map((entry) => ({ ...entry, category }))
@@ -559,10 +605,11 @@
     return offers;
   }
 
-  function safeTravelUrl(value) {
+  function safeTravelUrl(value, providerId = "") {
     if (!value) return "";
     try {
       const url = new URL(value, window.location.origin);
+      if (providerId === "discovercars" && url.origin !== "https://www.discovercars.com") return "";
       if (url.origin === window.location.origin && url.pathname.startsWith("/go/")) return url.toString();
       return url.protocol === "https:" ? url.toString() : "";
     } catch (error) {
@@ -577,15 +624,15 @@
   function travelOfferMarkup(entry, city, options = {}) {
     const providerLabel = travelProviderLabel(entry);
     const label = entry.label || "Explore options";
-    const metadata = `data-travel-provider="${escapeHtml(entry.provider)}" data-travel-category="${escapeHtml(entry.category)}" data-travel-campaign="${escapeHtml(entry.campaign || "")}" data-travel-placement="${escapeHtml(entry.placement || "")}" data-travel-city="${escapeHtml(city.id)}"`;
-    const placeholder = Boolean(travelConfig().demo) && (entry.placeholder || travelProvider(entry.provider).placeholder);
+    const metadata = `data-travel-provider="${escapeHtml(entry.provider)}" data-travel-category="${escapeHtml(entry.category)}" data-travel-campaign="${escapeHtml(entry.campaign || "")}" data-travel-placement="${escapeHtml(entry.placement || "")}" data-travel-city="${escapeHtml(city.id)}" data-travel-country="${escapeHtml(city.rawCountry || city.country)}"`;
+    const placeholder = Boolean(travelConfig().demo) && entry.placeholder !== false && (entry.placeholder || travelProvider(entry.provider).placeholder);
     const className = `travel-offer-action${placeholder ? " is-placeholder" : ""}`;
 
     if (placeholder) {
       return `<button type="button" class="${className}" ${metadata} data-travel-placeholder="true"><span>${escapeHtml(label)}</span><small>${escapeHtml(providerLabel)} · preview</small></button>`;
     }
 
-    const href = safeTravelUrl(entry.url);
+    const href = safeTravelUrl(entry.url, entry.provider);
     if (!href) return "";
     const compact = options.compact ? " is-compact" : "";
     return `<a class="${className}${compact}" href="${escapeHtml(href)}" target="_blank" rel="sponsored noopener noreferrer" ${metadata}><span>${escapeHtml(label)}</span><small>${escapeHtml(providerLabel)}</small><b aria-hidden="true">↗</b></a>`;
@@ -618,6 +665,7 @@
     const payload = {
       event: "affiliate_click",
       city: target.dataset.travelCity,
+      country: target.dataset.travelCountry,
       provider: target.dataset.travelProvider,
       category: target.dataset.travelCategory,
       placement: target.dataset.travelPlacement,
