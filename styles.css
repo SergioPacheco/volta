@@ -153,7 +153,9 @@ button:focus-visible, input:focus-visible {
 .eyebrow { margin: 0 0 10px; color: var(--acid); font: 500 10px "DM Mono", monospace; letter-spacing: .14em; text-transform: uppercase; }
 .city-intro h1 { max-width: 560px; margin: 0; font: 300 clamp(40px, 4.2vw, 62px)/.92 "Newsreader", serif; letter-spacing: -.035em; text-wrap: balance; text-shadow: 0 5px 40px rgba(0,0,0,.25); }
 .city-note { max-width: 340px; margin: 23px 0 16px; color: rgba(255,255,255,.73); font-size: 12px; line-height: 1.6; }
-.source-link { display: inline-flex; align-items: center; gap: 8px; padding: 0 0 5px; border: 0; border-bottom: 1px solid rgba(255,255,255,.35); background: none; color: rgba(255,255,255,.7); cursor: pointer; font: 400 10px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .05em; }
+.source-link { display: inline-flex; align-items: center; gap: 8px; padding: 0 0 5px; border: 0; border-bottom: 1px solid rgba(255,255,255,.35); background: none; color: rgba(255,255,255,.7); cursor: pointer; font: 400 10px "DM Mono", monospace; text-decoration: none; text-transform: uppercase; letter-spacing: .05em; }
+.source-link:hover, .source-link:focus-visible { color: #fff; border-bottom-color: var(--acid); }
+.source-link[aria-disabled="true"] { cursor: not-allowed; opacity: .45; pointer-events: none; }
 .source-link svg { width: 14px; }
 
 .rail { position: absolute; z-index: 4; top: 50%; right: 44px; display: flex; flex-direction: column; align-items: center; gap: 13px; transform: translateY(-50%); }
@@ -508,7 +510,7 @@ button:focus-visible, input:focus-visible {
   .city-count { margin-bottom: 20px; }
   .city-intro h1 { font-size: clamp(36px, 10vw, 48px); line-height: .94; }
   .city-note { max-width: 300px; margin-top: 16px; font-size: 11px; }
-  .source-link { display: none; }
+  .source-link { display: inline-flex; }
   .rail { right: 16px; }
   .travel-planner h2 { font-size: 24px; }
   .travel-category { padding: 8px; }

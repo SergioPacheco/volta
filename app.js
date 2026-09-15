@@ -323,6 +323,7 @@
     startVideo: $("#start-video"),
     videoLoading: $("#video-loading"),
     poster: $("#poster"),
+    sourceLink: $("#source-link"),
     radio: $("#radio-player"),
     cityName: $("#city-name"),
     cityRegion: $("#city-region"),
@@ -489,6 +490,21 @@
     const url = new URL(`https://www.youtube.com/watch?v=${encodeURIComponent(ride.id)}`);
     if (Number(ride.start) > 0) url.searchParams.set("t", `${Math.floor(Number(ride.start))}s`);
     return url.toString();
+  }
+
+  function updateRideSourceLink(ride) {
+    if (!elements.sourceLink) return;
+
+    if (!ride?.id) {
+      elements.sourceLink.removeAttribute("href");
+      elements.sourceLink.setAttribute("aria-disabled", "true");
+      elements.sourceLink.setAttribute("aria-label", "No source video is available for this ride");
+      return;
+    }
+
+    elements.sourceLink.href = buildYoutubeWatchUrl(ride);
+    elements.sourceLink.removeAttribute("aria-disabled");
+    elements.sourceLink.setAttribute("aria-label", `View the source video for ${currentCity().name}`);
   }
 
   const TRAVEL_CATEGORIES = {
@@ -1066,6 +1082,7 @@
    */
   function updateVideo(city, options = {}) {
     const ride = currentRide(city);
+    updateRideSourceLink(ride);
     if (!ride) {
       // Fallback: cidade sem vídeo disponível
       elements.videoShell.classList.remove("is-ready");
