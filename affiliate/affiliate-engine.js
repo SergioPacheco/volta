@@ -114,6 +114,9 @@
     trackClick(...args) {
       return global.YouCityAffiliateTracking?.trackClick?.(...args);
     },
+    track(...args) {
+      return global.YouCityAffiliateTracking?.track?.(...args);
+    },
     observeImpressions(...args) {
       return global.YouCityAffiliateTracking?.observeImpressions?.(...args);
     },

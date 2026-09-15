@@ -5,6 +5,7 @@
     "discovercars:update": "node scripts/update-discovercars-locations.js",
     "discovercars:test": "node scripts/test-discovercars.js",
     "affiliate:test": "node scripts/test-affiliates.js",
+    "stay22:report": "node scripts/stay22-reporting.js",
     "test": "npm run affiliate:test && npm run discovercars:test"
   }
 }

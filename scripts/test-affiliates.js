@@ -6,6 +6,7 @@ const { resolve } = require("node:path");
 const vm = require("node:vm");
 
 const ROOT_DIR = resolve(__dirname, "..");
+assert.match(readFileSync(resolve(ROOT_DIR, "index.html"), "utf8"), /AWAITING_STAY22_SCRIPT/, "missing Hub snippet must be documented");
 const catalog = require(resolve(ROOT_DIR, "data/discovercars-locations.json"));
 const context = vm.createContext({
   URL,
@@ -92,15 +93,15 @@ const granadaUrl = new URL(granadaOffer.url);
 assert.equal(granadaUrl.origin + granadaUrl.pathname, "https://www.stay22.com/allez/roam");
 assert.equal(granadaUrl.searchParams.get("aid"), "youcity");
 assert.equal(granadaUrl.searchParams.get("address"), "Granada, Spain");
-assert.equal(granadaUrl.searchParams.get("campaign"), "yc_granada_es_hotels");
+assert.equal(granadaUrl.searchParams.get("campaign"), "yc_granada_es_hotels_travelplanner");
 
 for (const [city, address, campaign] of [
-  [saoPauloCity, "São Paulo, Brazil", "yc_sao-paulo_br_hotels"],
-  [tokyoCity, "Tokyo, Japan", "yc_tokyo_jp_hotels"],
-  [romeCity, "Rome, Italy", "yc_rome_it_hotels"],
-  [barcelonaCity, "Barcelona, Spain", "yc_barcelona_es_hotels"],
-  [{ name: "Málaga", country: "Spain", countryCode: "ES" }, "Málaga, Spain", "yc_malaga_es_hotels"],
-  [{ name: "Córdoba", country: "Spain", countryCode: "ES" }, "Córdoba, Spain", "yc_cordoba_es_hotels"]
+  [saoPauloCity, "São Paulo, Brazil", "yc_sao-paulo_br_hotels_travelplanner"],
+  [tokyoCity, "Tokyo, Japan", "yc_tokyo_jp_hotels_travelplanner"],
+  [romeCity, "Rome, Italy", "yc_rome_it_hotels_travelplanner"],
+  [barcelonaCity, "Barcelona, Spain", "yc_barcelona_es_hotels_travelplanner"],
+  [{ name: "Málaga", country: "Spain", countryCode: "ES" }, "Málaga, Spain", "yc_malaga_es_hotels_travelplanner"],
+  [{ name: "Córdoba", country: "Spain", countryCode: "ES" }, "Córdoba, Spain", "yc_cordoba_es_hotels_travelplanner"]
 ]) {
   const url = new URL(stay22Offer(city).url);
   assert.equal(url.searchParams.get("address"), address, `${city.name} address should preserve accents`);
@@ -108,16 +109,16 @@ for (const [city, address, campaign] of [
 }
 
 for (const [city, address, campaign] of [
-  [granadaCity, "Granada, Spain", "yc_granada_es_activities"],
-  [barcelonaCity, "Barcelona, Spain", "yc_barcelona_es_activities"],
-  [romeCity, "Rome, Italy", "yc_rome_it_activities"],
-  [tokyoCity, "Tokyo, Japan", "yc_tokyo_jp_activities"],
-  [saoPauloCity, "São Paulo, Brazil", "yc_sao-paulo_br_activities"],
-  [{ name: "Málaga", country: "Spain", countryCode: "ES" }, "Málaga, Spain", "yc_malaga_es_activities"],
-  [{ name: "Córdoba", country: "Spain", countryCode: "ES" }, "Córdoba, Spain", "yc_cordoba_es_activities"],
-  [{ name: "Québec", country: "Canada", countryCode: "CA" }, "Québec, Canada", "yc_quebec_ca_activities"],
-  [{ name: "Kraków", country: "Poland", countryCode: "PL" }, "Kraków, Poland", "yc_krakow_pl_activities"],
-  [{ name: "Zürich", country: "Switzerland", countryCode: "CH" }, "Zürich, Switzerland", "yc_zurich_ch_activities"]
+  [granadaCity, "Granada, Spain", "yc_granada_es_activities_travelplanner"],
+  [barcelonaCity, "Barcelona, Spain", "yc_barcelona_es_activities_travelplanner"],
+  [romeCity, "Rome, Italy", "yc_rome_it_activities_travelplanner"],
+  [tokyoCity, "Tokyo, Japan", "yc_tokyo_jp_activities_travelplanner"],
+  [saoPauloCity, "São Paulo, Brazil", "yc_sao-paulo_br_activities_travelplanner"],
+  [{ name: "Málaga", country: "Spain", countryCode: "ES" }, "Málaga, Spain", "yc_malaga_es_activities_travelplanner"],
+  [{ name: "Córdoba", country: "Spain", countryCode: "ES" }, "Córdoba, Spain", "yc_cordoba_es_activities_travelplanner"],
+  [{ name: "Québec", country: "Canada", countryCode: "CA" }, "Québec, Canada", "yc_quebec_ca_activities_travelplanner"],
+  [{ name: "Kraków", country: "Poland", countryCode: "PL" }, "Kraków, Poland", "yc_krakow_pl_activities_travelplanner"],
+  [{ name: "Zürich", country: "Switzerland", countryCode: "CH" }, "Zürich, Switzerland", "yc_zurich_ch_activities_travelplanner"]
 ]) {
   const offer = stay22Offer(city, "activities");
   assert.ok(offer, `Stay22 activities should resolve for ${city.name}`);
@@ -126,8 +127,54 @@ for (const [city, address, campaign] of [
   assert.equal(url.searchParams.get("aid"), "youcity");
   assert.equal(url.searchParams.get("address"), address, `${city.name} activities address should preserve accents`);
   assert.equal(url.searchParams.get("campaign"), campaign);
-  assert.equal(offer.label, `Things to do in ${city.name}`);
+assert.equal(offer.label, `Things to do in ${city.name}`);
 }
+
+const stay22 = context.window.YouCityStay22;
+assert.equal(new URL(stay22.createRoamUrl(affiliate.createContext(granadaCity, "hotels"))).searchParams.has("provider"), false, "Roam defaults to AI routing");
+config.providers.stay22.roam.forceProvider = "booking";
+assert.equal(new URL(stay22.createRoamUrl(affiliate.createContext(granadaCity, "hotels"))).searchParams.get("provider"), "booking");
+config.providers.stay22.roam.forceProvider = "not-a-provider";
+assert.equal(new URL(stay22.createRoamUrl(affiliate.createContext(granadaCity, "hotels"))).searchParams.has("provider"), false, "invalid provider must be ignored");
+config.providers.stay22.roam.excludeProviders = ["vrbo", "expedia", "not-a-provider"];
+assert.equal(new URL(stay22.createRoamUrl(affiliate.createContext(granadaCity, "hotels"))).searchParams.get("excludeproviders"), "vrbo,expedia");
+config.providers.stay22.roam.forceProvider = null;
+config.providers.stay22.roam.excludeProviders = [];
+config.experiments.enabled = true;
+config.experiments.stay22.enabled = true;
+config.experiments.stay22.activeVariant = "stay22_booking";
+const experimentOffer = stay22Offer(granadaCity);
+assert.equal(new URL(experimentOffer.url).searchParams.get("provider"), "booking", "configured experiment should force Booking through Roam");
+assert.equal(experimentOffer.variant, "stay22_booking");
+config.experiments.enabled = false;
+config.experiments.stay22.enabled = false;
+config.experiments.stay22.activeVariant = "stay22_roam";
+
+const searchUrl = stay22.createAccommodationSearchUrl(saoPauloCity, { checkin: "2099-06-10", checkout: "2099-06-15", adults: 2, children: 1 });
+assert.ok(searchUrl, "valid accommodation dates should create a Searchbar URL");
+const searchParams = new URL(searchUrl).searchParams;
+assert.equal(new URL(searchUrl).pathname, "/allez/searchbar");
+assert.equal(searchParams.get("address"), "São Paulo, Brazil");
+assert.equal(searchParams.get("checkin"), "2099-06-10");
+assert.equal(searchParams.get("checkout"), "2099-06-15");
+assert.equal(searchParams.get("adults"), "2");
+assert.equal(searchParams.get("children"), "1");
+assert.equal(searchParams.get("campaign"), "yc_sao-paulo_br_hotel-search_travelplanner");
+assert.equal(stay22.createAccommodationSearchUrl(granadaCity, { checkin: "2020-01-01", checkout: "2020-01-02" }), "", "past dates must be rejected");
+assert.equal(stay22.createAccommodationSearchUrl(granadaCity, { checkin: "2099-06-10", checkout: "2099-06-10" }), "", "same-day stays must be rejected");
+const mapUrl = new URL(stay22.createMapUrl(tokyoCity));
+assert.equal(mapUrl.pathname, "/embed/gm");
+assert.equal(mapUrl.searchParams.get("aid"), "youcity");
+assert.equal(mapUrl.searchParams.get("address"), "Tokyo, Japan");
+assert.equal(mapUrl.searchParams.get("campaign"), "yc_tokyo_jp_hotels_map");
+config.features.stay22.map = false;
+assert.equal(stay22.createMapUrl(tokyoCity), "", "map flag should disable map URLs");
+config.features.stay22.map = true;
+config.features.stay22.activities = false;
+assert.equal(stay22Offer(granadaCity, "activities"), undefined, "activities flag should disable activities");
+config.features.stay22.activities = true;
+assert.equal(stay22Offer(granadaCity, "cars"), undefined, "Stay22 cars remain disabled until confirmed");
+assert.equal(stay22Offer(granadaCity, "flights"), undefined, "Stay22 flights remain disabled until confirmed");
 
 config.providers.stay22.enabled = false;
 assert.equal(stay22Offer(granadaCity), undefined, "disabled Stay22 should be hidden");

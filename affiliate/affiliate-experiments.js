@@ -40,7 +40,16 @@
     }
   };
 
+  function getStay22Routing(context) {
+    const experiment = global.YOUCITY_AFFILIATE_CONFIG?.experiments?.stay22;
+    if (global.YOUCITY_AFFILIATE_CONFIG?.experiments?.enabled !== true || experiment?.enabled !== true) return null;
+    const variant = experiment.activeVariant;
+    const routing = experiment.variants?.[variant];
+    if (!routing || (routing.forceProvider !== null && typeof routing.forceProvider !== "string")) return null;
+    return { variant, forceProvider: routing.forceProvider || null, vertical: context?.vertical || "" };
+  }
+
   global.YouCityAffiliate.registerRankingStrategy("default", defaultRanking);
   global.YouCityAffiliate.registerRankingStrategy("ab-test", abTestRanking);
-  global.YouCityAffiliateExperiments = { defaultRanking, abTestRanking };
+  global.YouCityAffiliateExperiments = { defaultRanking, abTestRanking, getStay22Routing };
 })(window);

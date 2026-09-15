@@ -61,25 +61,30 @@ invented by the application.
 ## Stay22
 
 Stay22 is registered for the `hotels` and `activities` verticals with public
-AID `youcity`. It uses GetYourGuide for activities. The provider builds the
-Stay22 Allez URL dynamically from `city.name` and `city.country`; there is no
-Stay22 destination catalog.
+AID `youcity`. Hotels use `/allez/roam` by default and activities use
+`/allez/getyourguide`. The provider builds links dynamically from city data;
+there is no Stay22 destination catalog.
 
-The endpoints are:
+The same provider module exposes the documented accommodation Searchbar URL
+(`/allez/searchbar`) and Map URL (`/embed/gm`) for the Travel Planner. Search
+dates are validated before URL generation, and the Map iframe is lazy and
+on-demand. Campaigns use
+`yc_{citySlug}_{countryCode}_{vertical}_{placement}` while addresses retain
+real characters and are encoded by `URLSearchParams`.
 
-- `hotels` → `https://www.stay22.com/allez/roam`
-- `activities` → `https://www.stay22.com/allez/getyourguide`
+Stay22 flags are available at `features.stay22` and as provider-local feature
+overrides. `features.providers.stay22` and `providers.stay22.enabled` remain
+supported. Roam remains 100% default; validated `provider` forcing and
+`excludeproviders` are opt-in through `providers.stay22.roam` or the disabled
+Stay22 experiment definitions in `affiliate-experiments.js`.
 
-Each generated link receives a campaign in the form
-`yc_{citySlug}_{countryCode}_{vertical}`. The address retains accents and is
-encoded by `URLSearchParams`; only the campaign uses the shared normalized slug
-helper.
-
-Stay22 can be toggled with `features.providers.stay22` or
-`providers.stay22.enabled`, and its order is controlled by
-`providers.stay22.priority`. It coexists with Expedia, Booking.com and
-Travelpayouts so the existing ranking and experiment mechanisms can compare
-them later.
+Cars and Flights are deliberately not registered as Stay22 offers because the
+current official material does not document enough of the Generator/search
+contract for this UI. DiscoverCars remains the current cars provider. Nova,
+Spark, LinkSwap and Retail are not reimplemented; they depend on the official
+domain-specific Stay22 Script and account rollout. See
+[`stay22-integration.md`](stay22-integration.md) for the status matrix and
+external setup.
 
 ## Verticals
 

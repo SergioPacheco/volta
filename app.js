@@ -334,6 +334,18 @@
     travelDisclosure: $("#travel-disclosure"),
     travelPlannerLocation: $("#travel-planner-location"),
     travelPreviewBadge: $("#travel-preview-badge"),
+    stay22Tools: $("#stay22-tools"),
+    stay22SearchForm: $("#stay22-search-form"),
+    stay22Checkin: $("#stay22-checkin"),
+    stay22Checkout: $("#stay22-checkout"),
+    stay22Adults: $("#stay22-adults"),
+    stay22Children: $("#stay22-children"),
+    stay22SearchStatus: $("#stay22-search-status"),
+    stay22SearchResult: $("#stay22-search-result"),
+    stay22MapButton: $("#stay22-map-button"),
+    stay22MapPanel: $("#stay22-map-panel"),
+    stay22MapClose: $("#stay22-map-close"),
+    stay22MapFrame: $("#stay22-map-frame"),
     cityIndex: $("#city-index"),
     cityTotal: $("#city-total"),
     topLocation: $("#top-location"),
@@ -543,6 +555,52 @@
     return `<article class="travel-category${extraClass}" data-travel-category-card="${escapeHtml(category)}"><div class="travel-category-heading"><span class="travel-category-icon" aria-hidden="true">${categoryInfo.icon}</span><div><strong>${escapeHtml(categoryInfo.label)}</strong><small>${escapeHtml(categoryInfo.description)}</small></div></div><div class="travel-category-actions">${actions}</div></article>`;
   }
 
+  function trackStay22Action(action, extra = {}) {
+    const city = currentCity();
+    affiliate.track({
+      event: `affiliate_${action}`,
+      provider: "stay22",
+      vertical: "hotels",
+      action,
+      city: city.name,
+      country: city.country,
+      countryCode: city.countryCode || "",
+      placement: "travel_planner",
+      ...extra
+    });
+  }
+
+  function destroyStay22Map() {
+    if (elements.stay22MapFrame) elements.stay22MapFrame.replaceChildren();
+    if (elements.stay22MapPanel) elements.stay22MapPanel.hidden = true;
+  }
+
+  function renderStay22Tools(city) {
+    try {
+      const stay22 = window.YouCityStay22;
+      if (!elements.stay22Tools || !stay22) return;
+      destroyStay22Map();
+      const hotelsEnabled = stay22.isEnabled("hotels");
+      elements.stay22Tools.hidden = !hotelsEnabled;
+      if (!hotelsEnabled) return;
+
+      const searchEnabled = stay22.isEnabled("searchbar");
+      const mapEnabled = stay22.isEnabled("map");
+      elements.stay22SearchForm.hidden = !searchEnabled;
+      elements.stay22MapButton.hidden = !mapEnabled;
+      elements.stay22SearchStatus.textContent = "";
+      elements.stay22SearchResult.hidden = true;
+      elements.stay22SearchResult.removeAttribute("href");
+      elements.stay22Checkin.min = stay22.today();
+      elements.stay22Checkout.min = stay22.today();
+      elements.stay22SearchForm.dataset.cityId = city.id;
+    } catch (error) {
+      destroyStay22Map();
+      if (elements.stay22Tools) elements.stay22Tools.hidden = true;
+      if (window.YOUCITY_AFFILIATE_CONFIG?.debug) console.warn("[YouCity Affiliate] Stay22 tools unavailable", error.message);
+    }
+  }
+
   function renderTravelPlanner(city) {
     if (!elements.travelPlanner || !elements.travelPrimary || !elements.travelSecondary) return;
     if (elements.travelPlannerLocation) elements.travelPlannerLocation.textContent = `${city.name} · ${city.country}`;
@@ -555,6 +613,7 @@
     elements.travelDisclosure.textContent = window.YOUCITY_AFFILIATE_CONFIG?.disclosure?.short || "Travel options may include affiliate links.";
     elements.travelPlanner.classList.toggle("is-demo", false);
     elements.travelPreviewBadge.hidden = true;
+    renderStay22Tools(city);
     affiliate.observeImpressions(elements.travelPlanner);
   }
 
@@ -2356,6 +2415,79 @@
       trackTravelClick(offer);
     });
 
+    elements.stay22SearchForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const stay22 = window.YouCityStay22;
+      const city = currentCity();
+      const checkin = elements.stay22Checkin.value;
+      const checkout = elements.stay22Checkout.value;
+      const valid = stay22?.validAccommodationDates(checkin, checkout);
+      if (!valid) {
+        elements.stay22SearchStatus.textContent = "Choose valid dates: today or later, with check-out after check-in.";
+        elements.stay22SearchResult.hidden = true;
+        return;
+      }
+      const url = stay22.createAccommodationSearchUrl(city, {
+        checkin,
+        checkout,
+        adults: elements.stay22Adults.value,
+        children: elements.stay22Children.value
+      }, { placement: "travel_planner" });
+      if (!url) {
+        elements.stay22SearchStatus.textContent = "Stay search is temporarily unavailable.";
+        return;
+      }
+      elements.stay22SearchResult.href = url;
+      elements.stay22SearchResult.hidden = false;
+      elements.stay22SearchResult.dataset.affiliateOffer = "true";
+      elements.stay22SearchResult.dataset.travelProvider = "stay22";
+      elements.stay22SearchResult.dataset.travelVertical = "hotels";
+      elements.stay22SearchResult.dataset.travelCityName = city.name;
+      elements.stay22SearchResult.dataset.travelCountry = city.country;
+      elements.stay22SearchResult.dataset.travelCountryCode = city.countryCode || "";
+      elements.stay22SearchResult.dataset.travelPlacement = "travel_planner";
+      elements.stay22SearchResult.dataset.travelProviderCampaign = new URL(url).searchParams.get("campaign") || "";
+      elements.stay22SearchStatus.textContent = "Search ready.";
+      trackStay22Action("search_submit", {
+        checkinProvided: Boolean(checkin),
+        checkoutProvided: Boolean(checkout),
+        adultsProvided: elements.stay22Adults.value !== "",
+        childrenProvided: elements.stay22Children.value !== ""
+      });
+      elements.stay22SearchResult.focus();
+    });
+
+    elements.stay22SearchResult.addEventListener("click", (event) => {
+      if (!elements.stay22SearchResult.href) return;
+      trackTravelClick(elements.stay22SearchResult);
+      event.stopPropagation();
+    });
+
+    elements.stay22Checkin.addEventListener("change", () => {
+      elements.stay22Checkout.min = elements.stay22Checkin.value || window.YouCityStay22?.today?.() || "";
+    });
+
+    elements.stay22MapButton.addEventListener("click", () => {
+      const city = currentCity();
+      const url = window.YouCityStay22?.createMapUrl(city, { placement: "map" });
+      if (!url) return;
+      destroyStay22Map();
+      const iframe = document.createElement("iframe");
+      iframe.src = url;
+      iframe.loading = "lazy";
+      iframe.title = `Accommodation map for ${city.name}`;
+      iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+      elements.stay22MapFrame.appendChild(iframe);
+      elements.stay22MapPanel.hidden = false;
+      trackStay22Action("map_open", { action: "map" });
+      elements.stay22MapClose.focus();
+    });
+
+    elements.stay22MapClose.addEventListener("click", () => {
+      destroyStay22Map();
+      elements.stay22MapButton.focus();
+    });
+
     elements.closeMapButtons.forEach((button) => {
       button.addEventListener("click", () => closeLayer(elements.mapModal));
     });
@@ -2393,7 +2525,10 @@
     });
 
     elements.closeTravelButtons.forEach((button) => {
-      button.addEventListener("click", () => closeLayer(elements.travelDrawer));
+      button.addEventListener("click", () => {
+        destroyStay22Map();
+        closeLayer(elements.travelDrawer);
+      });
     });
     
     elements.closeAboutButtons.forEach((button) => {
@@ -2586,6 +2721,7 @@
           break;
         case "Escape":
           closeLayer(elements.drawer);
+          destroyStay22Map();
           closeLayer(elements.travelDrawer);
           closeLayer(elements.about);
           closeLayer(elements.mapModal);

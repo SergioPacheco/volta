@@ -60,6 +60,17 @@
       }]
     </script>
     <link rel="stylesheet" href="/styles.css" />
+    <script>
+      (function (s, t, a, y, twenty, two) {
+        s.Stay22 = s.Stay22 || {};
+        s.Stay22.params = { lmaID: '6aa988f40f63b002f3d1083b' };
+        twenty = t.createElement(a);
+        two = t.getElementsByTagName(a)[0];
+        twenty.async = 1;
+        twenty.src = y;
+        two.parentNode.insertBefore(twenty, two);
+      })(window, document, 'script', 'https://scripts.stay22.com/letmeallez.js');
+    </script>
   </head>
   <body>
     <a href="#city-name" class="skip-link">Skip to main content</a>
@@ -334,6 +345,40 @@
               </div>
             </div>
             <div class="travel-primary" id="travel-primary"></div>
+            <section class="stay22-tools" id="stay22-tools" aria-labelledby="stay22-stay-title" hidden>
+              <div class="stay22-tools-heading">
+                <span class="travel-category-icon" aria-hidden="true">🏨</span>
+                <div>
+                  <strong id="stay22-stay-title">Stay in this city</strong>
+                  <small>Search dates or browse the accommodation map</small>
+                </div>
+              </div>
+              <form class="stay22-search" id="stay22-search-form" novalidate>
+                <div class="stay22-date-grid">
+                  <label for="stay22-checkin">Check-in</label>
+                  <label for="stay22-checkout">Check-out</label>
+                  <input id="stay22-checkin" name="checkin" type="date" autocomplete="off" />
+                  <input id="stay22-checkout" name="checkout" type="date" autocomplete="off" />
+                </div>
+                <div class="stay22-guest-grid">
+                  <label for="stay22-adults">Adults <span>(optional)</span></label>
+                  <label for="stay22-children">Children <span>(optional)</span></label>
+                  <input id="stay22-adults" name="adults" type="number" min="1" inputmode="numeric" placeholder="2" />
+                  <input id="stay22-children" name="children" type="number" min="0" inputmode="numeric" placeholder="0" />
+                </div>
+                <button class="stay22-search-button" type="submit">Search stays</button>
+                <p class="stay22-search-status" id="stay22-search-status" role="status" aria-live="polite"></p>
+                <a class="stay22-search-result" id="stay22-search-result" target="_blank" rel="sponsored noopener noreferrer" hidden>Open stay search ↗</a>
+              </form>
+              <button class="stay22-map-button" id="stay22-map-button" type="button">View stays on map</button>
+              <section class="stay22-map-panel" id="stay22-map-panel" aria-labelledby="stay22-map-title" hidden>
+                <div class="stay22-map-header">
+                  <h3 id="stay22-map-title">Stays nearby</h3>
+                  <button class="stay22-map-close" id="stay22-map-close" type="button" aria-label="Close stays map">Close</button>
+                </div>
+                <div class="stay22-map-frame" id="stay22-map-frame"></div>
+              </section>
+            </section>
             <div class="travel-secondary" id="travel-secondary"></div>
             <p class="travel-disclosure" id="travel-disclosure"></p>
           </section>

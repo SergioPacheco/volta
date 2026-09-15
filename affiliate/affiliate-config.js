@@ -72,6 +72,15 @@ window.YOUCITY_AFFILIATE_CONFIG = {
       airalo: true,
       heymondo: true,
       stay22: true
+    },
+    stay22: {
+      hotels: true,
+      activities: true,
+      searchbar: true,
+      map: true,
+      cars: false,
+      flights: false,
+      script: false
     }
   },
   providers: {
@@ -131,7 +140,36 @@ window.YOUCITY_AFFILIATE_CONFIG = {
       configured: true,
       priority: 100,
       verticals: ["hotels", "activities"],
-      aid: "youcity"
+      aid: "youcity",
+      // Public integration switches. Cars and flights stay off until their
+      // documented Allez construction contract is confirmed for this UI.
+      features: {
+        hotels: true,
+        activities: true,
+        searchbar: true,
+        map: true,
+        cars: false,
+        flights: false,
+        script: false
+      },
+      roam: {
+        forceProvider: null,
+        excludeProviders: []
+      },
+      stay22Automation: {
+        scriptInstalled: false,
+        nova: "managed-by-stay22",
+        spark: "managed-by-stay22",
+        linkSwap: "managed-by-stay22"
+      },
+      connectedTrips: true,
+      retail: "account-controlled",
+      status: {
+        cars: "NEEDS_EXTERNAL_CONFIGURATION",
+        flights: "NEEDS_EXTERNAL_CONFIGURATION",
+        script: "AWAITING_STAY22_SCRIPT",
+        retail: "UNKNOWN"
+      }
     }
   },
   ranking: {
@@ -139,7 +177,17 @@ window.YOUCITY_AFFILIATE_CONFIG = {
   },
   experiments: {
     enabled: false,
-    byVertical: {}
+    byVertical: {},
+    // Stay22 routing experiments are opt-in. The default remains 100% Roam.
+    stay22: {
+      enabled: false,
+      activeVariant: "stay22_roam",
+      variants: {
+        stay22_roam: { forceProvider: null },
+        stay22_booking: { forceProvider: "booking" },
+        stay22_expedia: { forceProvider: "expedia" }
+      }
+    }
   }
 };
 
